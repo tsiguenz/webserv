@@ -6,7 +6,7 @@
 #    By: tsiguenz <tsiguenz@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 17:55:43 by tsiguenz          #+#    #+#              #
-#    Updated: 2022/10/06 17:46:30 by tsiguenz         ###   ########.fr        #
+#    Updated: 2022/10/07 18:15:33 by tsiguenz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,7 @@ $(OBJ_PATH)%.o: $(SRC_PATH)%.cpp
 all: $(NAME)
 
 # Test rule
-t:
+test:
 	$(CC) $(FLAGS) $(INC) -D __IS_TEST__ $(TEST_SRC) $(SRC) -o $(TEST_NAME)
 
 clean:
@@ -52,4 +52,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re test
