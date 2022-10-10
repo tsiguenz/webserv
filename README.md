@@ -109,6 +109,8 @@ Basic use case of a server is to open socket, bind the socket with his IP and po
 
 The client need to open a socket, connect to the server and he can read/write data from the socket using recv and sent.
 
+### Blocking socket
+
 ---
 
 ## CGI

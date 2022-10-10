@@ -6,7 +6,7 @@
 #    By: tsiguenz <tsiguenz@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 17:55:43 by tsiguenz          #+#    #+#              #
-#    Updated: 2022/10/07 18:15:33 by tsiguenz         ###   ########.fr        #
+#    Updated: 2022/10/10 11:26:56 by tsiguenz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ OBJ_PATH = obj/
 TEST_PATH = test/
 INC = -Iinclude
 
-SRC_NAME = main.cpp max.cpp
+SRC_NAME = main.cpp utils.cpp
 TEST_SRC_NAME = test_main.cpp
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 
