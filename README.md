@@ -38,7 +38,9 @@ HTTP ([Hypertext Transfer Protocol](https://en.wikipedia.org/wiki/Hypertext_Tran
 HTTP message consist of:
 - **A start line**: HTTP request contain the HTTP method, a request target and a string indicate the HTTP version. HTTP response contain the HTTP version of the server, a status code and optionnaly a description of the status code.
 - **A header fields**: A list of key value that contain metadata about the HTTP connection and message. Each file is on a single line and have the format ```field_name: field_value```.
-- **Message body**: Optionnal section of bytes, often present in HTTP response from the server and sometimes in the request. It can have any format.
+- **Body**: Optionnal section of bytes, often present in HTTP response from the server and sometimes in the request. It can have any format.
+
+![HTTP](images/HTTP.png)
 
 ### HTTP Request
 
