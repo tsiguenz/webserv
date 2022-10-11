@@ -1,15 +1,16 @@
 #include "Server.hpp"
 
-Server::Server(int const& port): _port(port) {
-	try {
-		_initVirtualServer();
-	} catch (std::exception const& e)
-	{ std::cerr << e.what(); }
+Server::Server(int const& port) {
+	(void) port;
+	_initVirtualServer(8080);
+// not working with 2 virtual server
+//	_initVirtualServer(4242);
 }
 
 Server::~Server() {
 	close(_epFd);
-	close(_fdServer);
+	for (std::vector<int>::iterator it = _fdServer.begin(); it < _fdServer.end(); it++)
+		close(*it);
 }
 
 void	Server::run() {
@@ -25,18 +26,26 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 	for (int i = 0; i < nbEpollFd; i++) {
 		epoll_event	currentEvent = _events[i];
 		// Server case
-		if (currentEvent.data.fd == _fdServer)
-			_newConnection();
+		if (_isServer(currentEvent.data.fd) == 1)
+			_newConnection(currentEvent.data.fd);
 		// Client case
-		if (currentEvent.data.fd != _fdServer) {
+		if (_isServer(currentEvent.data.fd) == 0) {
 			_parseRequest(currentEvent);
 			_sendResponse(currentEvent);
 		}
 	}
 }
 
-void	Server::_newConnection() const {
-	int	clientSocket = accept(_fdServer, (sockaddr *) NULL, NULL);
+int	Server::_isServer(int const& fd) const {
+	std::vector<int>::const_iterator	it = _fdServer.begin();
+	for (; it < _fdServer.end(); it++)
+		if (*it == fd)
+			return 1;
+	return 0;
+}
+
+void	Server::_newConnection(int const& fd) const {
+	int	clientSocket = accept(fd, (sockaddr *) NULL, NULL);
 	if (clientSocket == -1)
 		throw std::runtime_error("error in accept()\n");
 	_addEvent(clientSocket, EPOLLIN);
@@ -62,27 +71,29 @@ void	Server::_sendResponse(epoll_event const& event) const {
 	close(event.data.fd);
 }
 
-void	Server::_initVirtualServer() {
+void	Server::_initVirtualServer(int const& port) {
 	sockaddr_in	my_addr;
 	int			on = 1;
 
 	bzero(&my_addr, sizeof(sockaddr_in));
 	my_addr.sin_family = AF_INET;
-	my_addr.sin_port = htons(_port);
+	my_addr.sin_port = htons(port);
 	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bzero(&(my_addr.sin_zero), 8);
-	_fdServer = socket(AF_INET, SOCK_STREAM, 0);
-	if (_fdServer == -1)
+	int	newFd = socket(AF_INET, SOCK_STREAM, 0);
+	_setNonBlocking(newFd);
+	if (newFd == -1)
 		throw std::runtime_error("error in _initServer::socket()\n");
-	if (setsockopt(_fdServer, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) == -1)
+	if (setsockopt(newFd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) == -1)
 		throw std::runtime_error("error in _initServer::socketopt()\n");
-	if (bind(_fdServer, (sockaddr *) &my_addr, sizeof(sockaddr)) == -1)
+	if (bind(newFd, (sockaddr *) &my_addr, sizeof(sockaddr)) == -1)
 		throw std::runtime_error("error in _initServer::bind()\n");
-	if (listen(_fdServer, BACKLOG) == -1)
+	if (listen(newFd, BACKLOG) == -1)
 		throw std::runtime_error("error in _initServer::listen()\n");
 	if ((_epFd = epoll_create(1)) == -1)
 		throw std::runtime_error("error in _initServer::epol_create()\n");
-	_addEvent(_fdServer, EPOLLIN);
+	_addEvent(newFd, EPOLLIN);
+	_fdServer.push_back(newFd);
 }
 
 void	Server::_addEvent(int const& fd, long const& events) const {
@@ -98,7 +109,7 @@ void	Server::_addEvent(int const& fd, long const& events) const {
 void	Server::_modEvent(int const& fd, long const& events) const {
 	epoll_event	ev;
 
-	bzero(&ev, sizeof(epoll_event));
+	//bzero(&ev, sizeof(epoll_event));
 	ev.data.fd = fd;
 	ev.events = events;
 	if (epoll_ctl(_epFd, EPOLL_CTL_MOD, fd, &ev) == -1)
@@ -108,4 +119,10 @@ void	Server::_modEvent(int const& fd, long const& events) const {
 void	Server::_delEvent(int const& fd) const {
 	if (epoll_ctl(_epFd, EPOLL_CTL_DEL, fd, NULL) == -1)
 		throw std::runtime_error("error in _delEvent::epol_ctl()\n");
+}
+
+// TODO protect fcntl
+void	Server::_setNonBlocking(int const& fd) const {
+	int oldFlags = fcntl(fd, F_GETFL, 0);
+	fcntl(fd, F_SETFL, oldFlags | O_NONBLOCK);
 }

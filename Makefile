@@ -14,7 +14,7 @@ NAME = webserv
 TEST_NAME = $(NAME)_test
 
 CC = c++
-FLAGS = -g3 -Wall -Wextra -Werror -std=c++98
+FLAGS = -g3 -fsanitize=address -Wall -Wextra -Werror -std=c++98
 
 SRC_PATH = src/
 OBJ_PATH = obj/

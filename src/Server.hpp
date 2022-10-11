@@ -21,22 +21,24 @@ class Server {
 
 	private:
 		// TODO create struct for that to handle multiple virtual servers
-		int	const	_port;
-		int			_fdServer;
-		int			_epFd;
-		epoll_event	_events[EVENTS_MAX];
+		std::vector<int>	_fdServer;
+		int					_epFd;
+		epoll_event			_events[EVENTS_MAX];
 
 		// Initialize new socket (fd) who can listen on a specific port
-		void	_initVirtualServer();
+		void	_initVirtualServer(int const& port);
 		void	_addEvent(int const& fd, long const& events) const;
 		void	_modEvent(int const& fd, long const& events) const;
 		void	_delEvent(int const& fd) const;
+		int		_isServer(int const& fd) const;
 
 		// Main loop who handle I/O events
-		void	_newConnection() const;
+		void	_newConnection(int const& fd) const;
 		void	_handleEvent(int const& nbEpollFd) const;
 		void	_parseRequest(epoll_event const& event) const;
 		void	_sendResponse(epoll_event const& event) const;
+
+		void	_setNonBlocking(int const& fd) const;
 };
 
 #endif // SERVER_HPP
