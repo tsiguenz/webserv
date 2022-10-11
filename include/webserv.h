@@ -18,7 +18,4 @@
 
 # include "Server.hpp"
 
-void	ft_exit(std::string str, int ret);
-void	ft_exit(std::string str, int ret, int serverSocket);
-
 #endif // WEBSERV_H

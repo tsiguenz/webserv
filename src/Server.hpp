@@ -3,35 +3,40 @@
 
 # include "webserv.h"
 
-# define BUFFER_SIZE 1064 * 128
-# define EVENTS_MAX 100
+# define BUFFER_SIZE 1024 // ?
+# define EVENTS_MAX 1000 // ?
 # define BACKLOG 10
 # define DUMMY_RESPONSE "HTTP/1.1 200 OK\nServer: test\nContent-Lenght: 13\nContent-Type: text/html\n\n<H1>webserv</H1>\n"
 
 class Server {
-public:
-	typedef struct epoll_event	epoll_event;
-	typedef struct sockaddr_in	sockaddr_in;
-	typedef struct sockaddr		sockaddr;
+	public:
+		typedef struct epoll_event	epoll_event;
+		typedef struct sockaddr_in	sockaddr_in;
+		typedef struct sockaddr		sockaddr;
 
-	// TODO change that for the struct returned by the parsing of file config
-	Server(int const& port);
+		// TODO change that for the struct returned by the parsing of file config
+		Server(int const& port);
+		virtual ~Server();
+		void	run();
 
-	virtual ~Server();
+	private:
+		// TODO create struct for that to handle multiple virtual servers
+		int	const	_port;
+		int			_fdServer;
+		int			_epFd;
+		epoll_event	_events[EVENTS_MAX];
 
-	void	run();
+		// Initialize new socket (fd) who can listen on a specific port
+		void	_initVirtualServer();
+		void	_addEvent(int const& fd, long const& events) const;
+		void	_modEvent(int const& fd, long const& events) const;
+		void	_delEvent(int const& fd) const;
 
-private:
-	// TODO create struct for that to handle multiple ports
-	int _port; // const ?
-	int	_epFd; // const ?
-	int _fdServer; // const ?
-	epoll_event	_events[EVENTS_MAX];
-
-	void	_initServer();
-	void	_addEvent(int& fd, long events);
-	void	_modEvent(int& fd, long events);
-	void	_delEvent(int& fd);
+		// Main loop who handle I/O events
+		void	_newConnection() const;
+		void	_handleEvent(int const& nbEpollFd) const;
+		void	_parseRequest(epoll_event const& event) const;
+		void	_sendResponse(epoll_event const& event) const;
 };
 
 #endif // SERVER_HPP
