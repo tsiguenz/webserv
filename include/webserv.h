@@ -14,10 +14,9 @@
 # include <arpa/inet.h>		// inet_addr()
 # include <iostream>
 # include <vector>
+# include <stdexcept>
 
-typedef struct epoll_event	epoll_event;
-typedef struct sockaddr_in	sockaddr_in;
-typedef struct sockaddr		sockaddr;
+# include "Server.hpp"
 
 void	ft_exit(std::string str, int ret);
 void	ft_exit(std::string str, int ret, int serverSocket);

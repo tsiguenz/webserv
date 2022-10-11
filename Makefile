@@ -6,7 +6,7 @@
 #    By: tsiguenz <tsiguenz@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 17:55:43 by tsiguenz          #+#    #+#              #
-#    Updated: 2022/10/10 11:26:56 by tsiguenz         ###   ########.fr        #
+#    Updated: 2022/10/11 18:31:11 by tsiguenz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,9 +19,9 @@ FLAGS = -g3 -Wall -Wextra -Werror -std=c++98
 SRC_PATH = src/
 OBJ_PATH = obj/
 TEST_PATH = test/
-INC = -Iinclude
+INC = -Iinclude -Isrc
 
-SRC_NAME = main.cpp utils.cpp
+SRC_NAME = main.cpp utils.cpp Server.cpp
 TEST_SRC_NAME = test_main.cpp
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 
