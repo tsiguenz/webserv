@@ -5,9 +5,8 @@ void	ft_exit(std::string str, int ret) {
 	exit(ret);
 }
 
-void	ft_exit(std::string str, int ret, std::vector<int> socketFd) {
+void	ft_exit(std::string str, int ret, int serverSocket) {
 	std::cerr << str;
-	for (std::vector<int>::iterator it = socketFd.begin(); it != socketFd.end(); it++)
-		close(*it);
+	close(serverSocket);
 	exit(ret);
 }

@@ -1,9 +1,10 @@
 .obsidian
 obj
 *.swp
+*.swo
 .DS_Store
 tags
-*.nfs
+.nfs*
 webserv
 webserv_test
 log

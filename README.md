@@ -111,6 +111,8 @@ The client need to open a socket, connect to the server and he can read/write da
 
 ### Blocking socket
 
+We use [epoll](https://embetronicx.com/tutorials/linux/device-drivers/epoll-in-linux-device-driver/) API to monitor multiple file descriptor to see if I/O are ready on them.
+
 ---
 
 ## CGI
