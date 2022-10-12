@@ -24,10 +24,12 @@ class Server {
 	private:
 		// TODO create struct for that to handle multiple virtual servers
 		std::vector<int>	_fdsServer;
-		// keep alive need to store clients for next I/O operations
+		// TODO keep alive need to store clients for next I/O operations
 		std::vector<int>	_fdsClient;
 		int					_epFd;
 		epoll_event			_events[EVENTS_MAX];
+
+		void	_initEpoll();
 
 		// Initialize new socket (fd) who can listen on a specific port
 		void	_initVirtualServer(int const& port);

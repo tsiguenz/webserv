@@ -2,10 +2,9 @@
 
 Server::Server(int const& port) {
 	(void) port;
-	if ((_epFd = epoll_create(1)) == -1)
-		throw std::runtime_error("error in epoll_create()\n");
-	_initVirtualServer(8080);
-	_initVirtualServer(8081);
+	_initEpoll();
+	_initVirtualServer(1024);
+	_initVirtualServer(1025);
 }
 
 Server::~Server() {
@@ -32,6 +31,11 @@ std::vector<int>	Server::getFdsServer() const {
 
 std::vector<int>	Server::getFdsclient() const {
 	return _fdsClient;
+}
+
+void	Server::_initEpoll() {
+	if ((_epFd = epoll_create(1)) == -1)
+		throw std::runtime_error("error in epoll_create()\n");
 }
 
 void	Server::_handleEvent(int const& nbEpollFd) const {

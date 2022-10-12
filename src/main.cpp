@@ -12,6 +12,9 @@ int	main(int argc, char **argv) {
 		std::cerr << "Parse config file: " << argv[1] << std::endl;
 	// create server and run it
 	try {
+		signal(SIGINT, signalHandler); // CTRL / C
+		signal(SIGQUIT, SIG_IGN); // CTRL / backslash
+		signal(SIGTSTP, SIG_IGN); // CTRL / Z
 		Server	serv(8080);
 
 		serv.run();

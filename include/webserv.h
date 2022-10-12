@@ -13,9 +13,12 @@
 # include <netinet/in.h>	// struct sockaddr_in
 # include <arpa/inet.h>		// inet_addr()
 # include <iostream>
+# include <csignal>			// signal()
 # include <vector>
 # include <stdexcept>
 
 # include "Server.hpp"
+
+void	signalHandler(int sig);
 
 #endif // WEBSERV_H
