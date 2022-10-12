@@ -2,15 +2,19 @@
 
 Server::Server(int const& port) {
 	(void) port;
+	if ((_epFd = epoll_create(1)) == -1)
+		throw std::runtime_error("error in epoll_create()\n");
 	_initVirtualServer(8080);
-// not working with 2 virtual server
-//	_initVirtualServer(4242);
+	_initVirtualServer(8081);
 }
 
 Server::~Server() {
-	close(_epFd);
-	for (std::vector<int>::iterator it = _fdServer.begin(); it < _fdServer.end(); it++)
+	std::vector<int>::const_iterator	it = _fdsServer.begin();
+	std::vector<int>::const_iterator	end = _fdsServer.end();
+	for (; it != end; it++)
 		close(*it);
+	close(_epFd);
+	std::cerr << "destructor called\n";
 }
 
 void	Server::run() {
@@ -22,26 +26,35 @@ void	Server::run() {
 	}
 }
 
+std::vector<int>	Server::getFdsServer() const {
+	return _fdsServer;
+}
+
+std::vector<int>	Server::getFdsclient() const {
+	return _fdsClient;
+}
+
 void	Server::_handleEvent(int const& nbEpollFd) const {
 	for (int i = 0; i < nbEpollFd; i++) {
 		epoll_event	currentEvent = _events[i];
-		// Server case
-		if (_isServer(currentEvent.data.fd) == 1)
+		if (currentEvent.events & EPOLLERR)
+			throw std::runtime_error("error EPOLLERR\n");
+		else if (_isServer(currentEvent.data.fd) == true)
 			_newConnection(currentEvent.data.fd);
-		// Client case
-		if (_isServer(currentEvent.data.fd) == 0) {
+		else if (_isServer(currentEvent.data.fd) == false) {
 			_parseRequest(currentEvent);
 			_sendResponse(currentEvent);
 		}
 	}
 }
 
-int	Server::_isServer(int const& fd) const {
-	std::vector<int>::const_iterator	it = _fdServer.begin();
-	for (; it < _fdServer.end(); it++)
+bool	Server::_isServer(int const& fd) const {
+	std::vector<int>::const_iterator	it = _fdsServer.begin();
+	std::vector<int>::const_iterator	end = _fdsServer.end();
+	for (; it != end; it++)
 		if (*it == fd)
-			return 1;
-	return 0;
+			return true;
+	return false;
 }
 
 void	Server::_newConnection(int const& fd) const {
@@ -68,7 +81,11 @@ void	Server::_sendResponse(epoll_event const& event) const {
 	// TODO: construct HTTP response
 	std::string	str = DUMMY_RESPONSE;
 	send(event.data.fd, str.c_str(), str.size(), 0);
-	close(event.data.fd);
+	// if keep alive else defautl
+	if (0)
+		_modEvent(event.data.fd, EPOLLIN);
+	else
+		close(event.data.fd);
 }
 
 void	Server::_initVirtualServer(int const& port) {
@@ -81,19 +98,17 @@ void	Server::_initVirtualServer(int const& port) {
 	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bzero(&(my_addr.sin_zero), 8);
 	int	newFd = socket(AF_INET, SOCK_STREAM, 0);
-	_setNonBlocking(newFd);
 	if (newFd == -1)
 		throw std::runtime_error("error in _initServer::socket()\n");
+	_setNonBlocking(newFd);
 	if (setsockopt(newFd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &on, sizeof(int)) == -1)
 		throw std::runtime_error("error in _initServer::socketopt()\n");
 	if (bind(newFd, (sockaddr *) &my_addr, sizeof(sockaddr)) == -1)
 		throw std::runtime_error("error in _initServer::bind()\n");
 	if (listen(newFd, BACKLOG) == -1)
 		throw std::runtime_error("error in _initServer::listen()\n");
-	if ((_epFd = epoll_create(1)) == -1)
-		throw std::runtime_error("error in _initServer::epol_create()\n");
 	_addEvent(newFd, EPOLLIN);
-	_fdServer.push_back(newFd);
+	_fdsServer.push_back(newFd);
 }
 
 void	Server::_addEvent(int const& fd, long const& events) const {
@@ -109,7 +124,7 @@ void	Server::_addEvent(int const& fd, long const& events) const {
 void	Server::_modEvent(int const& fd, long const& events) const {
 	epoll_event	ev;
 
-	//bzero(&ev, sizeof(epoll_event));
+	bzero(&ev, sizeof(epoll_event));
 	ev.data.fd = fd;
 	ev.events = events;
 	if (epoll_ctl(_epFd, EPOLL_CTL_MOD, fd, &ev) == -1)
@@ -124,5 +139,6 @@ void	Server::_delEvent(int const& fd) const {
 // TODO protect fcntl
 void	Server::_setNonBlocking(int const& fd) const {
 	int oldFlags = fcntl(fd, F_GETFL, 0);
-	fcntl(fd, F_SETFL, oldFlags | O_NONBLOCK);
+	if (oldFlags == -1 || fcntl(fd, F_SETFL, oldFlags | O_NONBLOCK) == -1)
+		throw std::runtime_error("error in _setNonBlocking::fcntl()\n");
 }

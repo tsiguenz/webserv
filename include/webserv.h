@@ -6,7 +6,7 @@
 # include <unistd.h>		// close()
 # include <stdlib.h>		// exit()
 # include <strings.h>		// bzero()
-# include <fcntl.h>		// bzero()
+# include <fcntl.h>			// bzero()
 # include <sys/socket.h> 	// socket(), bind()
 # include <sys/types.h>		// exit()
 # include <sys/epoll.h>		// epoll()

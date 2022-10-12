@@ -6,7 +6,7 @@
 #    By: tsiguenz <tsiguenz@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/09 17:55:43 by tsiguenz          #+#    #+#              #
-#    Updated: 2022/10/11 18:31:11 by tsiguenz         ###   ########.fr        #
+#    Updated: 2022/10/12 10:24:00 by tsiguenz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = webserv
 TEST_NAME = $(NAME)_test
 
 CC = c++
-FLAGS = -g3 -fsanitize=address -Wall -Wextra -Werror -std=c++98
+FLAGS = -g3 -Wall -Wextra -Werror -std=c++98
 
 SRC_PATH = src/
 OBJ_PATH = obj/

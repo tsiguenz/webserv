@@ -18,10 +18,14 @@ class Server {
 		Server(int const& port);
 		virtual ~Server();
 		void	run();
+		std::vector<int>	getFdsServer() const;
+		std::vector<int>	getFdsclient() const;
 
 	private:
 		// TODO create struct for that to handle multiple virtual servers
-		std::vector<int>	_fdServer;
+		std::vector<int>	_fdsServer;
+		// keep alive need to store clients for next I/O operations
+		std::vector<int>	_fdsClient;
 		int					_epFd;
 		epoll_event			_events[EVENTS_MAX];
 
@@ -30,7 +34,7 @@ class Server {
 		void	_addEvent(int const& fd, long const& events) const;
 		void	_modEvent(int const& fd, long const& events) const;
 		void	_delEvent(int const& fd) const;
-		int		_isServer(int const& fd) const;
+		bool	_isServer(int const& fd) const;
 
 		// Main loop who handle I/O events
 		void	_newConnection(int const& fd) const;
