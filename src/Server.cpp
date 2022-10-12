@@ -13,7 +13,6 @@ Server::~Server() {
 	for (; it != end; it++)
 		close(*it);
 	close(_epFd);
-	std::cerr << "destructor called\n";
 }
 
 void	Server::run() {
@@ -36,6 +35,13 @@ std::vector<int>	Server::getFdsclient() const {
 void	Server::_initEpoll() {
 	if ((_epFd = epoll_create(1)) == -1)
 		throw std::runtime_error("error in epoll_create()\n");
+}
+
+
+void	Server::_setNonBlocking(int const& fd) const {
+	int oldFlags = fcntl(fd, F_GETFL, 0);
+	if (oldFlags == -1 || fcntl(fd, F_SETFL, oldFlags | O_NONBLOCK) == -1)
+		throw std::runtime_error("error in _setNonBlocking::fcntl()\n");
 }
 
 void	Server::_handleEvent(int const& nbEpollFd) const {
@@ -138,11 +144,4 @@ void	Server::_modEvent(int const& fd, long const& events) const {
 void	Server::_delEvent(int const& fd) const {
 	if (epoll_ctl(_epFd, EPOLL_CTL_DEL, fd, NULL) == -1)
 		throw std::runtime_error("error in _delEvent::epol_ctl()\n");
-}
-
-// TODO protect fcntl
-void	Server::_setNonBlocking(int const& fd) const {
-	int oldFlags = fcntl(fd, F_GETFL, 0);
-	if (oldFlags == -1 || fcntl(fd, F_SETFL, oldFlags | O_NONBLOCK) == -1)
-		throw std::runtime_error("error in _setNonBlocking::fcntl()\n");
 }

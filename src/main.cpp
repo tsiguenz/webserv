@@ -10,13 +10,12 @@ int	main(int argc, char **argv) {
 	// parse file
 	if (argc == 2)
 		std::cerr << "Parse config file: " << argv[1] << std::endl;
-	// create server and run it
 	try {
-		signal(SIGINT, signalHandler); // CTRL / C
-		signal(SIGQUIT, SIG_IGN); // CTRL / backslash
-		signal(SIGTSTP, SIG_IGN); // CTRL / Z
 		Server	serv(8080);
 
+		signal(SIGINT, signalHandler);
+		signal(SIGQUIT, SIG_IGN);
+		signal(SIGTSTP, SIG_IGN);
 		serv.run();
 	} catch (std::exception const& e) {
 		std::cerr << e.what();

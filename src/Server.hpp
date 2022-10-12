@@ -22,7 +22,7 @@ class Server {
 		std::vector<int>	getFdsclient() const;
 
 	private:
-		// TODO create struct for that to handle multiple virtual servers
+		// TODO replace by class Parser
 		std::vector<int>	_fdsServer;
 		// TODO keep alive need to store clients for next I/O operations
 		std::vector<int>	_fdsClient;
@@ -33,6 +33,7 @@ class Server {
 
 		// Initialize new socket (fd) who can listen on a specific port
 		void	_initVirtualServer(int const& port);
+		void	_setNonBlocking(int const& fd) const;
 		void	_addEvent(int const& fd, long const& events) const;
 		void	_modEvent(int const& fd, long const& events) const;
 		void	_delEvent(int const& fd) const;
@@ -43,8 +44,6 @@ class Server {
 		void	_handleEvent(int const& nbEpollFd) const;
 		void	_parseRequest(epoll_event const& event) const;
 		void	_sendResponse(epoll_event const& event) const;
-
-		void	_setNonBlocking(int const& fd) const;
 };
 
 #endif // SERVER_HPP
