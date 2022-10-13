@@ -8,8 +8,9 @@ int	main(int argc, char **argv) {
 		return EXIT_FAILURE;
 	}
 	// parse file
-	if (argc == 2)
+	if (argc == 2) {
 		std::cerr << "Parse config file: " << argv[1] << std::endl;
+	}
 	try {
 		Server	serv(8080);
 

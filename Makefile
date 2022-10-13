@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: tsiguenz <tsiguenz@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/05/09 17:55:43 by tsiguenz          #+#    #+#              #
-#    Updated: 2022/10/12 10:24:00 by tsiguenz         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = webserv
 TEST_NAME = $(NAME)_test
 
@@ -20,9 +8,18 @@ SRC_PATH = src/
 OBJ_PATH = obj/
 TEST_PATH = test/
 INC = -Iinclude -Isrc
+TEST_INC = -Itest/include
 
-SRC_NAME = main.cpp utils.cpp Server.cpp
-TEST_SRC_NAME = test_main.cpp
+SRC_NAME = 	main.cpp \
+			utils.cpp \
+			Server.cpp \
+			ConfigParser.cpp \
+			VirtualServer.cpp \
+			Location.cpp \
+
+TEST_SRC_NAME = test_main.cpp \
+				config_parser/config_parser_tests.cpp \
+
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 
 OBJ = $(addprefix $(OBJ_PATH), $(OBJ_NAME))
@@ -42,7 +39,8 @@ all: $(NAME)
 
 # Test rule
 test:
-	$(CC) $(FLAGS) $(INC) -D __IS_TEST__ $(TEST_SRC) $(SRC) -o $(TEST_NAME)
+	@$(CC) $(FLAGS) $(INC) $(TEST_INC) -D __IS_TEST__ $(TEST_SRC) $(SRC) -o $(TEST_NAME)
+	@./$(TEST_NAME)
 
 clean:
 	rm -rf obj

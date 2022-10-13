@@ -2,7 +2,6 @@
 # define WEBSERV_H
 
 # include <errno.h>
-
 # include <unistd.h>		// close()
 # include <stdlib.h>		// exit()
 # include <strings.h>		// bzero()
@@ -18,6 +17,7 @@
 # include <stdexcept>
 
 # include "Server.hpp"
+# include "ConfigParser.hpp"
 
 void	signalHandler(int sig);
 
