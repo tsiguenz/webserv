@@ -56,24 +56,51 @@ server {
 
 ### Location
 
-Location is another block (in a server block) where we can apply other directives.
+Location is another block (in a server block) where we can apply directives for a specific URI.
 
 Each location block start like that:
 ```
-location [modifier] [URI] {
+location [URI] {
 	// Directives
 }
 ```
 
-- Mothods allowed
+- Methods allowed
 	```
 	methods GET POST DELETE;
 	```
 
-- Default file (when request is derectory)
+- Define HTTP redirection
+	```
+	return 301 /html/index.html
+	```
+
+- Root (if the file searched is index.html, it is rooted to /tmp/www/index.html)
+	```
+	root /tmp/www
+	```
+
+- Directory listing
+	```
+	autoindex on;
+	autoindex off;
+	```
+
+- Default file (when request is directory)
 	```
 	index index.html;
 	```
+
+- Execute CGI with certain file extension
+	```
+	cgi-allowed-ext .php .py
+	```
+
+- Directory for the uploaded file
+	```
+	upload-path /download
+	```
+
 ---
 
 ## Intro

@@ -4,7 +4,7 @@ Server::Server(int const& port) {
 	(void) port;
 	_initEpoll();
 	_initVirtualServer(1024);
-	_initVirtualServer(1025);
+//	_initVirtualServer(1025);
 }
 
 Server::~Server() {
@@ -105,7 +105,7 @@ void	Server::_initVirtualServer(int const& port) {
 	bzero(&my_addr, sizeof(sockaddr_in));
 	my_addr.sin_family = AF_INET;
 	my_addr.sin_port = htons(port);
-	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_addr.s_addr = /*htonl(INADDR_ANY); // */htonl(inet_addr("0.0.0.0"));
 	bzero(&(my_addr.sin_zero), 8);
 	int	newFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (newFd == -1)
