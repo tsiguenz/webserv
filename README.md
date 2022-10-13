@@ -18,10 +18,62 @@ Run the dev test:
 
 ---
 
-## Configuration file format
+## Configuration file
 
-???
+Virtual server contain multiple directive like server name, port used to listen, default error page and so forth.
 
+Each virtual server is defined by a server block who start like that:
+```
+server {
+	// Directives
+}
+```
+
+### Directives
+
+- Server name
+	```
+	server_name blabla.com;
+	```
+
+- Listen (IP and port)
+	```
+	listen 1024;
+	listen localhost:1025;
+	listen localhost;
+	```
+
+- Error page
+	```
+	error_page 404 /404.html;
+	error_page 500 502 /50x.html;
+	```
+
+- Client max body size (limit the body size)
+	```
+	client_max_body_size 1024;
+	```
+
+### Location
+
+Location is another block (in a server block) where we can apply other directives.
+
+Each location block start like that:
+```
+location [modifier] [URI] {
+	// Directives
+}
+```
+
+- Mothods allowed
+	```
+	methods GET POST DELETE;
+	```
+
+- Default file (when request is derectory)
+	```
+	index index.html;
+	```
 ---
 
 ## Intro
@@ -136,3 +188,4 @@ CGI ([Common Gateway Interface](https://en.wikipedia.org/wiki/Common_Gateway_Int
 - [Guide to network programming](https://beej.us/guide/bgnet/)
 - [Difference between pipe and socket](https://www.baeldung.com/cs/pipes-vs-sockets)
 - [Understand CGI programing](http://www.whizkidtech.redprince.net/cgi-bin/tutorial)
+- [nginx location block](https://www.digitalocean.com/community/tutorials/nginx-location-directive)
