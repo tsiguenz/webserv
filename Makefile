@@ -7,15 +7,16 @@ FLAGS = -g3 -Wall -Wextra -Werror -std=c++98
 SRC_PATH = src/
 OBJ_PATH = obj/
 TEST_PATH = test/
-INC = -Iinclude -Isrc
+INC = -Iinclude -Isrc -Isrc/ParseConfig
 TEST_INC = -Itest/include
 
 SRC_NAME = 	main.cpp \
-			utils.cpp \
 			Server.cpp \
-			ConfigParser.cpp \
-			VirtualServer.cpp \
-			Location.cpp \
+			utils.cpp \
+			# Parse configuration file
+			ParseConfig/ConfigParser.cpp \
+			ParseConfig/VirtualServer.cpp \
+			ParseConfig/Location.cpp \
 
 TEST_SRC_NAME = test_main.cpp \
 				config_parser/config_parser_tests.cpp \
