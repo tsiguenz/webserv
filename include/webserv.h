@@ -15,9 +15,11 @@
 # include <iostream>
 # include <csignal>			// signal()
 # include <vector>
+# include <map>
 # include <stdexcept>
 
 # include "Server.hpp"
+# include "Request.hpp"
 
 void	signalHandler(int sig);
 

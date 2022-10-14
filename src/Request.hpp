@@ -10,19 +10,29 @@ class Request
 		Request(std::string const & toParse);
 		~Request();
 
+		//full unparsed request
+		std::string rawRequest;
 
-	private:
-		std::string raw; //the full unparsed request
+		//requestLine
+		std::string method; // GET POST OR DELETE
+		std::string url;
+		std::string	httpVersion;
+
+		//fieldLines
+		std::map<std::string, std::string> fieldLines;
 		
-		std::string type; // GET POST OR DELETE
-		std::string	Host;
-		std::string	Accepted_format;
-		std::string	Connection;
+		bool		badRequest;
 
-
-		static long Request_ID; //? use to identify the Request, maybe make it a tab of longs
+		long	getId(void) const;
+	private:
+		const	std::string illegalCharacter;
+		void		parsingRequest();
+		int			parsingRequestLine();
+		int			parsingFieldLines();
+		static long requestsId; //? use to identify the Request, maybe make it a tab of longs
+		long		id;
 };
 
-std::ostream &			operator<<( std::ostream & o, Request const & i );
+// std::ostream &			operator<<( std::ostream & o, Request const & i );
 
 #endif /* ********************************************************* REQUEST_H */
