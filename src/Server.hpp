@@ -8,6 +8,8 @@
 # define BACKLOG 10
 # define DUMMY_RESPONSE "HTTP/1.1 200 OK\nServer: test\nContent-Lenght: 13\nContent-Type: text/html\n\n<H1>webserv</H1>\n"
 
+class Request;
+
 class Server {
 	public:
 		typedef struct epoll_event	epoll_event;
@@ -20,7 +22,6 @@ class Server {
 		void	run();
 		std::vector<int>	getFdsServer() const;
 		std::vector<int>	getFdsclient() const;
-
 	private:
 		// TODO create struct for that to handle multiple virtual servers
 		std::vector<int>	_fdsServer;

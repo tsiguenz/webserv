@@ -75,7 +75,13 @@ void	Server::_parseRequest(epoll_event const& event) const {
 	char		buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer, BUFFER_SIZE, 0);
-	std::cout << buffer << std::endl;
+	
+	Request currentRequest(static_cast<std::string>(buffer));
+	if (currentRequest.badRequest == true) {
+		std::cout << "400 \n";
+		return;
+	}
+	currentRequest.printRequest();
 
 	_modEvent(event.data.fd, EPOLLOUT);
 }

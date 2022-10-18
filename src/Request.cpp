@@ -4,7 +4,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(std::string const & toParse): rawRequest(toParse), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::string const & toParse): rawRequest(toParse), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
 }
@@ -121,8 +121,9 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 			return 1;
 	}	
 	line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);	
-	while (!line.empty() || line != "\r\n") {
+	while (!line.empty() && line != "\r\n") {
 		
+		// std::cout << "line= " << line << std::endl;
 		if (line.find_first_of(':') == std::string::npos) {
 			badRequest = true;
 			return 1;
@@ -145,7 +146,7 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 			return 1;
 		}	
 		fieldLines[fieldName] = fieldValue;
-		std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl;
+		// std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl;
 		line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);
 	}
 
@@ -153,4 +154,17 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 
 }
 
+
+
+
+
+
+void	Request::printRequest(){
+
+	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << std::endl << std::endl;
+
+	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++) {
+        std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
+    }
+}
 /* ************************************************************************** */

@@ -24,10 +24,6 @@ int	main() {
 		std::cout << "400 \n";
 		return 1;
 	}
-	std::cout << "method: " << lol.method << "\n";
-	std::cout << "url: " << lol.url << "\n";
-	std::cout << "http: " << lol.httpVersion << "\n";
-	// std::cout <<  std::string::npos << '\n';
-
+	lol.printRequest();
 	return 0;
 }
