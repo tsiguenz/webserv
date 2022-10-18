@@ -5,7 +5,6 @@
 
 class Request
 {
-
 	public:
 		Request(std::string const & toParse);
 		~Request();
@@ -14,25 +13,29 @@ class Request
 		std::string rawRequest;
 
 		//requestLine
-		std::string method; // GET POST OR DELETE
+		std::string method;
 		std::string url;
 		std::string	httpVersion;
 
 		//fieldLines
 		std::map<std::string, std::string> fieldLines;
-		
+
+		//body
+		std::string body;
+
 		bool		badRequest;
 
-		long	getId(void) const;
 	private:
+
 		const	std::string illegalCharacter;
+		const	std::string escapingCharacter;
+		
 		void		parsingRequest();
 		int			parsingRequestLine();
 		int			parsingFieldLines();
-		static long requestsId; //? use to identify the Request, maybe make it a tab of longs
-		long		id;
-};
+		int			parsingFieldName(std::string fieldName);
+		std::string		parsingFieldValue(std::string fieldValue);
 
-// std::ostream &			operator<<( std::ostream & o, Request const & i );
+};
 
 #endif /* ********************************************************* REQUEST_H */

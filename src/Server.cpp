@@ -76,6 +76,7 @@ void	Server::_parseRequest(epoll_event const& event) const {
 	bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer, BUFFER_SIZE, 0);
 	std::cout << buffer << std::endl;
+
 	_modEvent(event.data.fd, EPOLLOUT);
 }
 
