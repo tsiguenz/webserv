@@ -46,8 +46,10 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == true)
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
-			_parseRequest(currentEvent);
-			_sendResponse(currentEvent);
+			Request currentRequest;
+			_parseRequest(currentEvent, &currentRequest);
+			currentRequest.printRequest();
+			_sendResponse(currentEvent, &currentRequest);
 		}
 	}
 }
@@ -68,7 +70,7 @@ void	Server::_newConnection(int const& fd) const {
 	_addEvent(clientSocket, EPOLLIN);
 }
 
-void	Server::_parseRequest(epoll_event const& event) const {
+void	Server::_parseRequest(epoll_event const& event, Request	*thisRequest) const {
 	if (!(event.events & EPOLLIN))
 		return ;
 	// TODO: warning if recv don't return all the request
@@ -81,14 +83,18 @@ void	Server::_parseRequest(epoll_event const& event) const {
 		std::cout << "400 \n";
 		return;
 	}
-	currentRequest.printRequest();
-
+	// Request lol(currentRequest);
+	// lol.printRequest();
+	thisRequest->create(currentRequest);
+	// (void)thisRequest;
+	// thisRequest->printRequest();
 	_modEvent(event.data.fd, EPOLLOUT);
 }
 
-void	Server::_sendResponse(epoll_event const& event) const {
+void	Server::_sendResponse(epoll_event const& event, Request	*currentRequest) const {
 	if (!(event.events & EPOLLOUT))
 		return ;
+	(void)currentRequest;
 	// TODO: construct HTTP response
 	std::string	str = DUMMY_RESPONSE;
 	send(event.data.fd, str.c_str(), str.size(), 0);
@@ -98,6 +104,7 @@ void	Server::_sendResponse(epoll_event const& event) const {
 	else
 		close(event.data.fd);
 }
+
 
 void	Server::_initVirtualServer(int const& port) {
 	sockaddr_in	my_addr;

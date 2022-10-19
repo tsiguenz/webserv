@@ -4,11 +4,20 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(std::string const & toParse): rawRequest(toParse), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(void): isParsed(false), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+{
+
+}
+
+Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(false), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
 }
 
+Request::Request( const Request & src )
+{
+	*this = src;
+}
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
@@ -24,11 +33,18 @@ Request::~Request()
 
 
 
-// std::ostream &			operator<<( std::ostream & o, Request const & i )
-// {
-// 	//o << "Value = " << i.getValue();
-// 	return o;
-// }
+Request &				Request::operator=( Request const & rhs )
+{
+	this->rawRequest = rhs.rawRequest;
+	this->method = rhs.method;
+	this->url = rhs.url;
+	this->httpVersion = rhs.httpVersion;
+	this->fieldLines = rhs.fieldLines;
+	this->isParsed = rhs.isParsed;
+	this->badRequest = rhs.badRequest;
+
+	return *this;
+}
 
 
 /*
@@ -38,6 +54,7 @@ Request::~Request()
 
 void	Request::parsingRequest(void) {
 
+	isParsed = true;
 	if (parsingRequestLine())
 		return ;
 	if (parsingFieldLines())
@@ -156,8 +173,16 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 
 
 
+void				Request::create(std::string const & toParse) {
+	rawRequest 	= toParse;
+	isParsed 	= false;
+	badRequest 	= false;
+	parsingRequest();
+}
 
-
+void				Request::create(Request const & rhs) {
+	*this = rhs;
+}
 
 void	Request::printRequest(){
 

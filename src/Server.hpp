@@ -6,7 +6,7 @@
 # define BUFFER_SIZE 1024 // ?
 # define EVENTS_MAX 1000 // ?
 # define BACKLOG 10
-# define DUMMY_RESPONSE "HTTP/1.1 200 OK\nServer: test\nContent-Lenght: 13\nContent-Type: text/html\n\n<H1>webserv</H1>\n"
+# define DUMMY_RESPONSE "HTTP/1.1 200 OK\r\nServer: test\r\nContent-Lenght: 17\r\nContent-Type: text/html\r\n\r\n<H1>webserv</H1>\r\n"
 
 class Request;
 
@@ -29,6 +29,7 @@ class Server {
 		std::vector<int>	_fdsClient;
 		int					_epFd;
 		epoll_event			_events[EVENTS_MAX];
+		Request				currentRequest();
 
 		void	_initEpoll();
 
@@ -42,8 +43,8 @@ class Server {
 		// Main loop who handle I/O events
 		void	_newConnection(int const& fd) const;
 		void	_handleEvent(int const& nbEpollFd) const;
-		void	_parseRequest(epoll_event const& event) const;
-		void	_sendResponse(epoll_event const& event) const;
+		void	_parseRequest(epoll_event const& event, Request	*currentRequest) const;
+		void	_sendResponse(epoll_event const& event, Request	*currentRequest) const;
 
 		void	_setNonBlocking(int const& fd) const;
 };
