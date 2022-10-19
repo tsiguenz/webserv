@@ -15,14 +15,52 @@
               font-family: verdana;
               font-size: 160%;
             }
+            body {
+              background-color: rgb(108, 144, 163);
+            }
+            .dark-mode {
+              background-color: rgb(33, 32, 32);
+            }
             </style>
     </head>
-    
-    <body style= "text-align:center;background-color:rgb(73, 92, 100);">
-        <div>
+   
+    <body>
+        <div style= "text-align:right">
+          <button type="button" onclick="changeColor()">Dark mode</button>
+        </div>
+
+        <div style= "text-align:center">
             <img src="images/index.png">
             <p>by Tsiguenz and Aboudjel</p>
-            <a href="index_copy.html">Contact</a>
         </div>
     </body>
+
+    <div></div>
+    <script>
+      function loadXMLDoc() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.documentElement.innerHTML = this.responseText;
+          }
+        };
+        xhttp.open("GET", "xmlhttp_info.txt", true);
+        xhttp.send();
+      }
+
+      function changeColor() {
+        var element = document.body;
+        element.classList.toggle("dark-mode");
+      }
+    </script>
 </html>
+
+
+
+<!-- Pour changer qu'une partie via une div: -->
+<!-- <div id="demo"></div>
+document.getElementById("demo").innerHTML =
+this.responseText; -->
+
+<!-- pour tout changer :
+document.documentElement.innerHTML = '<title>Test</title><p>LOLWAT'; -->
