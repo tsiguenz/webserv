@@ -83,11 +83,7 @@ void	Server::_parseRequest(epoll_event const& event, Request	*thisRequest) const
 		std::cout << "400 \n";
 		return;
 	}
-	// Request lol(currentRequest);
-	// lol.printRequest();
 	thisRequest->create(currentRequest);
-	// (void)thisRequest;
-	// thisRequest->printRequest();
 	_modEvent(event.data.fd, EPOLLOUT);
 }
 

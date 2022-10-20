@@ -25,6 +25,11 @@ class Request
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		std::string body;
 
+		// Response
+		std::string response;
+		int			code;
+
+		
 		bool		isParsed;
 		bool		badRequest;
 
@@ -37,12 +42,16 @@ class Request
 		const	std::string illegalCharacter;
 		const	std::string escapingCharacter;
 		
+		// Lexer/Parser
 		void			parsingRequest();
 		int				parsingRequestLine();
 		int				parsingFieldLines();
 		int				parsingFieldName(std::string fieldName);
 		std::string		parsingFieldValue(std::string fieldValue);
+		int				parsingBody(void);
 
+		// Response Checking
+		int				checkingFile();
 };
 
 #endif /* ********************************************************* REQUEST_H */

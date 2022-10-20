@@ -41,6 +41,7 @@ Request &				Request::operator=( Request const & rhs )
 	this->httpVersion = rhs.httpVersion;
 	this->fieldLines = rhs.fieldLines;
 	this->isParsed = rhs.isParsed;
+	this->body = rhs.body;
 	this->badRequest = rhs.badRequest;
 
 	return *this;
@@ -59,6 +60,10 @@ void	Request::parsingRequest(void) {
 		return ;
 	if (parsingFieldLines())
 		return ;
+	if (parsingBody())
+		return;
+	if (checkingFile())
+		return;
 }
 
 
@@ -107,27 +112,6 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 	return 0;
 }
 
-
-
-
-std::string	Request::parsingFieldValue(std::string fieldValue) {
-	return fieldValue;
-}
-
-
-
-
-
-int	Request::parsingFieldName(std::string fieldName) {
-	if (fieldName.length() == 0 || fieldName.find_first_of(" \a\b\f\n\r\t\v\n") != std::string::npos)
-		return 1;
-	return 0;
-}
-
-
-
-
-
 int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" OWS field-value OWS  (OWS =  SP/HT)
 
 	std::string copyRequest = rawRequest.erase(0, rawRequest.find_first_of('\n') + 1);
@@ -157,7 +141,7 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 			badRequest = true;
 			return 1;
 		}
-		copyRequest = rawRequest.erase(0, rawRequest.find_first_of('\n') + 1);
+		copyRequest = copyRequest.erase(0, copyRequest.find_first_of('\n') + 1);
 		if (copyRequest.find_first_of('\n') == std::string::npos) {
 			badRequest = true;
 			return 1;
@@ -168,8 +152,78 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 	}
 
 	return 0;
+}
+
+std::string	Request::parsingFieldValue(std::string fieldValue) {
+	return fieldValue;
+}
+
+int	Request::parsingFieldName(std::string fieldName) {
+	if (fieldName.length() == 0 || fieldName.find_first_of(" \a\b\f\n\r\t\v\n") != std::string::npos)
+		return 1;
+	return 0;
+}
+
+int	Request::parsingBody(void) {
+	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
+			badRequest = true;
+			return 1;
+	}
+	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4);
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int					Request::checkingFile(void) {
+
+	//en attendant le fichier de config
+	std::string pathRepertoire = "/mnt/nfs/homes/aboudjel/Desktop/webserv/html";
+	DIR *repertoire = opendir(pathRepertoire.c_str());
+	if (!repertoire)
+	{
+		std::cout << "ERREUR: en attendant le fichier config jai mis le path des fichier dans /mnt/nfs/homes/aboudjel/Desktop/webserv/html faut mettre ta racine a toi dans \n";
+		std::cout << "Request::checkingFile!" << std::endl;
+	}
+	closedir(repertoire);
+	//
+	if (url == "/")
+		url = "/index.html";
+	std::string path = pathRepertoire + url;
+	FILE* fp = std::fopen(path.c_str(), "r"); //DEFINIR LE PATH PAR LE REPERTOIRE DANS CONFIG !!!!!!!
+    if(!fp) {
+        code = 404;
+		std::cout << "404 mon PETIT REUF\n" << std::endl;
+        return 1;
+    }
+	std::fclose(fp);
+	std::cout << "c bon igo" << std::endl;
+	return 0;
 
 }
+
+
+
+
+
 
 
 
@@ -184,12 +238,40 @@ void				Request::create(Request const & rhs) {
 	*this = rhs;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void	Request::printRequest(){
 
-	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << std::endl << std::endl;
+	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << WHITE <<  std::endl << std::endl;
 
 	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++) {
         std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
     }
+
+	std::cout << BGREEN << "BODY: ";
+	if (body.empty())
+		std::cout << BRED << "NONE" WHITE << std::endl;
+	else
+		std::cout << BCYAN << body << WHITE << std::endl;
 }
 /* ************************************************************************** */

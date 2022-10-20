@@ -18,6 +18,11 @@
 # include <map>
 # include <stdexcept>
 # include <utility>
+#include <dirent.h>
+#include <cstdio>
+#include <cstdlib>
+ 
+
 
 # include "Server.hpp"
 # include "Request.hpp"

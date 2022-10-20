@@ -18,6 +18,7 @@ int	main() {
 				request += "Accept-Encoding: gzip, deflate, br\r\n";
 				request += "Accept-Language: en-US,en;q=0.9\r\n";
 				request += "\r\n";
+				request += "body be like";
     
 	Request lol(request);
 	if (lol.badRequest == true) {
