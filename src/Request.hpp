@@ -29,7 +29,7 @@ class Request
 		std::string response;
 		int			code;
 
-		
+
 		bool		isParsed;
 		bool		badRequest;
 

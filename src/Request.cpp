@@ -9,9 +9,12 @@ Request::Request(void): isParsed(false), badRequest(false), illegalCharacter("{}
 
 }
 
-Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(false), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(true), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
+	std::cout << rawRequest;
 	parsingRequest();
+	printRequest();
+	std::cout << rawRequest << std::endl;
 }
 
 Request::Request( const Request & src )
@@ -43,6 +46,7 @@ Request &				Request::operator=( Request const & rhs )
 	this->isParsed = rhs.isParsed;
 	this->body = rhs.body;
 	this->badRequest = rhs.badRequest;
+	this->isParsed = rhs.isParsed;
 
 	return *this;
 }
@@ -62,8 +66,8 @@ void	Request::parsingRequest(void) {
 		return ;
 	if (parsingBody())
 		return;
-	if (checkingFile())
-		return;
+	// if (checkingFile())
+	// 	return;
 }
 
 

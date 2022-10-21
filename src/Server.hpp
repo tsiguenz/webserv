@@ -9,6 +9,8 @@
 # define DUMMY_RESPONSE "HTTP/1.1 200 OK\r\nServer: test\r\nContent-Lenght: 17\r\nContent-Type: text/html\r\n\r\n<H1>webserv</H1>\r\n"
 
 class Request;
+class Response;
+
 
 class Server {
 	public:
@@ -43,7 +45,7 @@ class Server {
 		// Main loop who handle I/O events
 		void	_newConnection(int const& fd) const;
 		void	_handleEvent(int const& nbEpollFd) const;
-		void	_parseRequest(epoll_event const& event, Request	*currentRequest) const;
+		Request	_parseRequest(epoll_event const& event) const;
 		void	_sendResponse(epoll_event const& event, Request	*currentRequest) const;
 
 		void	_setNonBlocking(int const& fd) const;

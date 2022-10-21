@@ -13,19 +13,24 @@
 # include <netinet/in.h>	// struct sockaddr_in
 # include <arpa/inet.h>		// inet_addr()
 # include <iostream>
+# include <sstream>
+# include <fstream>
+# include <iterator>
 # include <csignal>			// signal()
 # include <vector>
 # include <map>
+# include <ctime>
 # include <stdexcept>
 # include <utility>
-#include <dirent.h>
-#include <cstdio>
-#include <cstdlib>
+# include <dirent.h>
+# include <cstdio>
+# include <cstdlib>
  
-
 
 # include "Server.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
+
 
 # define WHITE "\033[0m"
 # define BLACK "\033[0;30m"

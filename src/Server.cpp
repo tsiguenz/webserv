@@ -47,8 +47,8 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
 			Request currentRequest;
-			_parseRequest(currentEvent, &currentRequest);
-			currentRequest.printRequest();
+			Response currentResponse(_parseRequest(currentEvent));
+			// currentRequest.printRequest();
 			_sendResponse(currentEvent, &currentRequest);
 		}
 	}
@@ -70,21 +70,23 @@ void	Server::_newConnection(int const& fd) const {
 	_addEvent(clientSocket, EPOLLIN);
 }
 
-void	Server::_parseRequest(epoll_event const& event, Request	*thisRequest) const {
+Request	Server::_parseRequest(epoll_event const& event) const {
 	if (!(event.events & EPOLLIN))
-		return ;
+		return(Request()) ;
 	// TODO: warning if recv don't return all the request
 	char		buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer, BUFFER_SIZE, 0);
 	
 	Request currentRequest(static_cast<std::string>(buffer));
-	if (currentRequest.badRequest == true) {
-		std::cout << "400 \n";
-		return;
-	}
-	thisRequest->create(currentRequest);
+	// if (currentRequest.badRequest == true) {
+	// 	std::cout << "400 \n";
+	// 	return;
+	// }
+	currentRequest.printRequest();
 	_modEvent(event.data.fd, EPOLLOUT);
+	return (currentRequest);
+
 }
 
 void	Server::_sendResponse(epoll_event const& event, Request	*currentRequest) const {

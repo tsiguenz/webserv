@@ -20,6 +20,12 @@ int	main() {
 				request += "\r\n";
 				request += "body be like";
     
+	std::string line = "Date: ";
+ 	std::time_t result = std::time(NULL);
+    line += std::asctime(std::localtime(&result));
+	line.insert(line.find('\n'), " GMT\r");
+	// line +=" GMT\r";
+	std::cout << line;
 	Request lol(request);
 	if (lol.badRequest == true) {
 		std::cout << "400 \n";
