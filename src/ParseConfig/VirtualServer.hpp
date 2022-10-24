@@ -2,6 +2,9 @@
 # define VIRTUAL_SERVER_HPP
 
 # include "Location.hpp"
+# include <iostream>
+# include <list>
+# include <map>
 
 class VirtualServer {
 	public:
@@ -9,21 +12,21 @@ class VirtualServer {
 		VirtualServer();
 		virtual ~VirtualServer();
 
-		// Getter
-		std::string	getServerName();
-		std::string	getIp();
-		short		getPort();
-		std::string	getErrorPage();
-		std::string	getClientMaxBodySize();
-		std::vector<Location>	getLocationList();
+		// Accessors
+		std::string			getErrorPageByCode(int const& errorCode) const;
+		std::string			getServerName() const;
+		std::string			getIp() const;
+		short				getPort() const;
+		int					getClientMaxBodySize() const;
+		std::list<Location>	getLocationList() const;
 
 	private:
-		std::string			_serverName;
-		std::string			_ip;
-		short				_port;
-		std::string			_errorPage;
-		std::string			_clientMaxBodySize;
-		std::vector<Location>	_locationList;
+		std::string					_serverName;
+		std::string					_ip;
+		short						_port;
+		std::map<int, std::string>	_errorPages;
+		int							_clientMaxBodySize;
+		std::list<Location>			_locationList;
 	};
 
 #endif // VIRTUAL_SERVER_HPP

@@ -2,7 +2,7 @@
 # define LOCATION_HPP
 
 # include <iostream>
-# include <vector>
+# include <list>
 
 class Location {
 	public:
@@ -10,24 +10,24 @@ class Location {
 		Location();
 		virtual ~Location();
 
-		// Getters
-		std::string					getPath();
-		std::vector<std::string>	getAllowedMethods();
-		std::string					getRedir();
-		std::string					getRoot();
-		bool						getAutoIndex();
-		std::string					getIndex();
-		std::vector<std::string>	getAllowedExtCGI();
-		std::string					getUploadPath();
+		// Accessors
+		std::string					getPath() const;
+		std::list<std::string>		getAllowedMethods() const;
+		std::string					getRedir() const;
+		std::string					getRoot() const;
+		bool						getAutoIndex() const;
+		std::string					getIndex() const;
+		std::list<std::string>		getAllowedExtCGI() const;
+		std::string					getUploadPath() const;
 
 	private:
 		std::string					_path;
-		std::vector<std::string>	_allowedMethods;
+		std::list<std::string>		_allowedMethods;
 		std::string					_redir;
 		std::string					_root;
 		bool						_autoIndex;
 		std::string					_index;
-		std::vector<std::string>	_allowedExtCGI;
+		std::list<std::string>		_allowedExtCGI;
 		std::string					_uploadPath;
 	};
 

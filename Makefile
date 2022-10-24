@@ -13,7 +13,6 @@ TEST_INC = -Itest/include
 SRC_NAME = 	main.cpp \
 			Server.cpp \
 			utils.cpp \
-			# Parse configuration file
 			ParseConfig/ConfigParser.cpp \
 			ParseConfig/VirtualServer.cpp \
 			ParseConfig/Location.cpp \

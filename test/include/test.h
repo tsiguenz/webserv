@@ -1,7 +1,24 @@
 #ifndef TEST_H
 # define TEST_H
 
-#include "webserv.h"
+# include "webserv.h"
+
+# define DEFAULT "\e[0m"
+# define RED "\e[31m"
+# define GREEN "\e[32m"
+# define BLUE "\e[35m"
+
+template<typename T>
+void	assertEq(std::string str, T a, T b) {
+	bool	isEq = (a == b);
+
+	if (isEq)
+		std::cout << GREEN << "[OK] ";
+	else
+		std::cout << RED << "[KO] ";
+	std::cout << str << " : a = " << a << " b = " << b << DEFAULT << std::endl;
+
+}
 
 void	config_parser_tests();
 
