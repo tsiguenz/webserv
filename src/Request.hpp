@@ -30,6 +30,7 @@ class Request
 
 		bool		isParsed;
 		bool		badRequest;
+		bool		uriTooLong;
 
 		void		create(std::string const & toParse);
 		void		create(Request const & rhs);

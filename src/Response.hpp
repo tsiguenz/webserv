@@ -30,6 +30,7 @@ class Response
 		
 		// const MediaType	mime;
 		std::string	getTime(void);
+		std::string	getServerName(void);
 		std::string getLength(void);
 		void	getTypeContent(void);
 

@@ -4,12 +4,12 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(void): isParsed(false), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(void): isParsed(false), badRequest(false), uriTooLong(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 
 }
 
-Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(true), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::string const & toParse): rawRequest(toParse), uriTooLong(false), isParsed(true), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	std::cout << rawRequest;
 	parsingRequest();
@@ -47,6 +47,7 @@ Request &				Request::operator=( Request const & rhs )
 	this->body = rhs.body;
 	this->badRequest = rhs.badRequest;
 	this->isParsed = rhs.isParsed;
+	this->uriTooLong = rhs.uriTooLong;
 
 	return *this;
 }
@@ -64,9 +65,16 @@ void	Request::parsingRequest(void) {
 	if (parsingFieldLines())
 		return ;
 	if (parsingBody())
-		return;
-	// if (checkingFile())
-	// 	return;
+		return ;
+	if (method == "POST" && method == "DELETE") {
+		std::map<std::string,std::string>::iterator it;
+		it = fieldLines.find("content-length");
+  		if (it == fieldLines.end()) {
+			//check alors si ca peut etre chunk
+			badRequest = true;
+			return ;
+		}
+	}
 }
 
 
@@ -82,7 +90,7 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 	
 	method = firstLine.substr(0, nextSpace);
 
-	if (method != "GET" && method != "DELETE" && method != "POST"){ //modifier pour rajouter 405
+	if (method != "GET" && method != "DELETE" && method != "POST"){
 		badRequest = true;
 		return 1;
 	}
@@ -101,7 +109,10 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 		badRequest = true;
 		return 1;
 	}
-	
+	if (url.length() >= 2000) {
+		uriTooLong = true;
+		return 1;
+	}
 	firstLine = firstLine.erase(0, nextSpace + 1);
 
 	if (firstLine != "HTTP/1.1\r\n" && firstLine != "HTTP/1.0\r\n" && firstLine != "HTTP/0.9\r\n"){
