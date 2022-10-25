@@ -34,18 +34,6 @@ Response::~Response(){
 
 
 /*
-** --------------------------------- OVERLOAD ---------------------------------
-*/
-
-
-// std::ostream &			operator<<( std::ostream & o, Response const & i )
-// {
-// 	//o << "Value = " << i.getValue();
-// 	return o;
-// }
-
-
-/*
 ** --------------------------------- METHODS ----------------------------------
 */
 
@@ -54,12 +42,19 @@ void				Response::buildingResponse(void) {
 	// if (code == 400) {
 		
 	// }
-	response += getTime();
     if (method == "GET")
 	    getFile();
 
+	response += getTime();
+	response += getServerName();
+
+	if (code == 200) {
 	// TODO checking file accepted format
-	response += 
+
+	}
+	else {
+
+	}
 	response += "\r\n";
 	response += std::string(file.begin(), file.end());
     if (!body.empty()) {
@@ -105,15 +100,16 @@ std::string	Response::getTime(void) {
 	return (line);
 }
 
-// std::string Response::getServerName(void) {
-//     std::string line = "Server: WebServ 1.0 \n\r";
-//     return line;
-// }
-// std::string Response::getLength(void) {
-// 	std::string line = "Content-Length: ";
-// 	line += std::distance(this->file.begin(), this->file.end());
-// 	line += "\r\n";
-// }
+std::string Response::getServerName(void) {
+    std::string line = "Server: WebServ 1.0 \n\r";
+    return line;
+}
+std::string Response::getLength(void) {
+	std::string line = "Content-Length: ";
+	line += std::distance(this->file.begin(), this->file.end());
+	line += "\r\n";
+	return line;
+}
 
 // std::string Response::getContentType(void) {
 // 	std::string line = "Content-Type: ";
