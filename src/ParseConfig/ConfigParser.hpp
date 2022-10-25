@@ -4,6 +4,7 @@
 # include "VirtualServer.hpp"
 # include <iostream>
 # include <fstream> // ifstream
+# include <sstream> // stringstream
 # include <list>
 
 class	ConfigParser {
@@ -23,8 +24,16 @@ class	ConfigParser {
 		std::string					_fileContent;
 		std::list<VirtualServer>	_virtualServerList;
 
+// for testing
+#ifdef __IS_TEST__
+	public:
+#else
+	private:
+#endif
 		void	_checkFileName(std::string const& fileName) const;
-		void	_readFile();
+		void	_parseFile(std::string const& fileName);
+		void	_parseServerBlock(std::stringstream& serverBlock);
+//		void	_parseLocationBlock();
 };
 
 #endif // CONFIG_PARSER_HPP

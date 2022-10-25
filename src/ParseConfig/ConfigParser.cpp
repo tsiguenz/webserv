@@ -2,14 +2,13 @@
 
 // Object managment
 
-ConfigParser::ConfigParser()
-: _fileName(), _fileContent()
+ConfigParser::ConfigParser(): _fileName(), _fileContent()
 { _virtualServerList.push_back(VirtualServer()); }
 
 ConfigParser::ConfigParser(std::string const& fileName) {
 	_checkFileName(fileName);
 	_fileName = fileName;
-	_readFile();
+//	_parseFile(fileName);
 }
 
 ConfigParser::~ConfigParser() { }
@@ -28,19 +27,37 @@ std::string	ConfigParser::getFileContent() const
 // Helper functions
 
 void	ConfigParser::_checkFileName(std::string const& fileName) const {
-	(void) fileName;
-
+	if (fileName.size() <= 5)
+		throw std::invalid_argument("Invalid argument: file is too short in _checkFileName()\n");
+	if (fileName.substr(fileName.size() - 5, 5) != ".conf")
+		throw std::invalid_argument("Invalid argument: file extention is bad in _checkFileName()\n");
 }
 
-void	ConfigParser::_readFile() {
-	std::string	buffer;
+void	ConfigParser::_parseFile(std::string const& fileName) {
+	std::string	line;
+	std::stringstream	serverBlock;
 
-	std::ifstream	file(_fileName.c_str());
+	std::ifstream	file(fileName.c_str());
 	if (file.good() == false)
-		throw std::invalid_argument("Invalid argument: bad file name in _readFile()\n");
-	while (file.good() == true && std::getline(file, buffer))
-		_fileContent += (buffer += "\n");
+		throw std::invalid_argument("Invalid argument: error while opening file in _readFile()\n");
+	while (std::getline(file, line)) {
+		_fileContent += (line += "\n");
+		if (trim(line) == "server {")
+			_parseServerBlock(serverBlock);
+	}
 	file.close();
 	if (_fileContent.empty() == true)
 		throw std::invalid_argument("Invalid argument: file is empty in _readFile()\n");
 }
+
+void	ConfigParser::_parseServerBlock(std::stringstream& serverBlock) {
+	std::string	line;
+
+	while (std::getline(serverBlock, line)) {
+		_fileContent += (line += "\n");
+	}
+}
+ 
+//void	ConfigParser::_parseLocationBlock() {
+//	
+//}

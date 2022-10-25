@@ -5,6 +5,7 @@
 # include <iostream>
 # include <list>
 # include <map>
+# include "webserv.h"
 
 class VirtualServer {
 	public:
