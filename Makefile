@@ -21,7 +21,7 @@ OBJ_PATH = obj/
 TEST_PATH = test/
 INC = -Iinclude -Isrc
 
-SRC_NAME = main.cpp utils.cpp Server.cpp Request.cpp Response.cpp 
+SRC_NAME = main.cpp utils.cpp Server.cpp Request.cpp Response.cpp MediaType.cpp
 TEST_SRC_NAME = test_main.cpp
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 

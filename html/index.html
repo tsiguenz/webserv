@@ -31,22 +31,13 @@
 
         <div style= "text-align:center">
             <img src="images/index.png">
-            <p>by Tsiguenz and Aboudjel</p>
+            <p>by Tsiguenz, Adben-mc and Aboudjel</p>
+            <a href="index_copy.html">PAGE 2</a>
         </div>
     </body>
 
     <div></div>
     <script>
-      function loadXMLDoc() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            document.documentElement.innerHTML = this.responseText;
-          }
-        };
-        xhttp.open("GET", "xmlhttp_info.txt", true);
-        xhttp.send();
-      }
 
       function changeColor() {
         var element = document.body;

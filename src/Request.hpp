@@ -3,6 +3,8 @@
 
 # include "webserv.h"
 
+// class MediaType;
+
 class Request
 {
 	public:
@@ -10,6 +12,7 @@ class Request
 		Request(void);
 		Request(const Request & src);
 		~Request();
+
 
 		//full unparsed request
 		std::string rawRequest;
@@ -24,11 +27,6 @@ class Request
 
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		std::string body;
-
-		// Response
-		std::string response;
-		int			code;
-
 
 		bool		isParsed;
 		bool		badRequest;

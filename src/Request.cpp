@@ -14,7 +14,7 @@ Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(tru
 	std::cout << rawRequest;
 	parsingRequest();
 	printRequest();
-	std::cout << rawRequest << std::endl;
+	// std::cout << rawRequest << std::endl;
 }
 
 Request::Request( const Request & src )
@@ -59,7 +59,6 @@ Request &				Request::operator=( Request const & rhs )
 
 void	Request::parsingRequest(void) {
 
-	isParsed = true;
 	if (parsingRequestLine())
 		return ;
 	if (parsingFieldLines())
@@ -83,7 +82,7 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 	
 	method = firstLine.substr(0, nextSpace);
 
-	if (method != "GET" && method != "DELETE" && method != "POST"){
+	if (method != "GET" && method != "DELETE" && method != "POST"){ //modifier pour rajouter 405
 		badRequest = true;
 		return 1;
 	}
@@ -98,7 +97,7 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 
 	url =  firstLine.substr(0, nextSpace);
 
-	if (url.find(illegalCharacter) != std::string::npos) {
+	if (url.find(illegalCharacter) != std::string::npos) { //approfondir si nottament trop long
 		badRequest = true;
 		return 1;
 	}
@@ -146,19 +145,18 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 			return 1;
 		}
 		copyRequest = copyRequest.erase(0, copyRequest.find_first_of('\n') + 1);
-		if (copyRequest.find_first_of('\n') == std::string::npos) {
-			badRequest = true;
+		if (copyRequest.find_first_of('\n') == std::string::npos) { // \n\r???
+			badRequest = true; 
 			return 1;
 		}	
 		fieldLines[fieldName] = fieldValue;
 		// std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl;
 		line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);
 	}
-
 	return 0;
 }
 
-std::string	Request::parsingFieldValue(std::string fieldValue) {
+std::string	Request::parsingFieldValue(std::string fieldValue) { //si du parsing a faire sur la fieldValue la metttre ici
 	return fieldValue;
 }
 
@@ -169,7 +167,7 @@ int	Request::parsingFieldName(std::string fieldName) {
 }
 
 int	Request::parsingBody(void) {
-	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
+	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) { //est ce que logique /r/n/r/n ???
 			badRequest = true;
 			return 1;
 	}
@@ -214,7 +212,7 @@ int					Request::checkingFile(void) {
 	std::string path = pathRepertoire + url;
 	FILE* fp = std::fopen(path.c_str(), "r"); //DEFINIR LE PATH PAR LE REPERTOIRE DANS CONFIG !!!!!!!
     if(!fp) {
-        code = 404;
+        // code = 404;
 		std::cout << "404 mon PETIT REUF\n" << std::endl;
         return 1;
     }
