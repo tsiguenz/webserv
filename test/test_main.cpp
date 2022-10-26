@@ -42,5 +42,7 @@ int	main() {
 	std::cout << "quand on envoie ' application/json' : "<< lol.isTypeSupported(" application/json") << std::endl;
 	std::cout << "quand on envoie accepted png pour  text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9; 'png' : "<< lol.isInAccepted("png", " text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n") << std::endl;
 
+	std::cout << "quand on envoie ' lol/image.jpg' : "<< lol.getMediaType("lol/image.jpg") << std::endl; //new
+
 	return 0;
 }
