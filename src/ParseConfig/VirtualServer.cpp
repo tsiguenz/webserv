@@ -12,8 +12,6 @@ VirtualServer::~VirtualServer() { }
 
 // Accessors
 
-// return the content to return in the http response ?
-// but hot reload can be broken...
 std::string	VirtualServer::getErrorPageByCode(int const& errorCode) const {
 	return _errorPages.at(errorCode);
 }
@@ -36,4 +34,28 @@ int	VirtualServer::getClientMaxBodySize() const {
 
 std::list<Location>	VirtualServer::getLocationList() const {
 	return _locationList;
+}
+
+void	VirtualServer::setErrorPage(int const& errorCode, std::string const& path) {
+	_errorPages.insert(std::make_pair(errorCode, path));
+}
+
+void	VirtualServer::setServerName(std::string const& serverName) {
+	_serverName = serverName;
+}
+
+void	VirtualServer::setIp(std::string const& ip) {
+	_ip = ip;
+}
+
+void	VirtualServer::setPort(short const& port) {
+	_port = port;
+}
+
+void	VirtualServer::setClientMaxBodySize(int const& size) {
+	_clientMaxBodySize = size;
+}
+
+void	VirtualServer::setNewLocation(Location location) {
+	_locationList.push_back(location);
 }

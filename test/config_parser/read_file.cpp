@@ -1,13 +1,13 @@
 #include "test.h"
 #include "ConfigParser.hpp"
 
-void	parse_file() {
-	std::cout << "---------- parse_file() ----------\n";
-	int	ctn = 0;
+void	read_file() {
+	std::cout << "---------- read_file() ----------\n";
 	ConfigParser	cp;
 	// file does not exist
 	{
-		try { cp._parseFile("test/config/does_not_exist.conf"); }
+		int	ctn = 0;
+		try { cp._readFile("test/config/does_not_exist"); }
 		catch (std::exception const& e) {
 			(void) e;
 			ctn++;
@@ -16,20 +16,22 @@ void	parse_file() {
 	}
 	// no permission
 	{
-		try { cp._parseFile("test/config/cannot_open.conf"); }
+		int	ctn = 0;
+		try { cp._readFile("test/config/cannot_open.conf"); }
 		catch (std::exception const& e) {
 			(void) e;
 			ctn++;
 		}
-		assertEq("file with no permission test", ctn, 2);
+		assertEq("file with no permission test", ctn, 1);
 	}
 	// directory
 	{
-		try { cp._parseFile("test/config/directory.conf"); }
+		int	ctn = 0;
+		try { cp._readFile("test/config/directory.conf"); }
 		catch (std::exception const& e) {
 			(void) e;
 			ctn++;
 		}
-		assertEq("read directory test", ctn, 3);
+		assertEq("read directory test", ctn, 1);
 	}
 }

@@ -21,9 +21,11 @@ void	assertEq(std::string str, T a, T b) {
 }
 
 void	config_parser_tests();
-void	check_file_name();
 void	object_managment();
-void	parse_file();
+void	check_file_name();
+void	read_file();
+void	get_block();
+void	parse_file_content();
 void	parse_server_block();
 void	parse_location_block();
 

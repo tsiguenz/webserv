@@ -23,17 +23,22 @@ class	ConfigParser {
 		std::string					_fileName;
 		std::string					_fileContent;
 		std::list<VirtualServer>	_virtualServerList;
+		std::list<std::string>		_allowedServerDirectives;
+		std::list<std::string>		_allowedLocationDirectives;
+		std::string const			_WHITESPACES;
 
-// for testing
 #ifdef __IS_TEST__
 	public:
-#else
-	private:
 #endif
 		void	_checkFileName(std::string const& fileName) const;
-		void	_parseFile(std::string const& fileName);
-		void	_parseServerBlock(std::stringstream& serverBlock);
-//		void	_parseLocationBlock();
+		void	_initAllowedDirectives();
+		bool	_isServerDirective(std::string const& str);
+		bool	_isLocationDirective(std::string const& str);
+		void	_readFile(std::string const& fileName);
+		std::string	_getServerBlock(std::stringstream& sContent);
+		void	_parseFileContent(std::string const& fileContent);
+		VirtualServer	_parseServerBlock(std::string const& serverBlock);
+		void	_parseLocationBlock(std::string const& locationBlock);
 };
 
 #endif // CONFIG_PARSER_HPP

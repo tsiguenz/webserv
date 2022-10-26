@@ -21,7 +21,9 @@ TEST_SRC_NAME = test_main.cpp \
 				config_parser/config_parser_tests.cpp \
 				config_parser/object_managment.cpp \
 				config_parser/check_file_name.cpp \
-				config_parser/parse_file.cpp \
+				config_parser/read_file.cpp \
+				config_parser/get_block.cpp \
+				config_parser/parse_file_content.cpp \
 				config_parser/parse_server_block.cpp \
 				config_parser/parse_location_block.cpp \
 

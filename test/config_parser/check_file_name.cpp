@@ -3,10 +3,10 @@
 
 void	check_file_name() {
 	std::cout << "---------- check_file_name() ----------\n";
-	int	ctn = 0;
 	ConfigParser	cp;
 	// bad extention
 	{
+		int	ctn = 0;
 		try { cp._checkFileName("test/config/bad_extention"); }
 		catch (std::exception const& e) {
 			(void) e;
@@ -17,6 +17,16 @@ void	check_file_name() {
 			(void) e;
 			ctn++;
 		}
-		assertEq("file with bad extention test", ctn, 2);
+		assertEq("file with bad extention", ctn, 2);
+	}
+	// file name too short
+	{
+		int	ctn = 0;
+		try { cp._checkFileName("conf"); }
+		catch (std::exception const& e) {
+			(void) e;
+			ctn++;
+		}
+		assertEq("file name too short", ctn, 1);
 	}
 }

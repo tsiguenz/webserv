@@ -21,6 +21,13 @@ class VirtualServer {
 		int					getClientMaxBodySize() const;
 		std::list<Location>	getLocationList() const;
 
+		void	setErrorPage(int const& errorCode, std::string const& path);
+		void	setServerName(std::string const& serverName);
+		void	setIp(std::string const& ip);
+		void	setPort(short const& port);
+		void	setClientMaxBodySize(int const& size);
+		void	setNewLocation(Location location);
+
 	private:
 		std::string					_serverName;
 		std::string					_ip;

@@ -3,10 +3,10 @@
 
 void	object_managment() {
 	std::cout << "---------- object_managment() ----------\n";
-	int	ctn = 0;
 	ConfigParser	cp;
 	// default constructor test
 	{
+		int	ctn = 0;
 		VirtualServer	vs = cp.getVirtualServerList().front();
 		if (vs.getIp() != "127.0.0.1")
 			ctn++;
