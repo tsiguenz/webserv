@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 # include "webserv.h"
+# include "Response.hpp"
 
 # define BUFFER_SIZE 1024 // ?
 # define EVENTS_MAX 1000 // ?

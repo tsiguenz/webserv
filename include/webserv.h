@@ -25,11 +25,7 @@
 # include <dirent.h>
 # include <cstdio>
 # include <cstdlib>
- 
-
-# include "Server.hpp"
-# include "Request.hpp"
-# include "Response.hpp"
+# include <functional>
 
 
 

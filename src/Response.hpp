@@ -3,8 +3,12 @@
 
 # include "webserv.h"
 
+# include "Request.hpp"
+# include "Response.hpp"
+# include "MediaType.hpp"
+// # define <!DOCTYPE html><html><head><title>Code d'erreur</title></head><body><a href="lien"></a><p>message</p></body></html>
 class Request;
-// class MediaType;
+class MediaType;
 
 class Response
 {
@@ -19,21 +23,33 @@ class Response
 		std::map<std::string, std::string> fieldLines;
 		std::string body;
 
+		std::string			fileName;
 		std::vector<char>	file;
+		
 		std::string 		response;
 		int					code;
 
+		void		printResponse(void);
 	private:
 		
+		MediaType	mime;
+		std::map<int, std::pair<std::string, std::string> >	statusCodes;
+
 		void		buildingResponse(void);
-		void		getFile(void);
 		
-		// const MediaType	mime;
+		void		getFile(void); //GET
+		void		postFile(void); //POST
+		void		deleteFile(void); //DELETE
+		
+		void	handleError(void);
+
+		std::string getResponse(void);
 		std::string	getTime(void);
 		std::string	getServerName(void);
 		std::string getLength(void);
-		void	getTypeContent(void);
+		std::string	getTypeContent(void);
 
+		void		initMapCode(void);
 };
 
 // std::ostream &			operator<<( std::ostream & o, Response const & i );

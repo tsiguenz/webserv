@@ -357,8 +357,8 @@ MediaType::MediaType(){
 MediaType::~MediaType(){
 }
 
-std::string MediaType::getMediaType(std::string requestedType) {
-    return (mime.at(requestedType));
+std::string MediaType::getMediaType(std::string url) {
+    return (mime.at(url));
 }
 
 /* ************************************************************************** */

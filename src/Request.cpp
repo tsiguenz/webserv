@@ -9,11 +9,11 @@ Request::Request(void): isParsed(false), badRequest(false), uriTooLong(false), i
 
 }
 
-Request::Request(std::string const & toParse): rawRequest(toParse), uriTooLong(false), isParsed(true), badRequest(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(true), badRequest(false), uriTooLong(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	std::cout << rawRequest;
 	parsingRequest();
-	printRequest();
+	// printRequest();
 	// std::cout << rawRequest << std::endl;
 }
 
