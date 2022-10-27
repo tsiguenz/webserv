@@ -10,17 +10,8 @@ TEST_PATH = test/
 INC = -Iinclude -Isrc -Isrc/ParseConfig
 TEST_INC = -Itest/include
 
-SRC_NAME = 	main.cpp \
-			Server.cpp \
-			utils.cpp \
-			# Parse configuration file
-			ParseConfig/ConfigParser.cpp \
-			ParseConfig/VirtualServer.cpp \
-			ParseConfig/Location.cpp \
-
-TEST_SRC_NAME = test_main.cpp \
-				config_parser/config_parser_tests.cpp \
-
+SRC_NAME = main.cpp utils.cpp Server.cpp Request.cpp Response.cpp MediaType.cpp
+TEST_SRC_NAME = test_main.cpp
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 
 OBJ = $(addprefix $(OBJ_PATH), $(OBJ_NAME))

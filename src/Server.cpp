@@ -28,10 +28,6 @@ std::vector<int>	Server::getFdsServer() const {
 	return _fdsServer;
 }
 
-std::vector<int>	Server::getFdsclient() const {
-	return _fdsClient;
-}
-
 void	Server::_initEpoll() {
 	if ((_epFd = epoll_create(1)) == -1)
 		throw std::runtime_error("error in epoll_create()\n");
@@ -52,8 +48,10 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == true)
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
-			_parseRequest(currentEvent);
-			_sendResponse(currentEvent);
+//			if (currentEvent.events & EPOLLIN)
+				Response 	currentResponse(_parseRequest(currentEvent));
+//			if (currentEvent.events & EPOLLOUT)
+				_sendResponse(currentEvent, currentResponse);
 		}
 	}
 }
@@ -74,29 +72,41 @@ void	Server::_newConnection(int const& fd) const {
 	_addEvent(clientSocket, EPOLLIN);
 }
 
-void	Server::_parseRequest(epoll_event const& event) const {
-	if (!(event.events & EPOLLIN))
-		return ;
+Request	Server::_parseRequest(epoll_event const& event) const {
+//	if (event.events & EPOLLOUT) {
+//		std::cout << BLUE "COUCOU\n" WHITE;
+//		return(Request()) ;
+//	}
 	// TODO: warning if recv don't return all the request
 	char		buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer, BUFFER_SIZE, 0);
-	std::cout << buffer << std::endl;
+	
+	Request currentRequest(static_cast<std::string>(buffer));
+	// if (currentRequest.badRequest == true) {
+	// 	std::cout << "400 \n";
+	// 	return;
+	// }
+	currentRequest.printRequest();
 	_modEvent(event.data.fd, EPOLLOUT);
+	return (currentRequest);
+
 }
 
-void	Server::_sendResponse(epoll_event const& event) const {
-	if (!(event.events & EPOLLOUT))
-		return ;
+void	Server::_sendResponse(epoll_event const& event, Response const& currentResponse) const {
+
+//	if (event.events & EPOLLIN){
+//		std::cout << RED "COUCOU\n" WHITE;
+//		return ;
+//	}
+	currentResponse.printResponse();
+//	currentRequest.printRequest();
 	// TODO: construct HTTP response
-	std::string	str = DUMMY_RESPONSE;
-	send(event.data.fd, str.c_str(), str.size(), 0);
-	// if keep alive else defautl
-	if (0)
-		_modEvent(event.data.fd, EPOLLIN);
-	else
-		close(event.data.fd);
+//	std::string	str = DUMMY_RESPONSE;
+	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);
+	close(event.data.fd);
 }
+
 
 void	Server::_initVirtualServer(int const& port) {
 	sockaddr_in	my_addr;

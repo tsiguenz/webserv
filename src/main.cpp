@@ -1,8 +1,11 @@
 #ifndef __IS_TEST__
 
 # include "webserv.h"
+// # include "Response.hpp"
+# include "Server.hpp"
 
 int	main(int argc, char **argv) {
+	// MediaType lol;
 	if (argc > 2) {
 		std::cerr << "Too much arguments. Try with: ./webserv [configuration file]\n";
 		return EXIT_FAILURE;
