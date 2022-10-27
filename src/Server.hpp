@@ -29,7 +29,6 @@ class Server {
 		// TODO create struct for that to handle multiple virtual servers
 		std::vector<int>	_fdsServer;
 		// TODO keep alive need to store clients for next I/O operations
-		std::vector<int>	_fdsClient;
 		int					_epFd;
 		epoll_event			_events[EVENTS_MAX];
 		Request				currentRequest();
@@ -47,7 +46,7 @@ class Server {
 		void	_newConnection(int const& fd) const;
 		void	_handleEvent(int const& nbEpollFd) const;
 		Request	_parseRequest(epoll_event const& event) const;
-		void	_sendResponse(epoll_event const& event, Response currentResponse) const;
+		void	_sendResponse(epoll_event const& event, Response const& currentResponse) const;
 
 		void	_setNonBlocking(int const& fd) const;
 };

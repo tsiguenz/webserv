@@ -29,10 +29,6 @@ std::vector<int>	Server::getFdsServer() const {
 	return _fdsServer;
 }
 
-std::vector<int>	Server::getFdsclient() const {
-	return _fdsClient;
-}
-
 void	Server::_initEpoll() {
 	if ((_epFd = epoll_create(1)) == -1)
 		throw std::runtime_error("error in epoll_create()\n");
@@ -46,11 +42,10 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == true)
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
-			Request currentRequest;
-			Response currentResponse(_parseRequest(currentEvent));
-			currentResponse.printResponse();
-			// currentRequest.printRequest();
-			_sendResponse(currentEvent, currentResponse);
+//			if (currentEvent.events & EPOLLIN)
+				Response 	currentResponse(_parseRequest(currentEvent));
+//			if (currentEvent.events & EPOLLOUT)
+				_sendResponse(currentEvent, currentResponse);
 		}
 	}
 }
@@ -72,10 +67,10 @@ void	Server::_newConnection(int const& fd) const {
 }
 
 Request	Server::_parseRequest(epoll_event const& event) const {
-	if (!(event.events & EPOLLIN)) {
-		std::cout << BLUE "COUCOU\n" WHITE;
-		return(Request()) ;
-	}
+//	if (event.events & EPOLLOUT) {
+//		std::cout << BLUE "COUCOU\n" WHITE;
+//		return(Request()) ;
+//	}
 	// TODO: warning if recv don't return all the request
 	char		buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
@@ -92,19 +87,18 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 
 }
 
-void	Server::_sendResponse(epoll_event const& event, Response currrentResponse) const {
-	if (!(event.events & EPOLLOUT)){
-		std::cout << RED "COUCOU\n" WHITE;
-		return ;
-	}
+void	Server::_sendResponse(epoll_event const& event, Response const& currentResponse) const {
+
+//	if (event.events & EPOLLIN){
+//		std::cout << RED "COUCOU\n" WHITE;
+//		return ;
+//	}
+	currentResponse.printResponse();
+//	currentRequest.printRequest();
 	// TODO: construct HTTP response
-	std::string	str = DUMMY_RESPONSE;
-	send(event.data.fd, currrentResponse.response.c_str(),  currrentResponse.response.size(), 0);
-	// if keep alive else defautl
-	if (0)
-		_modEvent(event.data.fd, EPOLLIN);
-	else
-		close(event.data.fd);
+//	std::string	str = DUMMY_RESPONSE;
+	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);
+	close(event.data.fd);
 }
 
 

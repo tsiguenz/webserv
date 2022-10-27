@@ -57,6 +57,7 @@ void				Response::buildingResponse(void) {
 	if (!file.empty())
 		response += getTypeContent();
 	response += getLength();
+	response += getConnectionType();
 	response += "\r\n";
 	if (!file.empty())
 		response += std::string(file.begin(), file.end());
@@ -69,7 +70,7 @@ void				Response::buildingResponse(void) {
 void		Response::getFile(void) {
 
 	//en attendant le fichier de config
-	std::string pathRepertoire = "/mnt/nfs/homes/aboudjel/Desktop/webserv/html";
+	std::string pathRepertoire = "html";
 	DIR *repertoire = opendir(pathRepertoire.c_str());
 	if (!repertoire)
 	{
@@ -162,7 +163,7 @@ std::string Response::getTypeContent(void) {
 }
 
 std::string Response::getConnectionType(void) { //pour linstant close, a voir si on gere le keep alive
-	std::string line = "Connexion: Close";
+	std::string line = "Connection: close";
 	line += "\r\n";
 	return line;
 }
@@ -235,7 +236,7 @@ void	Response::initMapCode(void) {
 
 }
 
-void	Response::printResponse(void) {
+void	Response::printResponse(void) const {
 	std::cout << response << std::endl;
 }
 /* ************************************************************************** */

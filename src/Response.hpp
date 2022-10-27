@@ -29,7 +29,7 @@ class Response
 		std::string 		response;
 		int					code;
 
-		void		printResponse(void);
+		void		printResponse(void) const;
 	private:
 		
 		MediaType	mime;
