@@ -12,6 +12,7 @@ ErrorHandler::ErrorHandler() {
 	errorMessage[403] = "The client does not have access rights to the content.";
 	errorMessage[404] = "The server cannot find the requested resource. In the browser, this means the URL is not recognized.";
 	errorMessage[405] = "The request method is known by the server but is not supported by the target resource.";
+	errorMessage[406] = "The server cannot produce a response matching the list of acceptable values defined in the request's proactive content negotiation headers.";
 	errorMessage[408] = "TIME OUT";
 	errorMessage[410] = "The requested content has been permanently deleted from server, with no forwarding address.";
 	errorMessage[411] = "Server rejected the request because the Content-Length header field is not defined and the server requires it.";
