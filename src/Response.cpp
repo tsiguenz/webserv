@@ -35,7 +35,7 @@ Response::~Response(){
 
 
 /*
-** --------------------------------- METHODS ----------------------------------
+** --------------------------------- MAIN METHODS ----------------------------------
 */
 
 void				Response::buildingResponse(void) {
@@ -62,7 +62,11 @@ void				Response::buildingResponse(void) {
 		response += std::string(file.begin(), file.end());
 }
 
-void					Response::getFile(void) {
+/*
+** --------------------------------- GET METHODE ----------------------------------
+*/
+
+void		Response::getFile(void) {
 
 	//en attendant le fichier de config
 	std::string pathRepertoire = "/mnt/nfs/homes/aboudjel/Desktop/webserv/html";
@@ -73,9 +77,8 @@ void					Response::getFile(void) {
 		std::cout << "Request::checkingFile!" << std::endl;
 	}
 	closedir(repertoire);
-	//
-	if (url == "/") //selon fichier de config
-		url = "/index.html";
+
+	redirectionUrl();
 	try {
 		mime.getMediaType(url);
 	}
@@ -99,6 +102,14 @@ void					Response::getFile(void) {
 
 }
 
+void		Response::redirectionUrl(void) {
+	if (url == "/") //selon fichier de config
+		url = "/index.html";
+}
+
+/*
+** --------------------------------- HANDLE ERROR ----------------------------------
+*/
 
 void		Response::handleError(void) {
 	if (code == 100) {
@@ -109,9 +120,12 @@ void		Response::handleError(void) {
 		fileName = "error.html";
 		file = std::vector<char>(statusCodes[code].second.begin(), statusCodes[code].second.end());
 	}
-
-
 }
+
+
+/*
+** ------------------------ SETTING UP EACH RESPONSE LINE -------------------------
+*/
 
 std::string	Response::getTime(void) {
 
@@ -126,6 +140,7 @@ std::string Response::getServerName(void) {
     std::string line = "Server: WebServ 1.0 \n\r";
     return line;
 }
+
 std::string Response::getLength(void) {
 	std::string line = "Content-Length: ";
 	std::ostringstream s;
@@ -137,12 +152,18 @@ std::string Response::getLength(void) {
 
 std::string Response::getTypeContent(void) {
 	std::string line = "Content-Type: "; //
-	// std::string contentType = this->mime.getMediaType(fileName); //fileName qui contient le name de ce quon envoie
-	// line += contentType;
-	// if (contentType == "text/html"){
-	// 	line += "; charset=utf-8";
-	// }
-	// line += "\r\n";
+	std::string contentType = this->mime.getMediaType(fileName); //fileName qui contient le name de ce quon envoie
+	line += contentType;
+	if (contentType == "text/html"){
+		line += "; charset=utf-8";
+	}
+	line += "\r\n";
+	return line;
+}
+
+std::string Response::getConnectionType(void) { //pour linstant close, a voir si on gere le keep alive
+	std::string line = "Connexion: Close";
+	line += "\r\n";
 	return line;
 }
 

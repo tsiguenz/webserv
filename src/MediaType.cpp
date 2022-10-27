@@ -358,7 +358,9 @@ MediaType::~MediaType(){
 }
 
 std::string MediaType::getMediaType(std::string url) {
-    return (mime.at(url));
+    std::string line = url.substr(url.find_last_of('.') + 1);
+    std::cout << "url =" << url << "line =" << line << std::endl;
+    return (mime[line]);
 }
 
 /* ************************************************************************** */

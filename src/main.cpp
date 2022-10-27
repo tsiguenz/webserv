@@ -1,7 +1,8 @@
 #ifndef __IS_TEST__
 
 # include "webserv.h"
-# include "Response.hpp"
+// # include "Response.hpp"
+# include "Server.hpp"
 
 int	main(int argc, char **argv) {
 	// MediaType lol;

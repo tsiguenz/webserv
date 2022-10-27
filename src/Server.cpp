@@ -48,8 +48,9 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == false) {
 			Request currentRequest;
 			Response currentResponse(_parseRequest(currentEvent));
+			currentResponse.printResponse();
 			// currentRequest.printRequest();
-			_sendResponse(currentEvent, &currentRequest);
+			_sendResponse(currentEvent, currentResponse);
 		}
 	}
 }
@@ -71,8 +72,10 @@ void	Server::_newConnection(int const& fd) const {
 }
 
 Request	Server::_parseRequest(epoll_event const& event) const {
-	if (!(event.events & EPOLLIN))
+	if (!(event.events & EPOLLIN)) {
+		std::cout << BLUE "COUCOU\n" WHITE;
 		return(Request()) ;
+	}
 	// TODO: warning if recv don't return all the request
 	char		buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
@@ -89,13 +92,14 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 
 }
 
-void	Server::_sendResponse(epoll_event const& event, Request	*currentRequest) const {
-	if (!(event.events & EPOLLOUT))
+void	Server::_sendResponse(epoll_event const& event, Response currrentResponse) const {
+	if (!(event.events & EPOLLOUT)){
+		std::cout << RED "COUCOU\n" WHITE;
 		return ;
-	(void)currentRequest;
+	}
 	// TODO: construct HTTP response
 	std::string	str = DUMMY_RESPONSE;
-	send(event.data.fd, str.c_str(), str.size(), 0);
+	send(event.data.fd, currrentResponse.response.c_str(),  currrentResponse.response.size(), 0);
 	// if keep alive else defautl
 	if (0)
 		_modEvent(event.data.fd, EPOLLIN);

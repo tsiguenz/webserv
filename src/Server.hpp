@@ -47,7 +47,7 @@ class Server {
 		void	_newConnection(int const& fd) const;
 		void	_handleEvent(int const& nbEpollFd) const;
 		Request	_parseRequest(epoll_event const& event) const;
-		void	_sendResponse(epoll_event const& event, Request	*currentRequest) const;
+		void	_sendResponse(epoll_event const& event, Response currentResponse) const;
 
 		void	_setNonBlocking(int const& fd) const;
 };

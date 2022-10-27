@@ -42,11 +42,13 @@ class Response
 		void		deleteFile(void); //DELETE
 		
 		void	handleError(void);
+		void	redirectionUrl(void);
 
 		std::string getResponse(void);
 		std::string	getTime(void);
 		std::string	getServerName(void);
 		std::string getLength(void);
+		std::string	getConnectionType(void);
 		std::string	getTypeContent(void);
 
 		void		initMapCode(void);
