@@ -10,7 +10,7 @@ TEST_PATH = test/
 INC = -Iinclude -Isrc -Isrc/ParseConfig
 TEST_INC = -Itest/include
 
-SRC_NAME = main.cpp utils.cpp Server.cpp Request.cpp Response.cpp MediaType.cpp
+SRC_NAME = main.cpp utils.cpp Server.cpp Request.cpp Response.cpp MediaType.cpp ErrorHandler.cpp
 TEST_SRC_NAME = test_main.cpp
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 

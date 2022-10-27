@@ -11,10 +11,10 @@ Request::Request(void): isParsed(false), badRequest(false), uriTooLong(false), i
 
 Request::Request(std::string const & toParse): rawRequest(toParse), isParsed(true), badRequest(false), uriTooLong(false), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
-	std::cout << rawRequest;
+	std::cout << rawRequest; //DEBUG
 	parsingRequest();
-	// printRequest();
-	// std::cout << rawRequest << std::endl;
+	// printRequest(); //DEBUG
+	// std::cout << rawRequest << std::endl; //DEBUG
 }
 
 Request::Request( const Request & src )
@@ -89,15 +89,12 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 	}
 	
 	method = firstLine.substr(0, nextSpace);
-
 	if (method != "GET" && method != "DELETE" && method != "POST"){
 		badRequest = true;
 		return 1;
 	}
-
 	firstLine = firstLine.erase(0, nextSpace + 1);
 	nextSpace = firstLine.find_first_of(' ');
-
 	if (nextSpace == std::string::npos){
 		badRequest = true;
 		return 1;
@@ -138,7 +135,7 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 	line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);	
 	while (!line.empty() && line != "\r\n") {
 		
-		// std::cout << "line= " << line << std::endl;
+		// std::cout << "line= " << line << std::endl; //DEBUG
 		if (line.find_first_of(':') == std::string::npos) {
 			badRequest = true;
 			return 1;
@@ -161,7 +158,7 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 			return 1;
 		}	
 		fieldLines[fieldName] = fieldValue;
-		// std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl;
+		// std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl; //DEBUG
 		line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);
 	}
 	return 0;
@@ -185,60 +182,6 @@ int	Request::parsingBody(void) {
 	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4);
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int					Request::checkingFile(void) {
-
-	//en attendant le fichier de config
-	std::string pathRepertoire = "/mnt/nfs/homes/aboudjel/Desktop/webserv/html";
-	DIR *repertoire = opendir(pathRepertoire.c_str());
-	if (!repertoire)
-	{
-		std::cout << "ERREUR: en attendant le fichier config jai mis le path des fichier dans /mnt/nfs/homes/aboudjel/Desktop/webserv/html faut mettre ta racine a toi dans \n";
-		std::cout << "Request::checkingFile!" << std::endl;
-	}
-	closedir(repertoire);
-	//
-	if (url == "/")
-		url = "/index.html";
-	std::string path = pathRepertoire + url;
-	FILE* fp = std::fopen(path.c_str(), "r"); //DEFINIR LE PATH PAR LE REPERTOIRE DANS CONFIG !!!!!!!
-    if(!fp) {
-        // code = 404;
-		std::cout << "404 mon PETIT REUF\n" << std::endl;
-        return 1;
-    }
-	std::fclose(fp);
-	std::cout << "c bon igo" << std::endl;
-	return 0;
-
-}
-
-
-
-
-
-
-
 
 void				Request::create(std::string const & toParse) {
 	rawRequest 	= toParse;

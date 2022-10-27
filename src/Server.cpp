@@ -87,7 +87,7 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 	// 	std::cout << "400 \n";
 	// 	return;
 	// }
-	currentRequest.printRequest();
+	// currentRequest.printRequest();
 	_modEvent(event.data.fd, EPOLLOUT);
 	return (currentRequest);
 
@@ -99,8 +99,7 @@ void	Server::_sendResponse(epoll_event const& event, Response const& currentResp
 //		std::cout << RED "COUCOU\n" WHITE;
 //		return ;
 //	}
-	currentResponse.printResponse();
-//	currentRequest.printRequest();
+	// currentResponse.printResponse();
 	// TODO: construct HTTP response
 //	std::string	str = DUMMY_RESPONSE;
 	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);

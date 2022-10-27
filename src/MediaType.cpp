@@ -357,10 +357,94 @@ MediaType::MediaType(){
 MediaType::~MediaType(){
 }
 
-std::string MediaType::getMediaType(std::string url) {
-    std::string line = url.substr(url.find_last_of('.') + 1);
-    std::cout << "url =" << url << "line =" << line << std::endl;
-    return (mime[line]);
+std::string MediaType::getMediaType(std::string requestedExtension) {
+    // std::cout << std::endl << RED "Request : " << requestedExtension << WHITE << std::endl;
+    requestedExtension.erase(std::remove_if(requestedExtension.begin(), requestedExtension.end(), ::isspace),
+            requestedExtension.end()); // remove all space
+    // std::cout << std::endl << PURPLE "Request : " << requestedExtension << PURPLE << WHITE << std::endl;
+    while (requestedExtension.find('/') != std::string::npos) // reach the file
+    {
+        requestedExtension = requestedExtension.substr(requestedExtension.find('/') + 1);
+    } 
+    // std::cout << CYAN << "final : " << requestedExtension << WHITE << std::endl;
+    while (requestedExtension.find_last_of('.') != std::string::npos) // reach the extension
+    {
+        requestedExtension = requestedExtension.substr(requestedExtension.find('.') + 1);
+    } 
+    // std::cout << GREEN << "final : " << requestedExtension << WHITE << std::endl;
+    return (mime.at(requestedExtension)); // searching extension in mime // at throw an exception if it's not find
 }
+
+std::string MediaType::getMediaExtension(std::string requestedType)
+{
+    if (requestedType.find('/') == std::string::npos)
+        return (NULL);
+    requestedType.erase(std::remove_if(requestedType.begin(), requestedType.end(), ::isspace),
+        requestedType.end()); // remove all space
+    for(std::map<std::string, std::string>::iterator it = mime.begin(); it != mime.end(); ++it)
+    {
+        if(mime[(*it).first] == requestedType)
+            return ((*it).first);
+    }
+    return (NULL);
+}
+
+// peut contenir une wildcart
+// requestedTypes : text/*;q=0.3, text/plain;q=0.7, text/plain;format=flowed, text/plain;format=fixed;q=0.4, */*;q=0.5
+// fileFormat : Mon file au format type
+bool 		MediaType::isInAccepted(std::string accepted, std::string fileFormat) //(recoit la ligne complete de "Accepted: " et la parse (du coup fait les ordre de prio et tout)) et check si ce quon sapprete a renvoyer et dans accepted //TODO
+{
+    accepted.erase(std::remove_if(accepted.begin(), accepted.end(), ::isspace),
+        accepted.end()); // remove all space
+    
+    for (int i = 0; i < 10; i++){
+        std::string parsed = accepted.substr(0, accepted.find(','));
+        if (parsed.find(';') != std::string::npos)
+            parsed = parsed.substr(0, accepted.find(';'));
+        std::cout << "Element : " << parsed << "\tfind : " << isTypeSupported(parsed) << std::endl;
+        if (isTypeSupported(parsed))
+            std::cout << "\t\t" << getMediaExtension(parsed) << std::endl;
+        if (isTypeSupported(parsed))
+            if (getMediaExtension(parsed) == fileFormat)
+                return (true);
+        if (accepted.find(',') == std::string::npos)
+            break;
+        accepted = accepted.substr(accepted.find(',') + 1);
+        // std::cout << "Accepted : " << accepted << std::endl;
+    }
+    (void)fileFormat;
+    return (false);
+}
+
+bool	MediaType::isTypeSupported(std::string	requestedType) //recoit la ligne dans contentType et check si le type est bien un media type accepté //TODO
+{
+    // std::cout << std::endl << RED "Giving : " << requestedType << RED << WHITE << std::endl;
+    requestedType.erase(std::remove_if(requestedType.begin(), requestedType.end(), ::isspace),
+        requestedType.end()); // remove all space
+    // std::cout << std::endl << PURPLE "Space : " << requestedType << PURPLE << WHITE << std::endl;
+    requestedType = requestedType.substr(0, requestedType.find(';'));
+    if (requestedType.find('/') == std::string::npos)
+        return (false); //comporte un /
+    // std::cout << std::endl << CYAN "After ';' : '" << requestedType << "'" CYAN << WHITE << std::endl;
+    for(std::map<std::string, std::string>::iterator it = mime.begin(); it != mime.end(); ++it)
+    {
+        if(mime[(*it).first] == requestedType)
+            return (true);
+    }
+    return (false);
+}
+
+bool	MediaType::isExtensionSupported(std::string	requestedExtension)
+{
+    requestedExtension.erase(std::remove_if(requestedExtension.begin(), requestedExtension.end(), ::isspace),
+        requestedExtension.end());
+    if (requestedExtension.find_last_of('.') == std::string::npos)
+        return (true);
+    requestedExtension = requestedExtension = requestedExtension.substr(requestedExtension.find_last_of('.')+1);
+    if (mime.find(requestedExtension) == mime.end())
+        return (false);
+    return (true);
+}
+
 
 /* ************************************************************************** */

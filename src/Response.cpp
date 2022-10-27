@@ -45,7 +45,7 @@ void				Response::buildingResponse(void) {
 	    getFile();
 	//if post ou delete 411
 
-	
+	// std::cout <<;
 	
 	if (code != 200)  {
 		handleError();
@@ -69,21 +69,11 @@ void				Response::buildingResponse(void) {
 
 void		Response::getFile(void) {
 
-	//en attendant le fichier de config
-	std::string pathRepertoire = "html";
-	DIR *repertoire = opendir(pathRepertoire.c_str());
-	if (!repertoire)
-	{
-		std::cout << "ERREUR: en attendant le fichier config jai mis le path des fichier dans /mnt/nfs/homes/aboudjel/Desktop/webserv/html faut mettre ta racine a toi dans \n";
-		std::cout << "Request::checkingFile!" << std::endl;
-	}
-	closedir(repertoire);
-
+	
+	std::string pathRepertoire = "html"; //SELON CONFIG
 	redirectionUrl();
-	try {
-		mime.getMediaType(url);
-	}
-	catch(std::exception& e) {	
+
+	if (!mime.isExtensionSupported(url)) {	
 		code = 415;
 		return;
 	}
@@ -92,12 +82,12 @@ void		Response::getFile(void) {
 	std::ifstream file(path.c_str());
     if(file.fail()) {
         code = 404;
-		std::cout << "404 mon PETIT REUF\n" << std::endl;
+		std::cout << "404 mon PETIT REUF\n" << std::endl; // DEBUG
         return ;
     }
 	this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
-	std::cout << "c bon igo lurl mene a qlq chose" << std::endl;
+	std::cout << "c bon igo lurl mene a qlq chose" << std::endl; // DEBUG
 	fileName = url;
 	return ;
 
@@ -232,7 +222,7 @@ void	Response::initMapCode(void) {
 	// statusCodes[415] = "Unsupported Media Type"; //
 	// statusCodes[431] = "Request Header Fields Too large"; //
 
-	// statusCodes[500] = "IInternal Server Error"; //
+	// statusCodes[500] = "Internal Server Error"; //
 
 }
 
