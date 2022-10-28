@@ -6,21 +6,13 @@
 
 //: mime()
 Response::Response( Request  src ): mime(){
-
-	if (!src.isParsed)
-		code = 500;
-	else if (src.badRequest)
-		code = 400;
-    else if (src.uriTooLong)
-        code = 414;
-	else {
-		code = 200;
-		method = src.method;
-		url = src.url;
-		httpVersion = src.httpVersion;
-		fieldLines = src.fieldLines;
-		body = src.body;
-	}
+	
+	code = src.parsingCode;
+	method = src.method;
+	url = src.url;
+	httpVersion = src.httpVersion;
+	fieldLines = src.fieldLines;
+	body = src.body;
 	initMapCode();
 	buildingResponse();
 }
@@ -41,9 +33,13 @@ Response::~Response(){
 void				Response::buildingResponse(void) {
 
 
-    if (code == 200 && method == "GET")
+    if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
-	//if post ou delete 411
+	if (method == "DELETE") {
+
+		deleteFile();
+	}
+	//if post 411
 
 	// std::cout <<;
 	
@@ -54,13 +50,17 @@ void				Response::buildingResponse(void) {
 	response = getResponse();
 	response += getTime();
 	response += getServerName();
-	if (!file.empty())
-		response += getTypeContent();
-	response += getLength();
 	response += getConnectionType();
-	response += "\r\n";
-	if (!file.empty())
-		response += std::string(file.begin(), file.end());
+	if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
+		if (!file.empty())
+			response += getTypeContent();
+		response += getLength();
+		response += "\r\n";
+		if (!file.empty())
+			response += std::string(file.begin(), file.end());
+	}
+	else
+		response += "\r\n";
 }
 
 /*
@@ -69,10 +69,10 @@ void				Response::buildingResponse(void) {
 
 void		Response::getFile(void) {
 
-	
-	std::string pathRepertoire = "html"; //SELON CONFIG
-	redirectionUrl();
-
+	std::string pathRepertoire = "html/"; //SELON CONFIG
+	redirectionUrl(); // pas vrm  redir plus redirIndex //SELON CONFIG
+	// redirectionUrl(); // en faire un qui redir //SELON CONFIG
+	// redirectionUrl(); // en faire un spé root //SELON CONFIG
 	if (!mime.isExtensionSupported(url)) {	
 		code = 415;
 		return;
@@ -89,6 +89,7 @@ void		Response::getFile(void) {
 	file.close();
 	std::cout << "c bon igo lurl mene a qlq chose" << std::endl; // DEBUG
 	fileName = url;
+	//check if its GET and if its in accepted
 	return ;
 
 }
@@ -97,6 +98,24 @@ void		Response::redirectionUrl(void) {
 	if (url == "/") //selon fichier de config
 		url = "/index.html";
 }
+
+
+/*
+** --------------------------------- DELETE METHODE ----------------------------------
+*/
+
+	void	Response::deleteFile(void) {
+		std::string pathRepertoire = "html"; //SELON CONFIG
+
+		if (fileName.find("..") != std::string::npos) {
+			code = 400;
+			return;
+		}
+
+		if (remove((pathRepertoire +fileName).c_str()) != 0) {
+     		code = 403; //403 ou 401?
+		}
+	}
 
 /*
 ** --------------------------------- HANDLE ERROR ----------------------------------

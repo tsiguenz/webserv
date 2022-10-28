@@ -28,10 +28,8 @@ class Request
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		std::string body;
 
-		bool		isParsed;
-		bool		badRequest;
-		bool		uriTooLong;
-
+		int			parsingCode;
+		
 		void		create(std::string const & toParse);
 		void		create(Request const & rhs);
 		Request &	operator=(Request const & rhs);
