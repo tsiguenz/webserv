@@ -25,6 +25,7 @@ void	object_managment();
 void	check_file_name();
 void	read_file();
 void	get_block();
+void	parse_directive();
 void	parse_file_content();
 void	parse_server_block();
 void	parse_location_block();

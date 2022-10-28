@@ -11,15 +11,16 @@ class VirtualServer {
 	public:
 		// Object managment
 		VirtualServer();
+		VirtualServer(VirtualServer const& vs);
 		virtual ~VirtualServer();
 
 		// Accessors
-		std::string			getErrorPageByCode(int const& errorCode) const;
-		std::string			getServerName() const;
-		std::string			getIp() const;
-		short				getPort() const;
-		int					getClientMaxBodySize() const;
-		std::list<Location>	getLocationList() const;
+		std::string				getErrorPageByCode(int const& errorCode) const;
+		std::list<std::string>	getServerNames() const;
+		std::string				getIp() const;
+		short					getPort() const;
+		int						getClientMaxBodySize() const;
+		std::list<Location>		getLocationList() const;
 
 		void	setErrorPage(int const& errorCode, std::string const& path);
 		void	setServerName(std::string const& serverName);
@@ -29,12 +30,16 @@ class VirtualServer {
 		void	setNewLocation(Location location);
 
 	private:
-		std::string					_serverName;
-		std::string					_ip;
-		short						_port;
+		std::list<std::string>	_serverNames;
+		std::string				_ip;
+		short					_port;
+		int						_clientMaxBodySize;
+		std::list<Location>		_locationList;
+		// set default in locations
 		std::map<int, std::string>	_errorPages;
-		int							_clientMaxBodySize;
-		std::list<Location>			_locationList;
+		bool						_autoIndex;
+		std::string					_index;
+		std::string					_root;
 	};
 
 #endif // VIRTUAL_SERVER_HPP

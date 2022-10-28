@@ -2,15 +2,21 @@
 
 // Object managment
 
-ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v")
-{ _virtualServerList.push_back(VirtualServer()); }
+ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v") {
+	_initAllowedDirectives();
+	_virtualServerList.push_back(VirtualServer());
+	VirtualServer&	vs = _virtualServerList.front();
+	vs.setIp("0.0.0.0");
+	vs.setPort(8080);
+	vs.setClientMaxBodySize(8192);
+}
 
 ConfigParser::ConfigParser(std::string const& fileName): _WHITESPACES(" \n\r\t\f\v") {
 	_checkFileName(fileName);
 	_initAllowedDirectives();
-//	_fileName = fileName;
-//	_readFile(fileName);
-//	_parseFileContent();
+	//	_fileName = fileName;
+	//	_readFile(fileName);
+	//	_parseFileContent();
 }
 
 ConfigParser::~ConfigParser() { }
@@ -40,13 +46,17 @@ void	ConfigParser::_initAllowedDirectives() {
 	_allowedServerDirectives.push_back("listen");
 	_allowedServerDirectives.push_back("error_page");
 	_allowedServerDirectives.push_back("client_max_body");
+	_allowedServerDirectives.push_back("index");
+	_allowedServerDirectives.push_back("root");
+	_allowedServerDirectives.push_back("autoindex");
 	_allowedLocationDirectives.push_back("methods");
 	_allowedLocationDirectives.push_back("return");
 	_allowedLocationDirectives.push_back("root");
 	_allowedLocationDirectives.push_back("autoindex");
 	_allowedLocationDirectives.push_back("index");
-	_allowedLocationDirectives.push_back("cgi-allowed-ext");
-	_allowedLocationDirectives.push_back("upload-path");
+	_allowedLocationDirectives.push_back("cgi_allowed_ext");
+	_allowedLocationDirectives.push_back("upload_path");
+	_allowedLocationDirectives.push_back("error_page");
 }
 
 bool	ConfigParser::_isServerDirective(std::string const& str) {
@@ -116,14 +126,21 @@ std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) {
 	throw std::invalid_argument("Block is not closed in _getServerBlock()\n");
 }
 
+void	ConfigParser::_parseDirective(std::string const& line, Location& location) {
+	std::string	tLine = trim(line);
+	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
+	if (_isLocationDirective(tLine.substr(0, tLine.find_first_of(_WHITESPACES))) == false)
+		throw std::invalid_argument("Bad directive name in location block\n");
+	if (directiveName == "redir")
+		_parseRedir(tLine, location);
+}
+
 void	ConfigParser::_parseFileContent(std::string const& fileContent) {
 	std::stringstream	sContent(fileContent);
 	std::string			serverBlock;
 
-	while ((serverBlock = _getServerBlock(sContent)) != "") {
-		std::cout << "loop" << std::endl;
+	while ((serverBlock = _getServerBlock(sContent)) != "")
 		_parseServerBlock(serverBlock);
-	}
 }
 
 VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
@@ -142,11 +159,59 @@ VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
 		size_t	sep = line.find_first_of(_WHITESPACES);
 		if (sep == std::string::npos)
 			throw std::invalid_argument("Bad directive syntax _parseServerBlock()\n");
-		std::cout << line.substr(0, line.find_first_of(_WHITESPACES)) << std::endl;
+//		std::cout << line.substr(0, line.find_first_of(_WHITESPACES)) << std::endl;
 	}
 	return vs;
 }
- 
+
 void	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
 	(void) locationBlock;
+}
+
+void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
+	std::string	tLine = trim(line);
+	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
+	if (_isServerDirective(tLine.substr(0, tLine.find_first_of(_WHITESPACES))) == false)
+		throw std::invalid_argument("Bad directive name in server block\n");
+	if (directiveName == "server_name")
+		_parseServerNames(tLine, vs);
+	if (directiveName == "listen") {
+		_parseIp(tLine, vs);
+//		_parsePort(tLine, vs);
+	}
+}
+
+void	ConfigParser::_parseServerNames(std::string const& line, VirtualServer& vs) {
+	if (vs.getServerNames().empty() == false)
+		throw std::invalid_argument("Server name is defined multiple time\n");
+	size_t	nextSpace = line.find_first_of(_WHITESPACES);
+	if (nextSpace == std::string::npos)
+		throw std::invalid_argument("Server name directive bad syntax\n");
+	std::string	str = trim(line.substr(nextSpace));
+	while (1) {
+		nextSpace = str.find_first_of(_WHITESPACES);
+		if (nextSpace == std::string::npos) {
+			vs.setServerName(str);
+			return ;
+		}
+		vs.setServerName(str.substr(0, str.find_first_of(_WHITESPACES)));
+		nextSpace = str.find_first_of(_WHITESPACES);
+		str = trim(str.substr(nextSpace));
+	}
+}
+
+void	ConfigParser::_parseIp(std::string const& line, VirtualServer& vs) {
+	if (vs.getIp().empty() == false || vs.getPort() != 0)
+		throw std::invalid_argument("Listen is defined multiple time\n");
+	size_t	nextSpace = line.find_first_of(_WHITESPACES);
+	if (nextSpace == std::string::npos)
+		throw std::invalid_argument("Listen directive bad syntax\n");
+	std::string	str = trim(line.substr(line.find_first_of(_WHITESPACES)));
+//	if (str.find(":") != std::string::npos)
+//		;
+}
+
+void	ConfigParser::_parseRedir(std::string const& line, Location location) {
+	std::string	str = line.substr(line.find_first_of(_WHITESPACES));
+	location.setRedir(trim(str));
 }

@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <list>
+# include <map>
 
 class Location {
 	public:
@@ -20,6 +21,8 @@ class Location {
 		std::list<std::string>		getAllowedExtCGI() const;
 		std::string					getUploadPath() const;
 
+		void	setRedir(std::string const& redir);
+
 	private:
 		std::string					_path;
 		std::list<std::string>		_allowedMethods;
@@ -29,6 +32,7 @@ class Location {
 		std::string					_index;
 		std::list<std::string>		_allowedExtCGI;
 		std::string					_uploadPath;
+		std::map<int, std::string>	_errorPages;
 	};
 
 #endif // LOCATION_HPP

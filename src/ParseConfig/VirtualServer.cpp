@@ -2,10 +2,14 @@
 
 // Object managment
 
-VirtualServer::VirtualServer(): _serverName(), _locationList() {
-	_ip = "127.0.0.1";
-	_port = 8080;
-	_clientMaxBodySize = -1; // do not limit by default
+VirtualServer::VirtualServer(): _serverNames(), _port(), _locationList() { }
+
+VirtualServer::VirtualServer(VirtualServer const& vs) {
+	_serverNames = vs._serverNames;
+	_ip = vs._ip;
+	_port = vs._port;
+	_clientMaxBodySize = vs._clientMaxBodySize;
+	_locationList = vs._locationList;
 }
 
 VirtualServer::~VirtualServer() { }
@@ -16,8 +20,8 @@ std::string	VirtualServer::getErrorPageByCode(int const& errorCode) const {
 	return _errorPages.at(errorCode);
 }
 
-std::string	VirtualServer::getServerName() const {
-	return _serverName;
+std::list<std::string>	VirtualServer::getServerNames() const {
+	return _serverNames;
 }
 
 std::string	VirtualServer::getIp() const {
@@ -41,7 +45,7 @@ void	VirtualServer::setErrorPage(int const& errorCode, std::string const& path) 
 }
 
 void	VirtualServer::setServerName(std::string const& serverName) {
-	_serverName = serverName;
+	_serverNames.push_back(serverName);
 }
 
 void	VirtualServer::setIp(std::string const& ip) {

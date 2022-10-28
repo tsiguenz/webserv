@@ -8,11 +8,11 @@ void	object_managment() {
 	{
 		int	ctn = 0;
 		VirtualServer	vs = cp.getVirtualServerList().front();
-		if (vs.getIp() != "127.0.0.1")
+		if (vs.getIp() != "0.0.0.0")
 			ctn++;
 		if (vs.getPort() != 8080)
 			ctn++;
-		if (vs.getClientMaxBodySize() != -1)
+		if (vs.getClientMaxBodySize() != 8192)
 			ctn++;
 		assertEq("default constructor test", ctn, 0);
 	}

@@ -26,6 +26,7 @@ TEST_SRC_NAME = test_main.cpp \
 				config_parser/parse_file_content.cpp \
 				config_parser/parse_server_block.cpp \
 				config_parser/parse_location_block.cpp \
+				config_parser/parse_directive.cpp \
 
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 

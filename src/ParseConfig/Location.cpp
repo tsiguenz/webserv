@@ -41,3 +41,7 @@ std::list<std::string>		Location::getAllowedExtCGI() const {
 std::string	Location::getUploadPath() const {
 	return _uploadPath;
 }
+
+void	Location::setRedir(std::string const& redir) {
+	_redir = redir;
+}
