@@ -6,7 +6,7 @@
 
 //: mime()
 Response::Response( Request  src ): mime(){
-	
+
 	code = src.parsingCode;
 	method = src.method;
 	url = src.url;
@@ -39,9 +39,8 @@ void				Response::buildingResponse(void) {
 
 		deleteFile();
 	}
-	//if post 411
+	//if post
 
-	// std::cout <<;
 	
 	if (code != 200)  {
 		handleError();
@@ -79,6 +78,7 @@ void		Response::getFile(void) {
 	}
 	std::string path = pathRepertoire + url;
 	// FILE* fp = std::fopen(path.c_str(), "r"); //DEFINIR LE PATH PAR LE REPERTOIRE DANS CONFIG !!!!!!!
+	// ici pour check les authorisations dou tu peux
 	std::ifstream file(path.c_str());
     if(file.fail()) {
         code = 404;
@@ -215,6 +215,7 @@ void	Response::initMapCode(void) {
 	statusCodes.insert( std::make_pair( 408, std::make_pair("Request Timeout","<!DOCTYPE html><html><head><title>408</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/408\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">TIME OUT</p></body></html>")));
 	statusCodes.insert( std::make_pair( 410, std::make_pair("Gone","<!DOCTYPE html><html><head><title>410</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/410\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The requested content has been permanently deleted from server, with no forwarding address.</p></body></html>")));
 	statusCodes.insert( std::make_pair( 411, std::make_pair("Length Required","<!DOCTYPE html><html><head><title>411</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/411\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">Server rejected the request because the Content-Length header field is not defined and the server requires it.</p></body></html>")));
+	statusCodes.insert( std::make_pair( 413, std::make_pair("Payload Too Large","<!DOCTYPE html><html><head><title>413</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/413\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">Request body is larger than limits defined by server.</p></body></html>")));
 	statusCodes.insert( std::make_pair( 414, std::make_pair("URI Too Long","<!DOCTYPE html><html><head><title>414</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/414\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The URI requested by the client is longer than the server is willing to interpret.</p></body></html>")));
 	statusCodes.insert( std::make_pair( 415, std::make_pair("Unsupported Media Type","<!DOCTYPE html><html><head><title>415</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/415\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The media format of the requested data is not supported by the server.</p></body></html>")));
 	statusCodes.insert( std::make_pair( 431, std::make_pair("Request Header Fields Too large","<!DOCTYPE html><html><head><title>431</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/431\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The server is unwilling to process the request because its header fields are too large. The request may be resubmitted after reducing the size of the request header fields.</p></body></html>")));
@@ -239,6 +240,7 @@ void	Response::initMapCode(void) {
 	// statusCodes[408] = "Request Timeout";//
 	// statusCodes[410] = "Gone";
 	// statusCodes[411] = "Length Required";//
+	// statusCodes[413] = "Payload Too Large";//
 	// statusCodes[414] = "URI Too Long";//
 	// statusCodes[415] = "Unsupported Media Type"; //
 	// statusCodes[431] = "Request Header Fields Too large"; //

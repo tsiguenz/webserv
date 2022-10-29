@@ -63,12 +63,11 @@ void	Request::parsingRequest(void) {
 		return ;
 	if (parsingBody())
 		return ;
+
 	if (method == "POST") {
 		std::map<std::string,std::string>::iterator it;
-		it = fieldLines.find("content-length");
-  		if (it == fieldLines.end()) {
-			//check alors si ca peut etre chunk
-		
+		it = fieldLines.find("Content-Length");
+  		if (it == fieldLines.end()) {	
 			parsingCode = 411;
 			return ;
 		}
@@ -187,11 +186,12 @@ int	Request::parsingFieldName(std::string fieldName) {
 
 int	Request::parsingBody(void) {
 	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) { //est ce que logique /r/n/r/n ???
-		
 			parsingCode = 400;
 			return 1;
 	}
 	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4);
+	if (body.size() >= 1000000) // config
+		parsingCode = 413;
 	return 0;
 }
 

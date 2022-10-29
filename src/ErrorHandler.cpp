@@ -5,6 +5,7 @@
 */
 
 ErrorHandler::ErrorHandler() {
+	
 	templateError = "<!DOCTYPE html><html><head><title></title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\"></p></body></html>";
 	
 	errorMessage[400] = "The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing)."; 
@@ -16,6 +17,7 @@ ErrorHandler::ErrorHandler() {
 	errorMessage[408] = "TIME OUT";
 	errorMessage[410] = "The requested content has been permanently deleted from server, with no forwarding address.";
 	errorMessage[411] = "Server rejected the request because the Content-Length header field is not defined and the server requires it.";
+	errorMessage[413] = "Request body is larger than limits defined by server.";
 	errorMessage[414] = "The URI requested by the client is longer than the server is willing to interpret.";
 	errorMessage[415] = "The media format of the requested data is not supported by the server."; 
 	errorMessage[431] = "The server is unwilling to process the request because its header fields are too large. The request may be resubmitted after reducing the size of the request header fields."; 
