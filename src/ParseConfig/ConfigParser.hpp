@@ -45,15 +45,14 @@ class	ConfigParser {
 
 		// VirtualServer
 		void			_parseServerNames(std::string const& line, VirtualServer& vs);
-		void			_parseIp(std::string const& line, VirtualServer& vs);
+		void			_parseListen(std::string const& line, VirtualServer& vs);
+		void			_parseErrorPage(std::string const& line, VirtualServer& vs);
+		void			_parseClientMaxBodySize(std::string const& line, VirtualServer& vs);
 		// Location
-		void			_parseRedir(std::string const& line, Location location);
+//		void			_parseRedir(std::string const& line, Location location);
 
-		template<typename T>
-		void	_dispatchParseDirective(std::string const& tLine, T& obj) {
-			_allowedServerDirectives.push_back("server_name");
-		}
-
+		// Helper
+		std::vector<std::string>	_splitInVector(std::string const& line) const;
 };
 
 #endif // CONFIG_PARSER_HPP

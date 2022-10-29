@@ -8,7 +8,7 @@ ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t
 	VirtualServer&	vs = _virtualServerList.front();
 	vs.setIp("0.0.0.0");
 	vs.setPort(8080);
-	vs.setClientMaxBodySize(8192);
+	vs.setClientMaxBodySize(1048576);
 }
 
 ConfigParser::ConfigParser(std::string const& fileName): _WHITESPACES(" \n\r\t\f\v") {
@@ -126,15 +126,6 @@ std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) {
 	throw std::invalid_argument("Block is not closed in _getServerBlock()\n");
 }
 
-void	ConfigParser::_parseDirective(std::string const& line, Location& location) {
-	std::string	tLine = trim(line);
-	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
-	if (_isLocationDirective(tLine.substr(0, tLine.find_first_of(_WHITESPACES))) == false)
-		throw std::invalid_argument("Bad directive name in location block\n");
-	if (directiveName == "redir")
-		_parseRedir(tLine, location);
-}
-
 void	ConfigParser::_parseFileContent(std::string const& fileContent) {
 	std::stringstream	sContent(fileContent);
 	std::string			serverBlock;
@@ -168,6 +159,7 @@ void	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
 	(void) locationBlock;
 }
 
+// virtual server overload
 void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
 	std::string	tLine = trim(line);
 	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
@@ -175,43 +167,93 @@ void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
 		throw std::invalid_argument("Bad directive name in server block\n");
 	if (directiveName == "server_name")
 		_parseServerNames(tLine, vs);
-	if (directiveName == "listen") {
-		_parseIp(tLine, vs);
-//		_parsePort(tLine, vs);
-	}
+	if (directiveName == "listen")
+		_parseListen(tLine, vs);
+	if (directiveName == "error_page")
+		_parseErrorPage(tLine, vs);
+	if (directiveName == "client_max_body")
+		_parseClientMaxBodySize(tLine, vs);
+}
+
+// location overload
+void	ConfigParser::_parseDirective(std::string const& line, Location& location) {
+	(void) location;
+	std::string	tLine = trim(line);
+	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
+	if (_isLocationDirective(tLine.substr(0, tLine.find_first_of(_WHITESPACES))) == false)
+		throw std::invalid_argument("Bad directive name in location block\n");
+//	if (directiveName == "redir")
+//		_parseRedir(tLine, location);
 }
 
 void	ConfigParser::_parseServerNames(std::string const& line, VirtualServer& vs) {
-	if (vs.getServerNames().empty() == false)
-		throw std::invalid_argument("Server name is defined multiple time\n");
-	size_t	nextSpace = line.find_first_of(_WHITESPACES);
-	if (nextSpace == std::string::npos)
-		throw std::invalid_argument("Server name directive bad syntax\n");
-	std::string	str = trim(line.substr(nextSpace));
-	while (1) {
-		nextSpace = str.find_first_of(_WHITESPACES);
-		if (nextSpace == std::string::npos) {
-			vs.setServerName(str);
-			return ;
-		}
-		vs.setServerName(str.substr(0, str.find_first_of(_WHITESPACES)));
-		nextSpace = str.find_first_of(_WHITESPACES);
-		str = trim(str.substr(nextSpace));
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() < 2)
+		throw std::invalid_argument("server name directive bad syntax\n");
+	v.erase(v.begin());
+	for (std::vector<std::string>::const_iterator it = v.begin(); it != v.end(); it++)
+		vs.setServerName(*it);
+}
+
+void	ConfigParser::_parseListen(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 2)
+		throw std::invalid_argument("listen directive bad syntax\n");
+	std::string	str = v.back();
+	size_t	sepPos = str.find(":");
+	// only port case
+	if (sepPos == std::string::npos && str.find(".") == std::string::npos)
+		vs.setPort(std::strtod(str.c_str(), NULL));
+	// only ip case
+	if (sepPos == std::string::npos && str.find(".") != std::string::npos)
+		vs.setIp(str);
+	// port and ip case
+	if (sepPos != std::string::npos) {
+		vs.setIp(str.substr(0, sepPos));
+		str = str.substr(sepPos + 1);
+		vs.setPort(std::strtod(str.c_str(), NULL));
 	}
 }
 
-void	ConfigParser::_parseIp(std::string const& line, VirtualServer& vs) {
-	if (vs.getIp().empty() == false || vs.getPort() != 0)
-		throw std::invalid_argument("Listen is defined multiple time\n");
-	size_t	nextSpace = line.find_first_of(_WHITESPACES);
-	if (nextSpace == std::string::npos)
-		throw std::invalid_argument("Listen directive bad syntax\n");
-	std::string	str = trim(line.substr(line.find_first_of(_WHITESPACES)));
-//	if (str.find(":") != std::string::npos)
-//		;
+void	ConfigParser::_parseErrorPage(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() < 3)
+		throw std::invalid_argument("error_page directive bad syntax\n");
+	v.erase(v.begin());
+	std::string	path = v.back();
+	for (std::vector<std::string>::const_iterator it = v.begin(); it != v.end() -1; it++)
+		vs.setErrorPage(std::strtod((*it).c_str(), NULL), path);
 }
 
-void	ConfigParser::_parseRedir(std::string const& line, Location location) {
-	std::string	str = line.substr(line.find_first_of(_WHITESPACES));
-	location.setRedir(trim(str));
+void	ConfigParser::_parseClientMaxBodySize(std::string const& line, VirtualServer& vs) {
+	(void) vs;
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 2)
+		throw std::invalid_argument("client_max_body directive bad syntax\n");
+	int	maxBodySize = strtod(v.back().c_str(), NULL);
+	// 10 MB limit
+	if (maxBodySize <= 0 || maxBodySize > 10485760)
+		throw std::invalid_argument("client_max_body bad value\n");
+	vs.setClientMaxBodySize(maxBodySize);
+}
+
+//void	ConfigParser::_parseRedir(std::string const& line, Location location) {
+//	std::string	str = line.substr(line.find_first_of(_WHITESPACES));
+//	location.setRedir(trim(str));
+//}
+
+std::vector<std::string>	ConfigParser::_splitInVector(std::string const& line) const {
+	std::string					str = line;
+	std::vector<std::string>	v;
+	size_t						nextSpace;
+
+	while (1) {
+		nextSpace = str.find_first_of(_WHITESPACES);
+		if (nextSpace == std::string::npos) {
+			v.push_back(str);
+			return v;
+		}
+		v.push_back(trim(str.substr(0, nextSpace)));
+		str = trim(str.substr(nextSpace));
+	}
 }

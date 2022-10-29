@@ -13,11 +13,9 @@ void	assertEq(std::string str, T a, T b) {
 	bool	isEq = (a == b);
 
 	if (isEq)
-		std::cout << GREEN << "[OK] ";
+		std::cout << GREEN << "[OK] " << str << DEFAULT << std::endl;
 	else
-		std::cout << RED << "[KO] ";
-	std::cout << str << " : a = " << a << " b = " << b << DEFAULT << std::endl;
-
+		std::cout << RED << "[KO] " << str << " : a = " << a << " b = " << b << DEFAULT << std::endl;
 }
 
 void	config_parser_tests();
