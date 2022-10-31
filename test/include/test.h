@@ -1,6 +1,7 @@
 #ifndef TEST_H
 # define TEST_H
 
+# include <iostream>
 # include "webserv.h"
 
 # define DEFAULT "\e[0m"

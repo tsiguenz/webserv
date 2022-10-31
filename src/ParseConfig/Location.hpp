@@ -18,10 +18,8 @@ class Location {
 		std::string					getRoot() const;
 		bool						getAutoIndex() const;
 		std::string					getIndex() const;
-		std::list<std::string>		getAllowedExtCGI() const;
+		std::list<std::string>		getAllowedExtCgi() const;
 		std::string					getUploadPath() const;
-
-		void	setRedir(std::string const& redir);
 
 	private:
 		std::string					_path;
@@ -30,7 +28,7 @@ class Location {
 		std::string					_root;
 		bool						_autoIndex;
 		std::string					_index;
-		std::list<std::string>		_allowedExtCGI;
+		std::list<std::string>		_allowedExtCgi;
 		std::string					_uploadPath;
 		std::map<int, std::string>	_errorPages;
 	};

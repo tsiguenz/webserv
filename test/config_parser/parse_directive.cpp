@@ -63,9 +63,8 @@ void	parse_directive() {
 			if (vs.getServerNames().front() != "eho.com")
 				ctn++;
 		}
-		assertEq("server name", ctn, 2);
+		assertEq("server_name", ctn, 2);
 	}
-	// parse listen
 	{
 		int	ctn = 0;
 		{
@@ -110,7 +109,6 @@ void	parse_directive() {
 		}
 		assertEq("listen", ctn, 2);
 	}
-	// error page
 	{
 		int	ctn = 0;
 		{
@@ -135,9 +133,8 @@ void	parse_directive() {
 				ctn++;
 			}
 		}
-		assertEq("error page", ctn, 1);
+		assertEq("error_page", ctn, 1);
 	}
-	// client max body size
 	{
 		int	ctn = 0;
 		{
@@ -161,7 +158,7 @@ void	parse_directive() {
 				(void) e;
 				ctn++;
 			}
-			try { cp._parseDirective("	client_max_body	10485761 sadfasdf", vs); }
+			try { cp._parseDirective("	client_max_body	1048577 sadfasdf", vs); }
 			catch (std::exception const& e) {
 				(void) e;
 				ctn++;
@@ -173,5 +170,175 @@ void	parse_directive() {
 			}
 		}
 		assertEq("client_max_body", ctn, 5);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	autoindex	on	", vs);
+			if (vs.getAutoIndex() != true)
+				ctn++;
+			cp._parseDirective("	autoindex	off	", vs);
+			if (vs.getAutoIndex() != false)
+				ctn++;
+			try { cp._parseDirective("	autoindex	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	autoindex	on off", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	autoindex	offf", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("autoindex", ctn, 3);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	root	/var/www	", vs);
+			if (vs.getRoot() != "/var/www")
+				ctn++;
+			try { cp._parseDirective("	root	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	root	/var/www /var/html", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("root", ctn, 2);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	index	index.html	", vs);
+			if (vs.getIndex() != "index.html")
+				ctn++;
+			try { cp._parseDirective("	index	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	index	index.html html/index.html", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("index", ctn, 2);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	methods	GET	", vs);
+			if (vs.getAllowedMethods().front() != "GET")
+				ctn++;
+			cp._parseDirective("	methods	GET	DELETE POST	", vs);
+			std::list<std::string>					lm = vs.getAllowedMethods();
+			std::list<std::string>::const_iterator	it = lm.begin();
+			if (*it++ != "GET")
+				ctn++;
+			if (*it++ != "DELETE")
+				ctn++;
+			if (*it++ != "POST")
+				ctn++;
+			try { cp._parseDirective("	methods	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	methods	get", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("methods", ctn, 2);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	return	404 http://google.com", vs);
+			if (vs.getReturnCode() != 404)
+				ctn++;
+			if (vs.getReturnPath() != "http://google.com")
+				ctn++;
+			try { cp._parseDirective("	return	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	return	404 www.google.com test", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	return	0 www.google.com test", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("return", ctn, 3);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	cgi_allowed_ext	.php .py", vs);
+			cp._parseDirective("	cgi_allowed_ext	.py", vs);
+			std::list<std::string>					lm = vs.getAllowedExtCgi();
+			if (lm.front() != ".php")
+				ctn++;
+			if (lm.back() != ".py")
+				ctn++;
+			if (lm.size() != 2)
+				ctn++;
+			try { cp._parseDirective("	cgi_allowed_ext	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	cgi_allowed_ext	py", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("cgi_allowed_ext", ctn, 2);
+	}
+	{
+		int	ctn = 0;
+		{
+			VirtualServer	vs;
+			cp._parseDirective("	upload_path	download", vs);
+			if (vs.getUploadPath() != "download")
+				ctn++;
+			try { cp._parseDirective("	upload_path	", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+			try { cp._parseDirective("	upload_path	abc def", vs); }
+			catch (std::exception const& e) {
+				(void) e;
+				ctn++;
+			}
+		}
+		assertEq("upload_path", ctn, 2);
 	}
 }

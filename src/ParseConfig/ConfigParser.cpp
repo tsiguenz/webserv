@@ -42,21 +42,27 @@ void	ConfigParser::_checkFileName(std::string const& fileName) const {
 }
 
 void	ConfigParser::_initAllowedDirectives() {
+	// VirtualServer
 	_allowedServerDirectives.push_back("server_name");
 	_allowedServerDirectives.push_back("listen");
-	_allowedServerDirectives.push_back("error_page");
 	_allowedServerDirectives.push_back("client_max_body");
+	_allowedServerDirectives.push_back("error_page");
 	_allowedServerDirectives.push_back("index");
 	_allowedServerDirectives.push_back("root");
 	_allowedServerDirectives.push_back("autoindex");
-	_allowedLocationDirectives.push_back("methods");
-	_allowedLocationDirectives.push_back("return");
+	_allowedServerDirectives.push_back("return");
+	_allowedServerDirectives.push_back("cgi_allowed_ext");
+	_allowedServerDirectives.push_back("upload_path");
+	_allowedServerDirectives.push_back("methods");
+	// Location
+	_allowedLocationDirectives.push_back("error_page");
+	_allowedLocationDirectives.push_back("index");
 	_allowedLocationDirectives.push_back("root");
 	_allowedLocationDirectives.push_back("autoindex");
-	_allowedLocationDirectives.push_back("index");
+	_allowedLocationDirectives.push_back("return");
 	_allowedLocationDirectives.push_back("cgi_allowed_ext");
 	_allowedLocationDirectives.push_back("upload_path");
-	_allowedLocationDirectives.push_back("error_page");
+	_allowedLocationDirectives.push_back("methods");
 }
 
 bool	ConfigParser::_isServerDirective(std::string const& str) {
@@ -163,7 +169,7 @@ void	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
 void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
 	std::string	tLine = trim(line);
 	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
-	if (_isServerDirective(tLine.substr(0, tLine.find_first_of(_WHITESPACES))) == false)
+	if (_isServerDirective(directiveName) == false)
 		throw std::invalid_argument("Bad directive name in server block\n");
 	if (directiveName == "server_name")
 		_parseServerNames(tLine, vs);
@@ -173,6 +179,20 @@ void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
 		_parseErrorPage(tLine, vs);
 	if (directiveName == "client_max_body")
 		_parseClientMaxBodySize(tLine, vs);
+	if (directiveName == "autoindex")
+		_parseAutoIndex(tLine, vs);
+	if (directiveName == "root")
+		_parseRoot(tLine, vs);
+	if (directiveName == "index")
+		_parseIndex(tLine, vs);
+	if (directiveName == "methods")
+		_parseMethods(tLine, vs);
+	if (directiveName == "return")
+		_parseReturn(tLine, vs);
+	if (directiveName == "cgi_allowed_ext")
+		_parseCgiAllowed(tLine, vs);
+	if (directiveName == "upload_path")
+		_parseUploadPath(tLine, vs);
 }
 
 // location overload
@@ -189,16 +209,15 @@ void	ConfigParser::_parseDirective(std::string const& line, Location& location) 
 void	ConfigParser::_parseServerNames(std::string const& line, VirtualServer& vs) {
 	std::vector<std::string>	v = _splitInVector(line);
 	if (v.size() < 2)
-		throw std::invalid_argument("server name directive bad syntax\n");
-	v.erase(v.begin());
-	for (std::vector<std::string>::const_iterator it = v.begin(); it != v.end(); it++)
+		throw std::invalid_argument("server_name directive bad number of arguments (ex: server_name webserv.com\n");
+	for (std::vector<std::string>::const_iterator it = v.begin() + 1; it != v.end(); it++)
 		vs.setServerName(*it);
 }
 
 void	ConfigParser::_parseListen(std::string const& line, VirtualServer& vs) {
 	std::vector<std::string>	v = _splitInVector(line);
 	if (v.size() != 2)
-		throw std::invalid_argument("listen directive bad syntax\n");
+		throw std::invalid_argument("listen directive bad number of arguments (ex: listen 127.0.0.1:8080)\n");
 	std::string	str = v.back();
 	size_t	sepPos = str.find(":");
 	// only port case
@@ -218,7 +237,7 @@ void	ConfigParser::_parseListen(std::string const& line, VirtualServer& vs) {
 void	ConfigParser::_parseErrorPage(std::string const& line, VirtualServer& vs) {
 	std::vector<std::string>	v = _splitInVector(line);
 	if (v.size() < 3)
-		throw std::invalid_argument("error_page directive bad syntax\n");
+		throw std::invalid_argument("error_page directive number of arguments (ex: error_page 400 404 4xx.html)\n");
 	v.erase(v.begin());
 	std::string	path = v.back();
 	for (std::vector<std::string>::const_iterator it = v.begin(); it != v.end() -1; it++)
@@ -226,21 +245,84 @@ void	ConfigParser::_parseErrorPage(std::string const& line, VirtualServer& vs) {
 }
 
 void	ConfigParser::_parseClientMaxBodySize(std::string const& line, VirtualServer& vs) {
-	(void) vs;
 	std::vector<std::string>	v = _splitInVector(line);
 	if (v.size() != 2)
 		throw std::invalid_argument("client_max_body directive bad syntax\n");
 	int	maxBodySize = strtod(v.back().c_str(), NULL);
 	// 10 MB limit
-	if (maxBodySize <= 0 || maxBodySize > 10485760)
+	if (maxBodySize <= 0 || maxBodySize > 1048576)
 		throw std::invalid_argument("client_max_body bad value\n");
 	vs.setClientMaxBodySize(maxBodySize);
 }
 
-//void	ConfigParser::_parseRedir(std::string const& line, Location location) {
-//	std::string	str = line.substr(line.find_first_of(_WHITESPACES));
-//	location.setRedir(trim(str));
-//}
+void	ConfigParser::_parseAutoIndex(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 2)
+		throw std::invalid_argument("autoindex directive bad number of arguments (ex: autoindex on)\n");
+	bool	autoIndex;
+	if (v.back() == "on")
+		autoIndex = true;
+	else if (v.back() == "off")
+		autoIndex = false;
+	else
+		throw std::invalid_argument("autoindex directive bad argument (argument must be on or off\n");
+	vs.setAutoIndex(autoIndex);
+}
+
+void	ConfigParser::_parseRoot(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 2)
+		throw std::invalid_argument("root directive bad number of arguments (ex: root /var/www)\n");
+	vs.setRoot(v.back());
+}
+
+void	ConfigParser::_parseIndex(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 2)
+		throw std::invalid_argument("index directive number of arguments (ex: index index.html)\n");
+	vs.setIndex(v.back());
+}
+
+void	ConfigParser::_parseMethods(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() == 1)
+		throw std::invalid_argument("methods directive number of arguments (ex: methods GET POST DELETE\n");
+	for (std::vector<std::string>::const_iterator it = v.begin() + 1; it != v.end(); it++) {
+		if (*it == "GET" || *it == "POST" || *it == "DELETE")
+				vs.setAllowedMethod(*it);
+		else
+			throw std::invalid_argument("methods directive bad argument (must be GET or/and POST or/and DELETE\n");
+	}
+}
+
+void	ConfigParser::_parseReturn(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 3)
+		throw std::invalid_argument("return directive bad number of arguments (ex: return 404 google.com)\n");
+	int	code = std::strtod(v.at(1).c_str(), NULL);
+	if (code == 0)
+		throw std::invalid_argument("return directive bad code (ex: return 404 google.com)\n");
+	vs.setReturn(code, v.at(2));
+}
+
+void	ConfigParser::_parseCgiAllowed(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() == 1)
+		throw std::invalid_argument("cgi_allowed_ext directive bad number of arguments (ex: cgi_allowed_ext .py .php)\n");
+	for (std::vector<std::string>::const_iterator it = v.begin() + 1; it != v.end(); it++) {
+		if ((*it).at(0) == '.')
+				vs.setAllowedExtCgi(*it);
+		else
+			throw std::invalid_argument("cgi_allowed_ext directive bad argument (must start by .)\n");
+	}
+}
+
+void	ConfigParser::_parseUploadPath(std::string const& line, VirtualServer& vs) {
+	std::vector<std::string>	v = _splitInVector(line);
+	if (v.size() != 2)
+		throw std::invalid_argument("upload_path directive bad number of arguments (ex: upload_path html/download)\n");
+	vs.setUploadPath(v.back());
+}
 
 std::vector<std::string>	ConfigParser::_splitInVector(std::string const& line) const {
 	std::string					str = line;

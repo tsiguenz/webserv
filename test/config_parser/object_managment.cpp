@@ -12,7 +12,7 @@ void	object_managment() {
 			ctn++;
 		if (vs.getPort() != 8080)
 			ctn++;
-		if (vs.getClientMaxBodySize() != 8192)
+		if (vs.getClientMaxBodySize() != 1048576)
 			ctn++;
 		assertEq("default constructor test", ctn, 0);
 	}

@@ -6,6 +6,7 @@
 # include <fstream> // ifstream
 # include <sstream> // stringstream
 # include <list>
+# include <cstdlib>
 
 class	ConfigParser {
 	public:
@@ -48,8 +49,13 @@ class	ConfigParser {
 		void			_parseListen(std::string const& line, VirtualServer& vs);
 		void			_parseErrorPage(std::string const& line, VirtualServer& vs);
 		void			_parseClientMaxBodySize(std::string const& line, VirtualServer& vs);
-		// Location
-//		void			_parseRedir(std::string const& line, Location location);
+		void			_parseAutoIndex(std::string const& line, VirtualServer& vs);
+		void			_parseRoot(std::string const& line, VirtualServer& vs);
+		void			_parseIndex(std::string const& line, VirtualServer& vs);
+		void			_parseMethods(std::string const& line, VirtualServer& vs);
+		void			_parseReturn(std::string const& line, VirtualServer& vs);
+		void			_parseCgiAllowed(std::string const& line, VirtualServer& vs);
+		void			_parseUploadPath(std::string const& line, VirtualServer& vs);
 
 		// Helper
 		std::vector<std::string>	_splitInVector(std::string const& line) const;

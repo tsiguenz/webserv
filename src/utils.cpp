@@ -1,4 +1,6 @@
 # include "webserv.h"
+# include <stdexcept>
+# include <csignal>
 
 void	signalHandler(int sig) {
 	if (sig == SIGINT)
