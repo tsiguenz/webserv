@@ -140,9 +140,9 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 	}	
 	line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);	
 	while (!line.empty() && line != "\r\n") {
-		
+
 		// std::cout << "line= " << line << std::endl; //DEBUG
-		if (line.find_first_of(':') == std::string::npos) {
+		if (line.find_first_of(':') == std::string::npos || line.find("\r\n") == std::string::npos ) {
 		
 			parsingCode = 400;
 			return 1;

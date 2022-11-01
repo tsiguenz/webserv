@@ -10,7 +10,7 @@ int	main() {
     			request += "Host: localhost:1024\r\n";
 				request += "Connection: keep-alive\r\n";
 				request += "sec-ch-ua: \"Google Chrome\";v=\"105\", \"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"105\"\r\n";
-				request += "sec-ch-ua-mobile: ?ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd0"; // AGEEEEEEEEEEEEEEEEEEEEEERERRRRRRRRRRRRRRRR
+				request += "sec-ch-ua-mobile: ?ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd0\r\n"; // AGEEEEEEEEEEEEEEEEEEEEEERERRRRRRRRRRRRRRRR
 				request += "sec-ch-ua-platform: \"Linux\"\r\n";
 				request += "Upgrade-Insecure-Requests: 1\r\n";
 				request += "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36\r\n";
