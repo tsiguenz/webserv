@@ -70,4 +70,24 @@ void	parse_location_block() {
 			ctn++;
 		assertEq("basic valid location block", ctn, 0);
 	}
+	{
+		int					ctn = 0;
+		Location			l;
+		std::string			locationBlock;
+		locationBlock += "location  /html {\n";
+		locationBlock += "	methods GET\n";
+		locationBlock += "	return 301 /html/index.html\n";
+		locationBlock += "	root /tmp/www\n";
+		locationBlock += "	autoindex on\n";
+		locationBlock += "	index html/index.html\n";
+		locationBlock += "	cgi_allowed_ext .php\n";
+		locationBlock += "	upload_path /download\n";
+		locationBlock += "	error_page 404 html/error/404.html\n";
+		try { l = cp._parseLocationBlock(locationBlock); }
+		catch (std::exception const& e) {
+			(void) e;
+			ctn++;
+		}
+		assertEq("block not close", ctn, 1);
+	}
 }

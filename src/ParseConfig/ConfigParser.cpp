@@ -207,9 +207,9 @@ void	ConfigParser::_parseFileContent(std::string const& fileContent) {
 }
 
 VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
+	VirtualServer				vs;
 	std::string					line;
 	std::stringstream			sBlock(serverBlock);
-	VirtualServer				vs;
 	std::vector<std::string>	vLine;
 
 	// skip first line
@@ -219,23 +219,22 @@ VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
 		if (vLine.empty() == true)
 			continue ;
 		if (vLine.at(0) == "}")
-			break ;
+			return vs;
 		if (vLine.at(0) == "location") {
+			// back from last line to get the line "location sdfasdf {"
 			for (size_t i = 0; i < line.size() + 1; i++)
 				sBlock.unget();
-			std::getline(sBlock, line);
-			// back from last line to get the line "location sdfasdf {"
-			_parseLocationBlock(_getLocationBlock(sBlock));
+			vs.setNewLocation(_parseLocationBlock(_getLocationBlock(sBlock)));
 		} else
 			_parseDirective(line, vs);
 	}
-	return vs;
+	throw std::invalid_argument("Block is not closed in _parseServerBlock()\n");
 }
 
 Location	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
+	Location					location;
 	std::string					line;
 	std::stringstream			sBlock(locationBlock);
-	Location					location;
 	std::vector<std::string>	vLine;
 
 	std::getline(sBlock, line);

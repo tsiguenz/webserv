@@ -9,6 +9,6 @@ void	config_parser_tests() {
 	get_block();
 	parse_directive();
 	parse_location_block();
-//	parse_server_block();
+	parse_server_block();
 //	parse_file_content();
 }

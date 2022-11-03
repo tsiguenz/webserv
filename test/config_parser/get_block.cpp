@@ -171,7 +171,7 @@ void	get_block() {
 		catch (std::exception const& e) {
 			ctn++;
 		}
-		assertEq("basic location block", ctn, 1);
+		assertEq("location block with no path", ctn, 1);
 	}
 	// two location blocks
 	{
