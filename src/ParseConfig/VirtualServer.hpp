@@ -17,6 +17,7 @@ class VirtualServer {
 
 		// Accessors
 		std::string					getErrorPageByCode(int const& errorCode) const;
+		std::map<int, std::string>	getErrorPages() const;
 		std::list<std::string>		getServerNames() const;
 		std::string					getIp() const;
 		short						getPort() const;

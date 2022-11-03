@@ -9,8 +9,8 @@
 # define GREEN "\e[32m"
 # define BLUE "\e[35m"
 
-template<typename T>
-void	assertEq(std::string str, T a, T b) {
+template<typename T, typename U>
+void	assertEq(std::string str, T a, U b) {
 	bool	isEq = (a == b);
 
 	if (isEq)

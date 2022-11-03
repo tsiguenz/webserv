@@ -8,6 +8,9 @@ void	parse_server_block() {
 	std::string	str;
 	str += "server {\n";
 	str += "	server_name webserv.com\n";
+	str += "location / {  \n";
+	str += "		root /html\n";
+	str += "	}\n";
 	str += "}\n";
 	ConfigParser	cp;
 	VirtualServer	vs = cp._parseServerBlock(str);

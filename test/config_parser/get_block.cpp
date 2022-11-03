@@ -8,7 +8,7 @@ void	get_block() {
 	{
 		int	ctn = 0;
 		std::string	str;
-		str += "server {\n";
+		str += "server		    {\n";
 		str += "	toto\n";
 		str += "}\n";
 		std::stringstream	sContent(str);
@@ -59,19 +59,18 @@ void	get_block() {
 		if (ret != cmp)
 			ctn++;
 
-		assertEq("block in block", ctn, 0);
+		assertEq("server block in server block", ctn, 0);
 	}
 	// empty
 	{
 		int	ctn = 0;
 		std::string	str;
 		std::stringstream	sContent(str);
-		std::string ret = cp._getServerBlock(sContent);
-
-		if (ret.empty() == false)
+		try { std::string ret = cp._getServerBlock(sContent); }
+		catch (std::exception const& e) {
 			ctn++;
-
-		assertEq("empty sContent", ctn, 0);
+		}
+		assertEq("empty sContent server", ctn, 1);
 	}
 	// bad head of block
 	{
@@ -86,7 +85,7 @@ void	get_block() {
 			(void) e;
 			ctn++;
 		}
-		assertEq("bad first line of block", ctn, 1);
+		assertEq("bad first line of server block", ctn, 1);
 	}
 	// non closed server block
 	{
@@ -102,7 +101,7 @@ void	get_block() {
 		}
 		assertEq("non closed server block", ctn, 1);
 	}
-	// block non closed in block
+	// server block non closed in server block
 	{
 		int	ctn = 0;
 		std::string	str;
@@ -120,7 +119,7 @@ void	get_block() {
 			ctn++;
 		}
 
-		assertEq("block non closed in block", ctn, 1);
+		assertEq("server block non closed in server block", ctn, 1);
 	}
 	// two server blocks with one non closed
 	{
@@ -143,5 +142,138 @@ void	get_block() {
 			ctn++;
 		}
 		assertEq("two server blocks whith one non closed", ctn, 1);
+	}
+	// basic location block
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "location /html  {\n";
+		str += "	toto\n";
+		str += "}\n";
+		std::stringstream	sContent(str);
+		std::string ret = cp._getLocationBlock(sContent);
+
+		if (ret != str)
+			ctn++;
+
+		assertEq("basic location block", ctn, 0);
+	}
+	// bad format head of location block
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "location  {\n";
+		str += "	toto\n";
+		str += "}\n";
+		std::stringstream	sContent(str);
+		
+		try { std::string ret = cp._getLocationBlock(sContent); }
+		catch (std::exception const& e) {
+			ctn++;
+		}
+		assertEq("basic location block", ctn, 1);
+	}
+	// two location blocks
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "location  /html {\n";
+		str += "	toto\n";
+		str += "}\n";
+		str += "location /html {\n";
+		str += "	tata\n";
+		str += "}\n";
+		std::stringstream	sContent(str);
+		std::string	cmp1 = str.substr(0, str.find("}") + 2);
+		std::string	cmp2 = str.substr(str.find("}") + 2);
+		std::string ret = cp._getLocationBlock(sContent);
+
+		if (ret != cmp1)
+			ctn++;
+		ret = cp._getLocationBlock(sContent);
+		if (ret != cmp2)
+			ctn++;
+
+		assertEq("two location blocks", ctn, 0);
+	}
+	// block in block
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "location /html {\n";
+		str += "	toto\n";
+		str += "	location /html {\n";
+		str += "		toto\n";
+		str += "	}\n";
+		str += "}\n";
+		std::stringstream	sContent(str);
+		try { std::string ret = cp._getLocationBlock(sContent); }
+		catch (std::exception const& e) {
+			ctn++;
+		}
+
+		assertEq("location block in location block is error", ctn, 1);
+	}
+	// empty
+	{
+		int	ctn = 0;
+		std::string	str;
+		std::stringstream	sContent(str);
+		try { std::string ret = cp._getLocationBlock(sContent); }
+		catch (std::exception const& e) {
+			ctn++;
+		}
+		assertEq("empty sContent location", ctn, 1);
+	}
+	// bad head of block
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "locations /html {\n";
+		str += "	toto\n";
+		str += "}\n";
+		std::stringstream	sContent(str);
+		try { std::string ret = cp._getLocationBlock(sContent); }
+		catch (std::exception const& e) {
+			(void) e;
+			ctn++;
+		}
+		assertEq("bad first line of location block", ctn, 1);
+	}
+	// non closed location block
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "location /html {\n";
+		str += "	toto\n";
+		std::stringstream	sContent(str);
+		try { std::string ret = cp._getLocationBlock(sContent); }
+		catch (std::exception const& e) {
+			(void) e;
+			ctn++;
+		}
+		assertEq("non closed location block", ctn, 1);
+	}
+	// two location blocks with one non closed
+	{
+		int	ctn = 0;
+		std::string	str;
+		str += "location /home {\n";
+		str += "	toto\n";
+		str += "}\n";
+		str += "									\n";
+		str += "location {\n";
+		std::stringstream	sContent(str);
+		std::string	cmp = str.substr(0, str.find("}") + 2);
+		std::string ret = cp._getLocationBlock(sContent);
+
+		if (ret != cmp)
+			ctn++;
+		try { std::string ret = cp._getLocationBlock(sContent); }
+		catch (std::exception const& e) {
+			(void) e;
+			ctn++;
+		}
+		assertEq("two location blocks whith one non closed", ctn, 1);
 	}
 }

@@ -232,12 +232,13 @@ VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
 	return vs;
 }
 
-Location	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
+void	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
 	std::string					line;
 	std::stringstream			sBlock(locationBlock);
 	Location					location;
 	std::vector<std::string>	vLine;
 
+	// first line
 	std::getline(sBlock, line);
 	vLine = _splitInVector(line);
 	location.setPath(vLine.at(1));
@@ -247,9 +248,9 @@ Location	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
 			continue ;
 		if (vLine.at(0) == "}")
 			return location;
-		_parseDirective(line, location);
+		_parseDirective(line, vs);
 	}
-	throw std::invalid_argument("Block is not closed in _parseLocationBlock()\n");
+	throw std::invalid_argument("Block is not closed in _getLocationBlock()\n");
 }
 
 std::vector<std::string>	ConfigParser::_splitInVector(std::string const& line) const {
