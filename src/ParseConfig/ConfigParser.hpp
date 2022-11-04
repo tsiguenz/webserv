@@ -37,8 +37,8 @@ class	ConfigParser {
 		bool			_isServerDirective(std::string const& str);
 		bool			_isLocationDirective(std::string const& str);
 		void			_readFile(std::string const& fileName);
-		std::string		_getServerBlock(std::stringstream& sContent);
-		std::string		_getLocationBlock(std::stringstream& sContent);
+		std::string		_getServerBlock(std::stringstream& sContent) const;
+		std::string		_getLocationBlock(std::stringstream& sContent) const;
 		void			_parseFileContent(std::string const& fileContent);
 		VirtualServer	_parseServerBlock(std::string const& serverBlock);
 		Location		_parseLocationBlock(std::string const& locationBlock);

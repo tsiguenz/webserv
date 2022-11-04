@@ -20,7 +20,6 @@ void	assertEq(std::string str, T a, U b) {
 }
 
 void	config_parser_tests();
-void	object_managment();
 void	check_file_name();
 void	read_file();
 void	get_block();

@@ -9,6 +9,7 @@ void	parse_location_block() {
 		Location			l;
 		std::string			locationBlock;
 		locationBlock += "location /html {\n";
+		locationBlock += "\n";
 		locationBlock += "}\n";
 		l = cp._parseLocationBlock(locationBlock);
 		if (l.getAllowedMethods().empty() != true)

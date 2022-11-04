@@ -47,6 +47,7 @@ class VirtualServer {
 		void	setAllowedExtCgi(std::string const& ext);
 		void	setUploadPath(std::string const& path);
 		void	setReturn(int const& code, std::string const& path);
+		void	setDefaultValueToLocation();
 
 	private:
 		std::list<std::string>		_serverNames;

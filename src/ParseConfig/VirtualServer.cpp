@@ -153,3 +153,42 @@ void	VirtualServer::setReturn(int const& code, std::string const& path) {
 	_returnCode = code;
 	_returnPath = path;
 }
+
+void	VirtualServer::setDefaultValueToLocation() {
+	std::list<Location>::iterator	it = _locationList.begin();
+	std::list<Location>::iterator	end = _locationList.end();
+
+	for (; it != end; it++) {
+		if ((*it).getAutoIndex() == false)
+			(*it).setAutoIndex(_autoIndex);
+		if ((*it).getIndex().empty() == true)
+			(*it).setIndex(_index);
+		if ((*it).getRoot().empty() == true)
+			(*it).setRoot(_root);
+		if ((*it).getUploadPath().empty() == true)
+			(*it).setUploadPath(_uploadPath);
+		if ((*it).getReturnCode() == 0 &&  (*it).getReturnPath().empty() == true)
+			(*it).setReturn(_returnCode, _returnPath);
+		std::list<std::string>	allowedMethod = (*it).getAllowedMethods();
+		if (allowedMethod.empty() == true) {
+			std::list<std::string>::const_iterator it2 = _allowedMethods.begin();
+			std::list<std::string>::const_iterator end2 = _allowedMethods.end();
+			for (; it2 != end2; it2++)
+				(*it).setAllowedMethod(*it2);
+		}
+		std::list<std::string>	allowedExt = (*it).getAllowedExtCgi();
+		if (allowedExt.empty() == true) {
+			std::list<std::string>::const_iterator it2 = _allowedExtCgi.begin();
+			std::list<std::string>::const_iterator end2 = _allowedExtCgi.end();
+			for (; it2 != end2; it2++)
+				(*it).setAllowedExtCgi(*it2);
+		}
+		std::map<int, std::string>	errorPage = (*it).getErrorPages();
+		if (errorPage.empty() == true) {
+			std::map<int, std::string>::const_iterator it2 = _errorPages.begin();
+			std::map<int, std::string>::const_iterator end2 = _errorPages.end();
+			for (; it2 != end2; it2++)
+				(*it).setErrorPage((*it2).first, (*it2).second);
+		}
+	}
+}

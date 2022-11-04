@@ -3,20 +3,20 @@
 // Object managment
 
 ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v") {
+	_checkFileName("config/default.conf");
+	_fileName = "config/default.conf";
 	_initAllowedDirectives();
-	_virtualServerList.push_back(VirtualServer());
-	VirtualServer&	vs = _virtualServerList.front();
-	vs.setIp("0.0.0.0");
-	vs.setPort(8080);
-	vs.setClientMaxBodySize(1048576);
+//	_readFile(fileName);
+//	_parseFileContent();
+//	vs.setClientMaxBodySize(1048576);
 }
 
 ConfigParser::ConfigParser(std::string const& fileName): _WHITESPACES(" \n\r\t\f\v") {
 	_checkFileName(fileName);
 	_initAllowedDirectives();
-	//	_fileName = fileName;
-	//	_readFile(fileName);
-	//	_parseFileContent();
+	_fileName = fileName;
+//	_readFile(fileName);
+//	_parseFileContent();
 }
 
 ConfigParser::~ConfigParser() { }
@@ -154,7 +154,7 @@ void	ConfigParser::_readFile(std::string const& fileName) {
 }
 
 // return the next block in { } and update the stringstream
-std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) {
+std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) const {
 	std::string					line;
 	std::string					ret;
 	std::vector<std::string>	vLine;
@@ -180,7 +180,7 @@ std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) {
 	throw std::invalid_argument("Block is not closed in _getServerBlock()\n");
 }
 
-std::string	ConfigParser::_getLocationBlock(std::stringstream& sContent) {
+std::string	ConfigParser::_getLocationBlock(std::stringstream& sContent) const {
 	std::string					line;
 	std::string					ret;
 	std::vector<std::string>	vLine;
@@ -203,7 +203,24 @@ std::string	ConfigParser::_getLocationBlock(std::stringstream& sContent) {
 }
 
 void	ConfigParser::_parseFileContent(std::string const& fileContent) {
-	(void) fileContent;
+	std::stringstream			sContent(fileContent);
+	std::string					line;
+	std::vector<std::string>	vLine;
+
+	while (std::getline(sContent, line)) {
+		vLine = _splitInVector(line);
+		if (vLine.empty() == true)
+			continue ;
+		if (vLine.size() != 2)
+			throw std::invalid_argument("Bad syntax for server block in _parseFileContent()\n");
+		if (vLine.at(0) == "server" && vLine.at(1) == "{") {
+			for (size_t i = 0; i < line.size() + 1; i++)
+				sContent.unget();
+			_virtualServerList.push_back(_parseServerBlock(_getServerBlock(sContent)));
+		}
+		else
+			throw std::invalid_argument("Bad syntax for server block in _parseFileContent()\n");
+	}
 }
 
 VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
@@ -218,8 +235,10 @@ VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
 		vLine = _splitInVector(line);
 		if (vLine.empty() == true)
 			continue ;
-		if (vLine.at(0) == "}")
+		if (vLine.at(0) == "}") {
+			vs.setDefaultValueToLocation();
 			return vs;
+		}
 		if (vLine.at(0) == "location") {
 			// back from last line to get the line "location sdfasdf {"
 			for (size_t i = 0; i < line.size() + 1; i++)
@@ -256,6 +275,8 @@ std::vector<std::string>	ConfigParser::_splitInVector(std::string const& line) c
 	std::vector<std::string>	v;
 	size_t						nextSpace;
 
+	if (str.empty() == true)
+		return v;
 	while (1) {
 		nextSpace = str.find_first_of(_WHITESPACES);
 		if (nextSpace == std::string::npos) {
