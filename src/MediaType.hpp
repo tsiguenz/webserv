@@ -1,7 +1,10 @@
 #ifndef MEDIATYPE_HPP
 # define MEDIATYPE_HPP
 
-# include "webserv.h"
+# include <iostream>
+# include <vector>
+# include <map>
+# include <algorithm>
 
 class MediaType
 {

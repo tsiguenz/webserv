@@ -1,6 +1,13 @@
 #include "test.h"
+#include "ConfigParser.hpp"
 
 void	config_parser_tests() {
-	ConfigParser	servInfos("test/config/one_server_bloc.conf");
-	ConfigParser	servInfos1;
+	std::cout << "---------- Config Parser Tests ----------\n";
+	check_file_name();
+	read_file();
+	get_block();
+	parse_directive();
+	parse_location_block();
+	parse_server_block();
+	parse_file_content();
 }

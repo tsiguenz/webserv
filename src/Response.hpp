@@ -1,11 +1,13 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
-# include "webserv.h"
-
+# include <sstream>
+# include <fstream>
+# include <ctime>
 # include "Request.hpp"
 # include "Response.hpp"
 # include "MediaType.hpp"
+
 // # define <!DOCTYPE html><html><head><title>Code d'erreur</title></head><body><a href="lien"></a><p>message</p></body></html>
 class Request;
 class MediaType;

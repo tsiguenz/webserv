@@ -1,7 +1,8 @@
 #ifndef ERRORHANDLER_HPP
 # define ERRORHANDLER_HPP
 
-# include "webserv.h"
+# include <map>
+# include <sstream>
 
 class ErrorHandler
 {
