@@ -43,7 +43,7 @@ void	parse_server_block() {
 			ctn++;
 		if (vs.getClientMaxBodySize() != 1024)
 			ctn++;
-		if (vs.getAutoIndex() != false)
+		if (vs.getAutoIndex() != "off")
 			ctn++;
 		if (vs.getRoot() != "/var/www")
 			ctn++;
@@ -76,7 +76,7 @@ void	parse_server_block() {
 			ctn++;
 		if (l.getRoot() != "/tmp/www")
 			ctn++;
-		if (l.getAutoIndex() != true)
+		if (l.getAutoIndex() != "on")
 			ctn++;
 		if (l.getIndex() != "html/index.html")
 			ctn++;
@@ -127,7 +127,7 @@ void	parse_server_block() {
 			ctn++;
 		if (vs.getClientMaxBodySize() != 1024)
 			ctn++;
-		if (vs.getAutoIndex() != false)
+		if (vs.getAutoIndex() != "off")
 			ctn++;
 		if (vs.getRoot() != "/var/www")
 			ctn++;
@@ -146,7 +146,7 @@ void	parse_server_block() {
 			ctn++;
 		if (l.getRoot() != "/tmp/www")
 			ctn++;
-		if (l.getAutoIndex() != true)
+		if (l.getAutoIndex() != "on")
 			ctn++;
 		if (l.getIndex() != "html/index.html")
 			ctn++;
@@ -191,7 +191,7 @@ void	parse_server_block() {
 			ctn++;
 		if (vs.getClientMaxBodySize() != 1024)
 			ctn++;
-		if (vs.getAutoIndex() != false)
+		if (vs.getAutoIndex() != "off")
 			ctn++;
 		if (vs.getRoot() != "/var/www")
 			ctn++;
@@ -210,7 +210,7 @@ void	parse_server_block() {
 			ctn++;
 		if (l.getRoot() != "/tmp/www")
 			ctn++;
-		if (l.getAutoIndex() != true)
+		if (l.getAutoIndex() != "on")
 			ctn++;
 		if (l.getIndex() != "html/index.html")
 			ctn++;
@@ -267,7 +267,7 @@ void	parse_server_block() {
 			ctn++;
 		if (l.getRoot() != "/var/www")
 			ctn++;
-		if (l.getAutoIndex() != true)
+		if (l.getAutoIndex() != "on")
 			ctn++;
 		if (l.getIndex() != "index.html")
 			ctn++;
@@ -329,7 +329,7 @@ void	parse_server_block() {
 			ctn++;
 		if (vs.getClientMaxBodySize() != 1024)
 			ctn++;
-		if (vs.getAutoIndex() != false)
+		if (vs.getAutoIndex() != "off")
 			ctn++;
 		if (vs.getRoot() != "/var/www")
 			ctn++;
@@ -362,7 +362,7 @@ void	parse_server_block() {
 			ctn++;
 		if (l.getRoot() != "/tmp/www")
 			ctn++;
-		if (l.getAutoIndex() != true)
+		if (l.getAutoIndex() != "on")
 			ctn++;
 		if (l.getIndex() != "html/index.html")
 			ctn++;
@@ -387,7 +387,7 @@ void	parse_server_block() {
 			ctn++;
 		if (l.getRoot() != "/tmp")
 			ctn++;
-		if (l.getAutoIndex() != false)
+		if (l.getAutoIndex() != "off")
 			ctn++;
 		if (l.getIndex() != "html/index2.html")
 			ctn++;

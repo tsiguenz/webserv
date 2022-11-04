@@ -3,11 +3,10 @@
 
 void	read_file() {
 	std::cout << "---------- read_file() ----------\n";
-	ConfigParser	cp;
 	// file does not exist
 	{
 		int	ctn = 0;
-		try { cp._readFile("test/config/does_not_exist"); }
+		try { ConfigParser	cp("test/config/does_not_exist"); }
 		catch (std::exception const& e) {
 			(void) e;
 			ctn++;
@@ -17,7 +16,7 @@ void	read_file() {
 	// no permission
 	{
 		int	ctn = 0;
-		try { cp._readFile("test/config/cannot_open.conf"); }
+		try { ConfigParser	cp("test/config/cannot_open.conf"); }
 		catch (std::exception const& e) {
 			(void) e;
 			ctn++;
@@ -27,7 +26,7 @@ void	read_file() {
 	// directory
 	{
 		int	ctn = 0;
-		try { cp._readFile("test/config/directory.conf"); }
+		try { ConfigParser	cp("test/config/directory.conf"); }
 		catch (std::exception const& e) {
 			(void) e;
 			ctn++;

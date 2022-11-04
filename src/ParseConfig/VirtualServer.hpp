@@ -23,7 +23,7 @@ class VirtualServer {
 		short						getPort() const;
 		int							getClientMaxBodySize() const;
 		std::list<Location>			getLocationList() const;
-		bool						getAutoIndex() const;
+		std::string					getAutoIndex() const;
 		std::string					getRoot() const;
 		std::string					getIndex() const;
 		std::list<std::string>		getAllowedMethods() const;
@@ -40,7 +40,7 @@ class VirtualServer {
 		void	setPort(short const& port);
 		void	setClientMaxBodySize(int const& size);
 		void	setNewLocation(Location location);
-		void	setAutoIndex(bool const& autoIndex);
+		void	setAutoIndex(std::string const& autoIndex);
 		void	setRoot(std::string const& root);
 		void	setIndex(std::string const& index);
 		void	setAllowedMethod(std::string const& method);
@@ -57,7 +57,7 @@ class VirtualServer {
 		std::list<Location>			_locationList;
 		// set default in locations
 		std::map<int, std::string>	_errorPages;
-		bool						_autoIndex;
+		std::string					_autoIndex;
 		std::string					_index;
 		std::string					_root;
 		std::list<std::string>		_allowedMethods;

@@ -2,21 +2,30 @@
 
 // Object managment
 
+# ifndef __IS_TEST__
+
 ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v") {
-	_checkFileName("config/default.conf");
 	_fileName = "config/default.conf";
+	_checkFileName(_fileName);
 	_initAllowedDirectives();
-//	_readFile(fileName);
-//	_parseFileContent();
-//	vs.setClientMaxBodySize(1048576);
+	_readFile(_fileName);
+	_parseFileContent(_fileContent);
 }
+
+# else
+
+ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v") {
+	_initAllowedDirectives();
+}
+
+# endif // __IS_TEST__
 
 ConfigParser::ConfigParser(std::string const& fileName): _WHITESPACES(" \n\r\t\f\v") {
 	_checkFileName(fileName);
 	_initAllowedDirectives();
 	_fileName = fileName;
-//	_readFile(fileName);
-//	_parseFileContent();
+	_readFile(_fileName);
+	_parseFileContent(_fileContent);
 }
 
 ConfigParser::~ConfigParser() { }

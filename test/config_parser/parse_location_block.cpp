@@ -20,7 +20,7 @@ void	parse_location_block() {
 			ctn++;
 		if (l.getRoot().empty() != true)
 			ctn++;
-		if (l.getAutoIndex() != false)
+		if (l.getAutoIndex().empty() != true)
 			ctn++;
 		if (l.getIndex().empty() != true)
 			ctn++;
@@ -59,7 +59,7 @@ void	parse_location_block() {
 			ctn++;
 		if (l.getRoot() != "/tmp/www")
 			ctn++;
-		if (l.getAutoIndex() != true)
+		if (l.getAutoIndex() != "on")
 			ctn++;
 		if (l.getIndex() != "html/index.html")
 			ctn++;

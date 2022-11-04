@@ -78,7 +78,7 @@ void	parse_file_content() {
 			ctn++;
 		if (vs.getClientMaxBodySize() != 1024)
 			ctn++;
-		if (vs.getAutoIndex() != false)
+		if (vs.getAutoIndex() != "off")
 			ctn++;
 		if (vs.getRoot() != "/var/www")
 			ctn++;
@@ -113,7 +113,7 @@ void	parse_file_content() {
 			ctn++;
 		if (loc.getRoot() != "/tmp/www")
 			ctn++;
-		if (loc.getAutoIndex() != true)
+		if (loc.getAutoIndex() != "on")
 			ctn++;
 		if (loc.getIndex() != "html/index.html")
 			ctn++;
@@ -138,7 +138,7 @@ void	parse_file_content() {
 			ctn++;
 		if (vs.getClientMaxBodySize() != 12345)
 			ctn++;
-		if (vs.getAutoIndex() != true)
+		if (vs.getAutoIndex() != "on")
 			ctn++;
 		if (vs.getRoot() != "/tmp/www")
 			ctn++;
@@ -158,31 +158,72 @@ void	parse_file_content() {
 			ctn++;
 		if (vs.isAllowedMethod("DELETE") != true)
 			ctn++;
-//		loc = vs.getLocationList().front();
-//		if (loc.isAllowedMethod("GET") != true)
-//			ctn++;
-//		if (loc.isAllowedMethod("POST") != false)
-//			ctn++;
-//		if (loc.isAllowedMethod("DELETE") != true)
-//			ctn++;
-//		if (loc.getReturnCode() != 301)
-//			ctn++;
-//		if (loc.getReturnPath() != "/html/index.html")
-//			ctn++;
-//		if (loc.getRoot() != "/tmp/www")
-//			ctn++;
-//		if (loc.getAutoIndex() != true)
-//			ctn++;
-//		if (loc.getIndex() != "html/index.html")
-//			ctn++;
-//		if (loc.isAllowedExtCgi(".php") != true)
-//			ctn++;
-//		if (loc.isAllowedExtCgi(".py") != false)
-//			ctn++;
-//		if (loc.getUploadPath() != "/download")
-//			ctn++;
-//		if (loc.getErrorPageByCode(404) != "html/error/404.html")
-//			ctn++;
+		std::list<Location>	ll = (*it).getLocationList();
+		std::list<Location>::const_iterator	itl = ll.begin();
+		loc = *itl;
+		if (loc.getPath() != "/var/www/html")
+			ctn++;
+		if (loc.isAllowedMethod("GET") != true)
+			ctn++;
+		if (loc.isAllowedMethod("POST") != false)
+			ctn++;
+		if (loc.isAllowedMethod("DELETE") != true)
+			ctn++;
+		if (loc.getReturnCode() != 301)
+			ctn++;
+		if (loc.getReturnPath() != "301.html")
+			ctn++;
+		if (loc.getRoot() != "/tmp/www")
+			ctn++;
+		if (loc.getAutoIndex() != "on")
+			ctn++;
+		if (loc.getIndex() != "default/index.html")
+			ctn++;
+		if (loc.isAllowedExtCgi(".php") != true)
+			ctn++;
+		if (loc.isAllowedExtCgi(".py") != false)
+			ctn++;
+		if (loc.getUploadPath() != "download")
+			ctn++;
+		if (loc.getErrorPageByCode(512) != "512.html")
+			ctn++;
+		itl++;
+		loc = *itl;
+		if (loc.getPath() != "/index")
+			ctn++;
+		if (loc.isAllowedMethod("GET") != true)
+			ctn++;
+		if (loc.isAllowedMethod("POST") != false)
+			ctn++;
+		if (loc.isAllowedMethod("DELETE") != true)
+			ctn++;
+		if (loc.getReturnCode() != 306)
+			ctn++;
+		if (loc.getReturnPath() != "index.html")
+			ctn++;
+		if (loc.getRoot() != "/html")
+			ctn++;
+		if (loc.getAutoIndex() != "off")
+			ctn++;
+		if (loc.getIndex() != "html/index.html")
+			ctn++;
+		if (loc.isAllowedExtCgi(".php") != false)
+			ctn++;
+		if (loc.isAllowedExtCgi(".py") != true)
+			ctn++;
+		if (loc.getUploadPath() != "/dw")
+			ctn++;
+		if (loc.getErrorPageByCode(404) != "404.html")
+			ctn++;
 		assertEq("file with multiple servers (second server)", ctn, 0);
+	}
+	// try to crash
+	{
+		std::string	str;
+		str += "server {\n";
+		str += "}\n";
+		ConfigParser	cp;
+		cp._parseFileContent(str);
+		std::list<VirtualServer>	l = cp.getVirtualServerList();
 	}
 }

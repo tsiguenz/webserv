@@ -17,7 +17,7 @@ class Location {
 		std::string					getErrorPageByCode(int const& errorCode) const;
 		std::map<int, std::string>	getErrorPages() const;
 		int							getClientMaxBodySize() const;
-		bool						getAutoIndex() const;
+		std::string					getAutoIndex() const;
 		std::string					getRoot() const;
 		std::string					getIndex() const;
 		std::list<std::string>		getAllowedMethods() const;
@@ -30,7 +30,7 @@ class Location {
 
 		void	setPath(std::string const& root);
 		void	setErrorPage(int const& errorCode, std::string const& path);
-		void	setAutoIndex(bool const& autoIndex);
+		void	setAutoIndex(std::string const& autoIndex);
 		void	setRoot(std::string const& root);
 		void	setIndex(std::string const& index);
 		void	setAllowedMethod(std::string const& method);
@@ -41,7 +41,7 @@ class Location {
 	private:
 		std::string					_path;
 		std::map<int, std::string>	_errorPages;
-		bool						_autoIndex;
+		std::string					_autoIndex;
 		std::string					_index;
 		std::string					_root;
 		std::list<std::string>		_allowedMethods;

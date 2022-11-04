@@ -176,10 +176,10 @@ void	parse_directive() {
 		{
 			VirtualServer	vs;
 			cp._parseDirective("	autoindex	on	", vs);
-			if (vs.getAutoIndex() != true)
+			if (vs.getAutoIndex() != "on")
 				ctn++;
 			cp._parseDirective("	autoindex	off	", vs);
-			if (vs.getAutoIndex() != false)
+			if (vs.getAutoIndex() != "off")
 				ctn++;
 			try { cp._parseDirective("	autoindex	", vs); }
 			catch (std::exception const& e) {

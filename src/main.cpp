@@ -2,6 +2,8 @@
 
 # include "webserv.h"
 # include "Server.hpp"
+# include <cerrno>
+# include <csignal>
 
 int	main(int argc, char **argv) {
 	if (argc > 2) {

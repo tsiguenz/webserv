@@ -49,7 +49,7 @@ std::list<Location>	VirtualServer::getLocationList() const {
 	return _locationList;
 }
 
-bool	VirtualServer::getAutoIndex() const {
+std::string	VirtualServer::getAutoIndex() const {
 	return _autoIndex;
 }
 
@@ -123,7 +123,7 @@ void	VirtualServer::setNewLocation(Location location) {
 	_locationList.push_back(location);
 }
 
-void	VirtualServer::setAutoIndex(bool const& autoIndex) {
+void	VirtualServer::setAutoIndex(std::string const& autoIndex) {
 	_autoIndex = autoIndex;
 }
 
@@ -159,7 +159,7 @@ void	VirtualServer::setDefaultValueToLocation() {
 	std::list<Location>::iterator	end = _locationList.end();
 
 	for (; it != end; it++) {
-		if ((*it).getAutoIndex() == false)
+		if ((*it).getAutoIndex().empty() == true)
 			(*it).setAutoIndex(_autoIndex);
 		if ((*it).getIndex().empty() == true)
 			(*it).setIndex(_index);

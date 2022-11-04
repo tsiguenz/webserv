@@ -107,11 +107,11 @@ class	ConfigParser {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
 					throw std::invalid_argument("autoindex directive bad number of arguments (ex: autoindex on)\n");
-				bool	autoIndex;
+				std::string	autoIndex;
 				if (v.back() == "on")
-					autoIndex = true;
+					autoIndex = "on";
 				else if (v.back() == "off")
-					autoIndex = false;
+					autoIndex = "off";
 				else
 					throw std::invalid_argument("autoindex directive bad argument (argument must be on or off\n");
 				vs.setAutoIndex(autoIndex);

@@ -32,7 +32,7 @@ std::map<int, std::string>	Location::getErrorPages() const {
 	return _errorPages;
 }
 
-bool	Location::getAutoIndex() const {
+std::string	Location::getAutoIndex() const {
 	return _autoIndex;
 }
 
@@ -90,7 +90,7 @@ void	Location::setErrorPage(int const& errorCode, std::string const& path) {
 	_errorPages.insert(std::make_pair(errorCode, path));
 }
 
-void	Location::setAutoIndex(bool const& autoIndex) {
+void	Location::setAutoIndex(std::string const& autoIndex) {
 	_autoIndex = autoIndex;
 }
 
