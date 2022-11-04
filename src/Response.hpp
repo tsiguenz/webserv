@@ -17,22 +17,23 @@ class Response
 		Response( Request  src );
 		~Response();
 
-		std::string method;
+		std::string method; //  "REQUEST_METHOD="
 		std::string url;
 		std::string	httpVersion;
-		std::map<std::string, std::string> fieldLines;
+		std::map<std::string, std::string> fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
 		std::string body;
 
 		std::string			fileName;
 		std::vector<char>	file;
 		
 		std::string 		response;
-		int					code;
+		int					code; // "REDIRECT_STATUS="
 
 		void		printResponse(void) const;
 	private:
 		
 		MediaType	mime;
+		
 		std::map<int, std::pair<std::string, std::string> >	statusCodes;
 
 		void		buildingResponse(void);

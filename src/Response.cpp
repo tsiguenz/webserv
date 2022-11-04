@@ -39,7 +39,11 @@ void				Response::buildingResponse(void) {
 
 		deleteFile();
 	}
-	//if post
+
+	// if (code == 200 && method == "POST") { 	//if post
+	// 	postFile();
+	// }
+
 
 	
 	if (code != 200)  {
@@ -161,7 +165,7 @@ std::string Response::getLength(void) {
 }
 
 std::string Response::getTypeContent(void) {
-	std::string line = "Content-Type: "; //
+	std::string line = "Content-Type: "; //check
 	std::string contentType = this->mime.getMediaType(fileName); //fileName qui contient le name de ce quon envoie
 	line += contentType;
 	if (contentType == "text/html"){

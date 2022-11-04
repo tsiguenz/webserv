@@ -13,7 +13,7 @@ Request::Request(std::string const & toParse): rawRequest(toParse), parsingCode(
 {
 	std::cout << rawRequest; //DEBUG
 	parsingRequest();
-	// printRequest(); //DEBUG
+	printRequest(); //DEBUG
 	// std::cout << rawRequest << std::endl; //DEBUG
 }
 
