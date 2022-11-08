@@ -1,10 +1,10 @@
 #include "test.h"
-#include "webserv.h"
-# include "MediaType.hpp"
-# include "Server.hpp"
+#include "MediaType.hpp"
+#include "Server.hpp"
 #include "ErrorHandler.hpp"
 
 int	main() {
+	config_parser_tests();
 	std::cout << "TEST main " << std::endl;
 	std::string request = "GET /index.html HTTP/1.1\r\n";
     			request += "Host: localhost:1024\r\n";

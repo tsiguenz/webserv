@@ -1,27 +1,7 @@
 #ifndef WEBSERV_H
 # define WEBSERV_H
 
-# include <errno.h>
-# include <unistd.h>		// close()
-# include <stdlib.h>		// exit()
-# include <strings.h>		// bzero()
-# include <fcntl.h>			// fcntl()
-# include <sys/socket.h> 	// socket(), bind()
-# include <sys/types.h>		// exit()
-# include <sys/epoll.h>		// epoll()
-# include <netinet/in.h>	// struct sockaddr_in
-# include <arpa/inet.h>		// inet_addr()
-#include <algorithm>        //A CHANGER!!!
 # include <iostream>
-# include <sstream>
-# include <fstream>
-# include <iterator>
-# include <csignal>			// signal()
-# include <iostream>
-# include <vector>
-# include <map>
-# include <ctime>
-# include <dirent.h>
 
 # define WHITE "\033[0m"
 # define BLACK "\033[0;30m"
@@ -42,6 +22,9 @@
 # define BPURPLE "\033[1;35m"
 # define BCYAN "\033[1;36m"
 
-void	signalHandler(int sig);
+void		signalHandler(int sig);
+std::string	ltrim(const std::string &s);
+std::string	rtrim(const std::string &s);
+std::string	trim(const std::string &s);
 
 #endif // WEBSERV_H

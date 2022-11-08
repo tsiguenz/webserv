@@ -1,8 +1,8 @@
 #ifndef __IS_TEST__
 
-# include "webserv.h"
-// # include "Response.hpp"
 # include "Server.hpp"
+# include <cerrno>
+# include <csignal>
 
 int	main(int argc, char **argv) {
 	// MediaType lol;

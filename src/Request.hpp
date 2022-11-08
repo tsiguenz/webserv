@@ -2,6 +2,7 @@
 # define REQUEST_HPP
 
 # include "webserv.h"
+# include <map>
 
 // class MediaType;
 
