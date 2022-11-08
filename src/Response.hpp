@@ -8,16 +8,13 @@
 # include "Response.hpp"
 # include "MediaType.hpp"
 
-// # define <!DOCTYPE html><html><head><title>Code d'erreur</title></head><body><a href="lien"></a><p>message</p></body></html>
-class Request;
-class MediaType;
-
 class Response
 {
 	public:
-
 		Response( Request  src );
 		~Response();
+
+		void		printResponse(void) const;
 
 		std::string method; //  "REQUEST_METHOD="
 		std::string url;
@@ -31,9 +28,7 @@ class Response
 		std::string 		response;
 		int					code; // "REDIRECT_STATUS="
 
-		void		printResponse(void) const;
 	private:
-		
 		MediaType	mime;
 		
 		std::map<int, std::pair<std::string, std::string> >	statusCodes;
@@ -56,7 +51,5 @@ class Response
 
 		void		initMapCode(void);
 };
-
-// std::ostream &			operator<<( std::ostream & o, Response const & i );
 
 #endif /* ******************************************************** RESPONSE_H */

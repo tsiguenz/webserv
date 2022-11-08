@@ -1,6 +1,7 @@
 #ifndef __IS_TEST__
 
 # include "Server.hpp"
+# include "ConfigParser.hpp"
 # include <cerrno>
 # include <csignal>
 
@@ -10,13 +11,13 @@ int	main(int argc, char **argv) {
 		std::cerr << "Too much arguments. Try with: ./webserv [configuration file]\n";
 		return EXIT_FAILURE;
 	}
-	// parse file
-	if (argc == 2) {
-		std::cerr << "Parse config file: " << argv[1] << std::endl;
-	}
 	try {
-		Server	serv(8080);
-
+		ConfigParser	cp;
+		if (argc == 2)
+			cp.parseFile(argv[1]);
+		else
+			cp.parseFile("config/default.conf");
+		Server	serv(cp);
 		signal(SIGINT, signalHandler);
 		signal(SIGQUIT, SIG_IGN);
 		signal(SIGTSTP, SIG_IGN);

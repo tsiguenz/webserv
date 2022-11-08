@@ -13,15 +13,11 @@
 # include <netinet/in.h>	// struct sockaddr_in
 # include <arpa/inet.h>		// inet_addr()
 # include "Response.hpp"
+# include "ConfigParser.hpp"
 
-# define BUFFER_SIZE 1024 // ?
-# define EVENTS_MAX 1000 // ?
+# define BUFFER_SIZE 1024 // TODO change using the max header size and the max body size
+# define EVENTS_MAX 1000
 # define BACKLOG 10
-# define DUMMY_RESPONSE "HTTP/1.1 200 OK\r\nServer: test\r\nContent-Lenght: 17\r\nContent-Type: text/html\r\n\r\n<H1>webserv</H1>\r\n"
-
-class Request;
-class Response;
-
 
 class Server {
 	public:
@@ -29,24 +25,22 @@ class Server {
 		typedef struct sockaddr_in	sockaddr_in;
 		typedef struct sockaddr		sockaddr;
 
-		// TODO change that for the struct returned by the parsing of file config
-		Server(int const& port);
+		Server(ConfigParser const& cp);
 		virtual ~Server();
 		void	run();
 		std::vector<int>	getFdsServer() const;
 		std::vector<int>	getFdsclient() const;
 	private:
 		// TODO replace by class Parser
-		std::vector<int>	_fdsServer;
-		// TODO keep alive need to store clients for next I/O operations
-		int					_epFd;
-		epoll_event			_events[EVENTS_MAX];
-		Request				currentRequest();
+		std::vector<int>			_fdsServer;
+		std::list<VirtualServer>	_virtualServerList;
+		int							_epFd;
+		epoll_event					_events[EVENTS_MAX];
 
+		// Member functions
 		void	_initEpoll();
-
 		// Initialize new socket (fd) who can listen on a specific port
-		void	_initVirtualServer(int const& port);
+		void	_initVirtualServer(VirtualServer const& vs);
 		void	_setNonBlocking(int const& fd) const;
 		void	_addEvent(int const& fd, long const& events) const;
 		void	_modEvent(int const& fd, long const& events) const;

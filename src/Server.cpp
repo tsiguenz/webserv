@@ -1,10 +1,14 @@
 #include "Server.hpp"
 
-Server::Server(int const& port) {
-	(void) port;
+Server::Server(ConfigParser const& cp) {
+	std::cout << "File config is: " << cp.getFileName() << std::endl;
+	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
-	_initVirtualServer(1024);
-//	_initVirtualServer(1025);
+	std::list<VirtualServer>::const_iterator	it = _virtualServerList.begin();
+	std::list<VirtualServer>::const_iterator	end = _virtualServerList.end();
+	// if multiple port defined, init can fail
+	for (; it != end; it++)
+		_initVirtualServer(*it);
 }
 
 Server::~Server() {
@@ -49,7 +53,8 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
 //			if (currentEvent.events & EPOLLIN)
-				Response 	currentResponse(_parseRequest(currentEvent));
+				Request		currentRequest(_parseRequest(currentEvent));
+				Response 	currentResponse(currentRequest);
 //			if (currentEvent.events & EPOLLOUT)
 				_sendResponse(currentEvent, currentResponse);
 		}
@@ -69,14 +74,10 @@ void	Server::_newConnection(int const& fd) const {
 	int	clientSocket = accept(fd, (sockaddr *) NULL, NULL);
 	if (clientSocket == -1)
 		throw std::runtime_error("error in accept()\n");
-	_addEvent(clientSocket, EPOLLIN);
+	_addEvent(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
 Request	Server::_parseRequest(epoll_event const& event) const {
-//	if (event.events & EPOLLOUT) {
-//		std::cout << BLUE "COUCOU\n" WHITE;
-//		return(Request()) ;
-//	}
 	// TODO: warning if recv don't return all the request
 	char		buffer[BUFFER_SIZE];
 	bzero(buffer, BUFFER_SIZE);
@@ -94,27 +95,19 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 }
 
 void	Server::_sendResponse(epoll_event const& event, Response const& currentResponse) const {
-
-//	if (event.events & EPOLLIN){
-//		std::cout << RED "COUCOU\n" WHITE;
-//		return ;
-//	}
-	// currentResponse.printResponse();
-	// TODO: construct HTTP response
-//	std::string	str = DUMMY_RESPONSE;
 	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);
 	close(event.data.fd);
 }
 
 
-void	Server::_initVirtualServer(int const& port) {
+void	Server::_initVirtualServer(VirtualServer const& vs) {
 	sockaddr_in	my_addr;
 	int			on = 1;
 
 	bzero(&my_addr, sizeof(sockaddr_in));
 	my_addr.sin_family = AF_INET;
-	my_addr.sin_port = htons(port);
-	my_addr.sin_addr.s_addr = /*htonl(INADDR_ANY); // */htonl(inet_addr("0.0.0.0"));
+	my_addr.sin_port = htons(vs.getPort());
+	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bzero(&(my_addr.sin_zero), 8);
 	int	newFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (newFd == -1)

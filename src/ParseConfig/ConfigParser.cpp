@@ -2,23 +2,9 @@
 
 // Object managment
 
-# ifndef __IS_TEST__
-
-ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v") {
-	_fileName = "config/default.conf";
-	_checkFileName(_fileName);
-	_initAllowedDirectives();
-	_readFile(_fileName);
-	_parseFileContent(_fileContent);
-}
-
-# else
-
 ConfigParser::ConfigParser(): _fileName(), _fileContent(), _WHITESPACES(" \n\r\t\f\v") {
 	_initAllowedDirectives();
 }
-
-# endif // __IS_TEST__
 
 ConfigParser::ConfigParser(std::string const& fileName): _WHITESPACES(" \n\r\t\f\v") {
 	_checkFileName(fileName);
@@ -42,6 +28,13 @@ std::string	ConfigParser::getFileContent() const
 { return _fileContent; }
 
 // Helper functions
+
+void	ConfigParser::parseFile(std::string const& fileName) {
+	_fileName = fileName;
+	_checkFileName(_fileName);
+	_readFile(_fileName);
+	_parseFileContent(_fileContent);
+}
 
 void	ConfigParser::_checkFileName(std::string const& fileName) const {
 	if (fileName.size() <= 5)

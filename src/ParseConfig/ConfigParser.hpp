@@ -19,6 +19,7 @@ class	ConfigParser {
 		std::list<VirtualServer>	getVirtualServerList() const;
 		std::string					getFileContent() const;
 		std::string					getFileName() const;
+		void						parseFile(std::string const& fileName);
 
 	private:
 		std::string					_fileName;
