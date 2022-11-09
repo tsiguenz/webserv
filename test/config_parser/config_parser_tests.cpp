@@ -10,4 +10,5 @@ void	config_parser_tests() {
 	parse_location_block();
 	parse_server_block();
 	parse_file_content();
+	get_virtual_server_and_location();
 }

@@ -30,9 +30,11 @@ class VirtualServer {
 		bool						isAllowedMethod(std::string const& method) const;
 		std::list<std::string>		getAllowedExtCgi() const;
 		bool						isAllowedExtCgi(std::string const& ext) const;
-		std::string					getUploadPath() const;
-		int							getReturnCode() const;
-		std::string					getReturnPath() const;
+		std::string					getUploadPath(std::string const& path = "") const;
+		int							getReturnCode(std::string const& path = "") const;
+		std::string					getReturnPath(std::string const& path = "") const;
+
+		std::list<Location>::const_iterator	getLocationByPath(std::string const& path) const;
 
 		void	setErrorPage(int const& errorCode, std::string const& path);
 		void	setServerName(std::string const& serverName);

@@ -30,6 +30,7 @@ TEST_SRC_NAME = test_main.cpp \
 				config_parser/parse_server_block.cpp \
 				config_parser/parse_location_block.cpp \
 				config_parser/parse_directive.cpp \
+				config_parser/get_virtual_server_and_location.cpp \
 
 OBJ_NAME = $(SRC_NAME:.cpp=.o)
 

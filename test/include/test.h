@@ -21,5 +21,6 @@ void	parse_directive();
 void	parse_file_content();
 void	parse_server_block();
 void	parse_location_block();
+void	get_virtual_server_and_location();
 
 #endif // TEST_H

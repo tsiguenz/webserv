@@ -22,7 +22,8 @@ VirtualServer::~VirtualServer() { }
 // Accessors
 
 std::string	VirtualServer::getErrorPageByCode(int const& errorCode) const {
-	return _errorPages.at(errorCode);
+	std::map<int, std::string>::const_iterator	it = _errorPages.find(errorCode);
+	return (it == _errorPages.end()) ? "" : (*it).second;
 }
 
 std::map<int, std::string>	VirtualServer::getErrorPages() const {
@@ -87,15 +88,34 @@ bool	VirtualServer::isAllowedExtCgi(std::string const& cgi) const {
 	return false;
 }
 
-std::string	VirtualServer::getUploadPath() const {
+std::string	VirtualServer::getUploadPath(std::string const& path) const {
+	if (path.empty() == true)
+		return _uploadPath;
+
+	// dir  = 	/html/hello
+	// path = 	/html
+	std::list<Location>::const_iterator	it = _locationList.begin();
+	std::list<Location>::const_iterator	end = _locationList.end();
+	std::string	dir = path.substr(0, path.rfind("/"));
+	for (; it != end; it++) {
+		size_t	pos = dir.find((*it).getPath());
+		if (pos == 0)
+			std::cout << (*it).getPath() << std::endl;
+//			if (dir.size() < dir)
+
+		if ((*it).getPath() == dir)
+			return (*it).getUploadPath();
+	}
 	return _uploadPath;
 }
 
-int	VirtualServer::getReturnCode() const {
+int	VirtualServer::getReturnCode(std::string const& path) const {
+	(void) path;
 	return _returnCode;
 }
 
-std::string	VirtualServer::getReturnPath() const {
+std::string	VirtualServer::getReturnPath(std::string const& path) const {
+	(void) path;
 	return _returnPath;
 }
 
