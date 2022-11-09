@@ -40,6 +40,7 @@ class Server {
 		// Member functions
 		void	_initEpoll();
 		// Initialize new socket (fd) who can listen on a specific port
+		VirtualServer const & getVirtualServer(Request const & currentRequest);
 		void	_initVirtualServer(VirtualServer const& vs);
 		void	_setNonBlocking(int const& fd) const;
 		void	_addEvent(int const& fd, long const& events) const;

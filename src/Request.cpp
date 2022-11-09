@@ -85,16 +85,16 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 		return 1;
 	}
 	
-	method = firstLine.substr(0, nextSpace);
-	if (method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
-		parsingCode = 405;
-		return 1;
-	}
-	if (method != "GET" && method != "DELETE" && method != "POST"){
+	// method = firstLine.substr(0, nextSpace); ----->virtualServer
+	// if (method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
+	// 	parsingCode = 405;
+	// 	return 1;
+	// }
+	// if (method != "GET" && method != "DELETE" && method != "POST"){
 	
-		parsingCode = 400;
-		return 1;
-	}
+	// 	parsingCode = 400;
+	// 	return 1;
+	// }
 	firstLine = firstLine.erase(0, nextSpace + 1);
 	nextSpace = firstLine.find_first_of(' ');
 	if (nextSpace == std::string::npos){
@@ -190,8 +190,8 @@ int	Request::parsingBody(void) {
 			return 1;
 	}
 	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4);
-	if (body.size() >= 1000000) // config
-		parsingCode = 413;
+	// if (body.size() >= 1000000) //  ---> config
+	// 	parsingCode = 413;
 	return 0;
 }
 

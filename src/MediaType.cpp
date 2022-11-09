@@ -5,6 +5,8 @@
 */
 
 MediaType::MediaType(){
+    mime["py"] = "cgi/python"; //a enlever
+    mime["php"] = "cgi/php"; //a enlever
     mime["txt"] = "text/plain";
     mime["hello"] = "hello";
     mime["3g2"] = "video/3gpp2";
