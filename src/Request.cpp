@@ -64,7 +64,7 @@ void	Request::parsingRequest(void) {
 	if (parsingBody())
 		return ;
 
-	if (method == "POST") {
+	if (method == "POST") { // ----> config
 		std::map<std::string,std::string>::iterator it;
 		it = fieldLines.find("Content-Length");
   		if (it == fieldLines.end()) {	
@@ -85,16 +85,7 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 		return 1;
 	}
 	
-	// method = firstLine.substr(0, nextSpace); ----->virtualServer
-	// if (method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
-	// 	parsingCode = 405;
-	// 	return 1;
-	// }
-	// if (method != "GET" && method != "DELETE" && method != "POST"){
-	
-	// 	parsingCode = 400;
-	// 	return 1;
-	// }
+	method = firstLine.substr(0, nextSpace);
 	firstLine = firstLine.erase(0, nextSpace + 1);
 	nextSpace = firstLine.find_first_of(' ');
 	if (nextSpace == std::string::npos){
@@ -171,6 +162,7 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 		// std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl; //DEBUG
 		line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);
 	}
+	trimingFieldLines();
 	return 0;
 }
 
@@ -185,16 +177,22 @@ int	Request::parsingFieldName(std::string fieldName) {
 }
 
 int	Request::parsingBody(void) {
-	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) { //est ce que logique /r/n/r/n ???
+	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
 			parsingCode = 400;
 			return 1;
 	}
-	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4);
-	// if (body.size() >= 1000000) //  ---> config
-	// 	parsingCode = 413;
+	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
 	return 0;
 }
 
+void	Request::trimingFieldLines() {
+	
+	for ( std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++)
+	{
+		(*it).second = trim((*it).second);
+	}
+	
+}
 void				Request::create(std::string const & toParse) {
 	rawRequest 	= toParse;
 	parsingCode = 200;

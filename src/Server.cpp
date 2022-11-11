@@ -54,7 +54,8 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == false) {
 //			if (currentEvent.events & EPOLLIN)
 				Request		currentRequest(_parseRequest(currentEvent));
-				Response 	currentResponse(currentRequest);
+				Response 	currentResponse(currentRequest, getVirtualServerByHost(currentRequest));
+				// currentResponse.printResponse();
 //			if (currentEvent.events & EPOLLOUT)
 				_sendResponse(currentEvent, currentResponse);
 		}
@@ -146,4 +147,109 @@ void	Server::_modEvent(int const& fd, long const& events) const {
 void	Server::_delEvent(int const& fd) const {
 	if (epoll_ctl(_epFd, EPOLL_CTL_DEL, fd, NULL) == -1)
 		throw std::runtime_error("error in _delEvent::epol_ctl()\n");
+}
+
+VirtualServer const &	Server::selectServer(short const & port, std::string const & ip, std::string const & serverName) const {
+
+	(void)port;
+	(void)ip;
+	(void)serverName;
+
+	// std::list<VirtualServer>	candidatVirtualServer = _virtualServerList;
+	// std::list<VirtualServer>::const_iterator it = candidatVirtualServer.begin();
+	// std::list<VirtualServer>::const_iterator end = candidatVirtualServer.end();
+	// for (; it != end; it++)
+	// {
+	// 	if (port != (*it).getPort())
+	// 		candidatVirtualServer.remove((*it));
+	// }
+	// if (candidatVirtualServer.empty())
+	// 	return(_virtualServerList.front());
+	// if (candidatVirtualServer.size() == 1)
+	// 	return(candidatVirtualServer.front());
+
+	// it = candidatVirtualServer.begin();
+	// for (; it != end; it++)
+	// {
+	// 	if (ip != (*it).getIp())
+	// 		candidatVirtualServer.remove((*it));
+	// }
+	// if (candidatVirtualServer.empty())
+	// 	return(_virtualServerList.front());
+	// if (candidatVirtualServer.size() == 1)
+	// 	return(candidatVirtualServer.front());
+	
+	// it = candidatVirtualServer.begin();
+	// if (serverName.empty())
+	// 	return(candidatVirtualServer.front());
+	// for (; it != end; it++)
+	// {
+	// 	bool isNamePresent= false;
+	// 	for (std::list<std::string>::const_iterator itVec = (*it).getServerNames().begin(); itVec != (*it).getServerNames().end(); itVec++)
+	// 	{
+	// 		if (serverName == (*itVec)) {
+	// 			isNamePresent = true;
+	// 		}			
+	// 	}
+	// 		if (isNamePresent = false)
+	// 			candidatVirtualServer.remove((*it));
+	// }
+	// return(candidatVirtualServer.front());
+	
+
+	// en attendant le debug:
+	return(_virtualServerList.front());
+}
+
+
+VirtualServer const &	Server::getVirtualServerByHost(Request const & currentRequest) const {
+	
+	std::string	ip;
+	std::string	portString;
+	std::string	serverName;
+	int		port = -1;
+
+	std::map<std::string, std::string>::const_iterator itFields = currentRequest.fieldLines.find("Host");
+	if (itFields == currentRequest.fieldLines.end())
+		return(_virtualServerList.front());
+
+	std::string	hostName = (*itFields).second;
+	size_t posLocalHost = hostName.find("localhost");
+	if (posLocalHost != std::string::npos) {
+		hostName.replace(posLocalHost, 9, "127.0.0.1");
+	}
+	
+	size_t posSeparator = hostName.find_last_of(':');
+	if (posSeparator == std::string::npos) {
+		if (is_digits(hostName) && hostName.size() < 6){
+			port = atoi(hostName.c_str());
+		}	
+		else if (validateIP(hostName))
+			ip = hostName;
+		else
+			serverName = hostName;
+	}
+	else {
+		std::string	firstPart = hostName.substr(0, posSeparator);
+		std::string	secondPart = hostName.substr(posSeparator + 1);
+		if(validateIP(firstPart))
+			ip = firstPart;
+		else
+			serverName =firstPart;
+		if (is_digits(secondPart) && secondPart.size() < 6)
+			port = atoi(secondPart.c_str());
+		else
+			return(_virtualServerList.front());
+		
+	}
+	//securiser overflow port
+	if (port > 65535)
+		return(_virtualServerList.front());
+	//set les val par defaut
+	if (port == -1)
+		port = 8080;
+	if (ip.empty())
+		ip = "0.0.0.0";
+	std::cout << BBLUE "\nIP:" << ip << " PORT:" << port << " SERVER NAME:" << serverName <<  WHITE <<std::endl; //debug
+	return(selectServer(port, ip, serverName));
 }

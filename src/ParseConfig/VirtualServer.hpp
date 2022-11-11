@@ -7,6 +7,7 @@
 # include <map>
 # include <vector>
 # include "webserv.h"
+# include "ErrorHandler.hpp"
 
 class VirtualServer {
 	public:
@@ -48,6 +49,8 @@ class VirtualServer {
 		void	setUploadPath(std::string const& path);
 		void	setReturn(int const& code, std::string const& path);
 		void	setDefaultValueToLocation();
+
+		ErrorHandler errorHandler;
 
 	private:
 		std::list<std::string>		_serverNames;

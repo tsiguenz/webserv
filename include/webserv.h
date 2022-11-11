@@ -2,6 +2,7 @@
 # define WEBSERV_H
 
 # include <iostream>
+# include <vector>
 
 # define WHITE "\033[0m"
 # define BLACK "\033[0;30m"
@@ -26,5 +27,7 @@ void		signalHandler(int sig);
 std::string	ltrim(const std::string &s);
 std::string	rtrim(const std::string &s);
 std::string	trim(const std::string &s);
-
+bool        is_digits(const std::string &str);
+bool        validateIP(std::string ip);
+std::vector<std::string> split(const std::string &str, char delim);
 #endif // WEBSERV_H

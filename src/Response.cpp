@@ -5,7 +5,7 @@
 */
 
 //: mime()
-Response::Response( Request  src ): mime(){
+Response::Response( Request  src, VirtualServer const & virtualServer ): mime(), server(virtualServer){
 
 	code = src.parsingCode;
 	method = src.method;
@@ -13,7 +13,7 @@ Response::Response( Request  src ): mime(){
 	httpVersion = src.httpVersion;
 	fieldLines = src.fieldLines;
 	body = src.body;
-	initMapCode();
+	root = server.getRoot();
 	buildingResponse();
 }
 
@@ -32,19 +32,14 @@ Response::~Response(){
 
 void				Response::buildingResponse(void) {
 
-
+	if (code == 200)
+		checkingMethod();
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
-	if (method == "DELETE") {
+	if (code == 200 && method == "DELETE") {
 
 		deleteFile();
 	}
-
-	// if (code == 200 && method == "POST") { 	//if post
-	// 	postFile();
-	// }
-
-
 	
 	if (code != 200)  {
 		handleError();
@@ -69,11 +64,25 @@ void				Response::buildingResponse(void) {
 /*
 ** --------------------------------- GET METHODE ----------------------------------
 */
-
+void		Response::checkingMethod(void) {
+	std::list<std::string> allowedMethods = server.getAllowedMethods();
+	for (std::list<std::string>::iterator itVec = allowedMethods.begin(); itVec != allowedMethods.end(); itVec++)
+	{
+		if (method == (*itVec)) {
+			return ;
+		}			
+	}
+	if (method == "DELETE" || method == "GET" || method == "POST" || method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
+		code = 405;
+		return ;
+	}
+	code = 400;
+	return ;
+}
 void		Response::getFile(void) {
 
-	std::string pathRepertoire = "html/"; //SELON CONFIG
-	redirectionUrl(); // pas vrm  redir plus redirIndex //SELON CONFIG
+	std::string pathRepertoire = server.getRoot(); 
+	redirectionUrl();
 	// redirectionUrl(); // en faire un qui redir //SELON CONFIG
 	// redirectionUrl(); // en faire un spé root //SELON CONFIG
 	if (!mime.isExtensionSupported(url)) {	
@@ -81,8 +90,6 @@ void		Response::getFile(void) {
 		return;
 	}
 	std::string path = pathRepertoire + url;
-	// FILE* fp = std::fopen(path.c_str(), "r"); //DEFINIR LE PATH PAR LE REPERTOIRE DANS CONFIG !!!!!!!
-	// ici pour check les authorisations dou tu peux
 	std::ifstream file(path.c_str());
     if(file.fail()) {
         code = 404;
@@ -99,8 +106,8 @@ void		Response::getFile(void) {
 }
 
 void		Response::redirectionUrl(void) {
-	if (url == "/") //selon fichier de config
-		url = "/index.html";
+	if (url == "/")
+		url = url + server.getIndex();
 }
 
 
@@ -109,7 +116,7 @@ void		Response::redirectionUrl(void) {
 */
 
 	void	Response::deleteFile(void) {
-		std::string pathRepertoire = "html"; //SELON CONFIG
+		std::string pathRepertoire = server.getRoot();
 
 		if (fileName.find("..") != std::string::npos) {
 			code = 400;
@@ -117,7 +124,7 @@ void		Response::redirectionUrl(void) {
 		}
 
 		if (remove((pathRepertoire +fileName).c_str()) != 0) {
-     		code = 403; //403 ou 401?
+     		code = 403;
 		}
 	}
 
@@ -126,13 +133,25 @@ void		Response::redirectionUrl(void) {
 */
 
 void		Response::handleError(void) {
-	if (code == 100) {
-		file.clear();
+	if(server.getErrorPages().count(code)) {
+		fileName = server.getRoot() + server.getErrorPageByCode(code);
+		std::ifstream fileBuffer(fileName.c_str());
+   		if(fileBuffer.fail()) {
+        	fileName = "error.html";
+			std::string fileGenerated = server.errorHandler.generateErrorHtml(code);
+			file = std::vector<char>(fileGenerated.begin(), fileGenerated.end());
+        	return ;
+   		}
+		this->file = std::vector<char>((std::istreambuf_iterator<char>(fileBuffer)),std::istreambuf_iterator<char>());
+		fileBuffer.close();
+		return ;
 	}
 
 	if (code > 399) {
 		fileName = "error.html";
-		file = std::vector<char>(statusCodes[code].second.begin(), statusCodes[code].second.end());
+		std::string fileGenerated = server.errorHandler.generateErrorHtml(code);
+		file = std::vector<char>(fileGenerated.begin(), fileGenerated.end());
+        return ;
 	}
 }
 
@@ -165,8 +184,8 @@ std::string Response::getLength(void) {
 }
 
 std::string Response::getTypeContent(void) {
-	std::string line = "Content-Type: "; //check
-	std::string contentType = this->mime.getMediaType(fileName); //fileName qui contient le name de ce quon envoie
+	std::string line = "Content-Type: ";
+	std::string contentType = this->mime.getMediaType(fileName);
 	line += contentType;
 	if (contentType == "text/html"){
 		line += "; charset=utf-8";
@@ -175,7 +194,7 @@ std::string Response::getTypeContent(void) {
 	return line;
 }
 
-std::string Response::getConnectionType(void) { //pour linstant close, a voir si on gere le keep alive
+std::string Response::getConnectionType(void) {
 	std::string line = "Connection: close";
 	line += "\r\n";
 	return line;
@@ -187,70 +206,9 @@ std::string Response::getResponse(void) {
 	s << code;
 	line += std::string(s.str());
 	line += " ";
-	line += statusCodes[code].first;
+	line += server.errorHandler.generateStatusMessage(code);
 	line += "\r\n";
 	return line;
-}
-
-
-
-
-
-void	Response::initMapCode(void) {
-
-	statusCodes.insert( std::make_pair( 100, std::make_pair("Continue","empty")));
-
-	statusCodes.insert( std::make_pair( 200, std::make_pair("OK","empty")));
-	statusCodes.insert( std::make_pair( 201, std::make_pair("Created","empty")));
-	statusCodes.insert( std::make_pair( 202, std::make_pair("Accepted","empty")));
-	statusCodes.insert( std::make_pair( 204, std::make_pair("No Content","empty")));
-
-	statusCodes.insert( std::make_pair( 300, std::make_pair("Multiple Choices","empty")));
-	statusCodes.insert( std::make_pair( 301, std::make_pair("Moved Permanently","empty")));
-	statusCodes.insert( std::make_pair( 302, std::make_pair("Found","empty")));
-	statusCodes.insert( std::make_pair( 304, std::make_pair("Not Modified","empty")));
-
-	statusCodes.insert( std::make_pair( 400, std::make_pair("Bad Request","<!DOCTYPE html><html><head><title>400</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/400\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).</p></body></html>")));
-	statusCodes.insert( std::make_pair( 401, std::make_pair("Unauthorized","<!DOCTYPE html><html><head><title>401</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/401\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The client must authenticate itself to get the requested response.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 403, std::make_pair("Forbidden","<!DOCTYPE html><html><head><title>403</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/403\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The client does not have access rights to the content.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 404, std::make_pair("Not Found","<!DOCTYPE html><html><head><title>404</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/404\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The server cannot find the requested resource. In the browser, this means the URL is not recognized. </p></body></html>")));
-	statusCodes.insert( std::make_pair( 405, std::make_pair("Method Not Allowed","<!DOCTYPE html><html><head><title>405</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/405\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The request method is known by the server but is not supported by the target resource.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 406, std::make_pair("Not Acceptable","<!DOCTYPE html><html><head><title>406</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/406\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The server cannot produce a response matching the list of acceptable values defined in the request's proactive content negotiation headers.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 408, std::make_pair("Request Timeout","<!DOCTYPE html><html><head><title>408</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/408\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">TIME OUT</p></body></html>")));
-	statusCodes.insert( std::make_pair( 410, std::make_pair("Gone","<!DOCTYPE html><html><head><title>410</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/410\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The requested content has been permanently deleted from server, with no forwarding address.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 411, std::make_pair("Length Required","<!DOCTYPE html><html><head><title>411</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/411\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">Server rejected the request because the Content-Length header field is not defined and the server requires it.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 413, std::make_pair("Payload Too Large","<!DOCTYPE html><html><head><title>413</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/413\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">Request body is larger than limits defined by server.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 414, std::make_pair("URI Too Long","<!DOCTYPE html><html><head><title>414</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/414\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The URI requested by the client is longer than the server is willing to interpret.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 415, std::make_pair("Unsupported Media Type","<!DOCTYPE html><html><head><title>415</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/415\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The media format of the requested data is not supported by the server.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 431, std::make_pair("Request Header Fields Too large","<!DOCTYPE html><html><head><title>431</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/431\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The server is unwilling to process the request because its header fields are too large. The request may be resubmitted after reducing the size of the request header fields.</p></body></html>")));
-	statusCodes.insert( std::make_pair( 500, std::make_pair("Internal Server Error","<!DOCTYPE html><html><head><title>500</title></head><body style=\"background-color: rgb(0, 0, 0);\"><img style=\"display: block; margin-left: auto; margin-right: auto; width: 50%\" src=\"https://http.cat/500\"><p style=\"text-align: center; margin-left: 30%; margin-right: 30%; color: white\">The server has encountered a situation it does not know how to handle.</p></body></html>")));
-
-	// statusCodes[200] = "OK";//
-	// statusCodes[201] = "Created";
-	// statusCodes[202] = "Accepted";
-	// statusCodes[204] = "No Content";
-	
-	// statusCodes[300] = "Multiple Choices";
-	// statusCodes[301] = "Moved Permanently";
-	// statusCodes[302] = "Found";
-	// statusCodes[304] = "Not Modified";
-	
-	// statusCodes[400] = "Bad Request"; //
-	// statusCodes[401] = "Unauthorized";
-	// statusCodes[403] = "Forbidden";//
-	// statusCodes[404] = "Not Found";
-	// statusCodes[405] = "Method Not Allowed";
-	// statusCodes[406] = "Not Acceptable";
-	// statusCodes[408] = "Request Timeout";//
-	// statusCodes[410] = "Gone";
-	// statusCodes[411] = "Length Required";//
-	// statusCodes[413] = "Payload Too Large";//
-	// statusCodes[414] = "URI Too Long";//
-	// statusCodes[415] = "Unsupported Media Type"; //
-	// statusCodes[431] = "Request Header Fields Too large"; //
-
-	// statusCodes[500] = "Internal Server Error"; //
-
 }
 
 void	Response::printResponse(void) const {

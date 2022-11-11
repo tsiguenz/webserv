@@ -3,6 +3,7 @@
 
 # include <vector>
 # include <iostream>
+# include <cstdlib> 		// isdigit()
 # include <unistd.h>		// close()
 # include <stdlib.h>		// exit()
 # include <strings.h>		// bzero()
@@ -13,6 +14,7 @@
 # include <netinet/in.h>	// struct sockaddr_in
 # include <arpa/inet.h>		// inet_addr()
 # include "Response.hpp"
+# include "webserv.h"
 # include "ConfigParser.hpp"
 
 # define BUFFER_SIZE 1024 // TODO change using the max header size and the max body size
@@ -40,7 +42,7 @@ class Server {
 		// Member functions
 		void	_initEpoll();
 		// Initialize new socket (fd) who can listen on a specific port
-		VirtualServer const & getVirtualServer(Request const & currentRequest);
+		VirtualServer const & getVirtualServerByHost(Request const & currentRequest) const;
 		void	_initVirtualServer(VirtualServer const& vs);
 		void	_setNonBlocking(int const& fd) const;
 		void	_addEvent(int const& fd, long const& events) const;
@@ -53,6 +55,8 @@ class Server {
 		void	_handleEvent(int const& nbEpollFd) const;
 		Request	_parseRequest(epoll_event const& event) const;
 		void	_sendResponse(epoll_event const& event, Response const& currentResponse) const;
+
+		VirtualServer const &	selectServer(short const & port, std::string const & ip, std::string const & name) const;
 };
 
 #endif // SERVER_HPP

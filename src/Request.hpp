@@ -27,6 +27,7 @@ class Request
 		std::map<std::string, std::string> fieldLines;
 
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
+		//TODO VECTOR UNSIGNED CHAR
 		std::string body;
 
 		int			parsingCode;
@@ -47,6 +48,7 @@ class Request
 		int				parsingFieldName(std::string fieldName);
 		std::string		parsingFieldValue(std::string fieldValue);
 		int				parsingBody(void);
+		void			trimingFieldLines();
 
 		// Response Checking
 		int				checkingFile();
