@@ -1,4 +1,6 @@
 #include "Response.hpp"
+#include <iostream>
+#include <sstream>
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -14,6 +16,11 @@ Response::Response( Request  src, VirtualServer const & virtualServer ): mime(),
 	fieldLines = src.fieldLines;
 	body = src.body;
 	root = server.getRoot();
+	serverName = server.getServerNames().front();
+	std::stringstream ss;
+	ss << server.getPort();
+	port = ss.str();
+
 	buildingResponse();
 }
 
@@ -34,13 +41,14 @@ void				Response::buildingResponse(void) {
 
 	if (code == 200)
 		checkingMethod();
+	//tu peux faire ton bail entre ici
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
 	if (code == 200 && method == "DELETE") {
 
 		deleteFile();
 	}
-	
+	//et la
 	if (code != 200)  {
 		handleError();
 	}

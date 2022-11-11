@@ -4,6 +4,7 @@
 # include <sstream>
 # include <fstream>
 # include <ctime>
+# include <sstream> 
 # include "Request.hpp"
 # include "Response.hpp"
 # include "MediaType.hpp"
@@ -23,7 +24,9 @@ class Response
 		std::map<std::string, std::string> fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
 		std::string body;
 
-		std::string root;
+		std::string root; //pour adam
+		std::string serverName; //pour adam
+		std::string port; //pour adam
 
 
 		std::string			fileName;

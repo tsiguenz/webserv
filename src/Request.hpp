@@ -3,6 +3,7 @@
 
 # include "webserv.h"
 # include <map>
+# include <vector>
 
 // class MediaType;
 
@@ -29,6 +30,7 @@ class Request
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		//TODO VECTOR UNSIGNED CHAR
 		std::string body;
+		std::vector<unsigned char> body2;
 
 		int			parsingCode;
 		
@@ -48,6 +50,8 @@ class Request
 		int				parsingFieldName(std::string fieldName);
 		std::string		parsingFieldValue(std::string fieldValue);
 		int				parsingBody(void);
+		int				parsingBody2(void);
+
 		void			trimingFieldLines();
 
 		// Response Checking

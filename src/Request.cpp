@@ -61,6 +61,8 @@ void	Request::parsingRequest(void) {
 		return ;
 	if (parsingFieldLines())
 		return ;
+	if (parsingBody2())
+		return ;
 	if (parsingBody())
 		return ;
 
@@ -176,12 +178,25 @@ int	Request::parsingFieldName(std::string fieldName) {
 	return 0;
 }
 
+int	Request::parsingBody2(void) {
+	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
+			parsingCode = 400;
+			return 1;
+	}
+	std::string::iterator it = rawRequest.begin() + rawRequest.find("\r\n\r\n", 4) + 4;
+	std::cout << BYELLOW "TAILLE POTENTIEL BODY:" << std::distance(it, rawRequest.end()) << std::endl;
+	// body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
+
+	return 0;
+}
+
 int	Request::parsingBody(void) {
 	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
 			parsingCode = 400;
 			return 1;
 	}
 	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
+
 	return 0;
 }
 
