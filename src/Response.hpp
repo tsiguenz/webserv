@@ -22,7 +22,7 @@ class Response
 		std::string url;
 		std::string	httpVersion;
 		std::map<std::string, std::string> fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
-		std::string body;
+		std::vector<unsigned char> body;
 
 		std::string root; //pour adam
 		std::string serverName; //pour adam

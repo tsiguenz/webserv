@@ -1,5 +1,7 @@
 #include "Request.hpp"
-
+#include "webserv.h"
+#include <stdio.h>
+#include <stdlib.h>
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
@@ -9,18 +11,22 @@ Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escap
 	parsingCode = 2;
 }
 
-Request::Request(std::string const & toParse): rawRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::vector<unsigned char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
-	std::cout << rawRequest; //DEBUG
+   
+	// std::cout << "size:" << std::distance(rawRequest.begin(), rawRequest.end()) << std::endl;
+	// std::cout << "count:" << rawRequest.size() << std::endl;
+
+ //DEBUG
 	parsingRequest();
 	printRequest(); //DEBUG
 	// std::cout << rawRequest << std::endl; //DEBUG
 }
 
-Request::Request( const Request & src )
-{
-	*this = src;
-}
+// Request::Request( const Request & src )
+// {
+// 	*this = src;
+// }
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
@@ -50,30 +56,33 @@ Request &				Request::operator=( Request const & rhs )
 }
 
 
-/*
-** --------------------------------- METHODS ----------------------------------
-*/
+// /*
+// ** --------------------------------- METHODS ----------------------------------
+// */
 
+int	Request::preParsing(void) {
+	rawRequest = std::string(vectorRequest.begin(), vectorRequest.end());
+	posEnd = rawRequest.find("\r\n\r\n", 4);
+	if (posEnd == std::string::npos) {
+			parsingCode = 400;
+			return 1;
+	}
+	else
+		posEnd = posEnd + 4;
+	return 0;
+}
 
 void	Request::parsingRequest(void) {
-
+	if (preParsing()) {
+		return ;
+	}
 	if (parsingRequestLine())
 		return ;
 	if (parsingFieldLines())
 		return ;
-	if (parsingBody2())
-		return ;
 	if (parsingBody())
 		return ;
 
-	if (method == "POST") { // ----> config
-		std::map<std::string,std::string>::iterator it;
-		it = fieldLines.find("Content-Length");
-  		if (it == fieldLines.end()) {	
-			parsingCode = 411;
-			return ;
-		}
-	}
 }
 
 
@@ -178,25 +187,34 @@ int	Request::parsingFieldName(std::string fieldName) {
 	return 0;
 }
 
-int	Request::parsingBody2(void) {
-	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
-			parsingCode = 400;
-			return 1;
-	}
-	std::string::iterator it = rawRequest.begin() + rawRequest.find("\r\n\r\n", 4) + 4;
-	std::cout << BYELLOW "TAILLE POTENTIEL BODY:" << std::distance(it, rawRequest.end()) << std::endl;
-	// body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
+// int	Request::parsingBody2(void) {
+// 	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
+// 			parsingCode = 400;
+// 			return 1;
+// 	}
+// 	std::string::iterator it = rawRequest.begin() + rawRequest.find("\r\n\r\n", 4) + 4;
+// 	std::cout << BYELLOW "TAILLE POTENTIEL BODY:" << std::distance(it, rawRequest.end()) << std::endl;
+// 	// body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
 
-	return 0;
-}
+// 	return 0;
+// }
 
 int	Request::parsingBody(void) {
-	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
-			parsingCode = 400;
+	
+	std::map<std::string,std::string>::iterator it;
+	it = fieldLines.find("content-length");
+	
+  	if (it == fieldLines.end()) {	
+		if (method == "POST") {
+			parsingCode = 411;
 			return 1;
+		}
+		else
+			return 0;
 	}
-	body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
-
+	short len = atoi(fieldLines["content-length"].c_str());
+	body = std::vector<unsigned char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
+	std::cout << BYELLOW "\n\n\n\nLEN =" << len << "SIZE BODY =" << body.size() << std::endl;
 	return 0;
 }
 
@@ -208,15 +226,15 @@ void	Request::trimingFieldLines() {
 	}
 	
 }
-void				Request::create(std::string const & toParse) {
-	rawRequest 	= toParse;
-	parsingCode = 200;
-	parsingRequest();
-}
+// void				Request::create(std::string const & toParse) {
+// 	rawRequest 	= toParse;
+// 	parsingCode = 200;
+// 	parsingRequest();
+// }
 
-void				Request::create(Request const & rhs) {
-	*this = rhs;
-}
+// void				Request::create(Request const & rhs) {
+// 	*this = rhs;
+// }
 
 
 
@@ -248,10 +266,14 @@ void	Request::printRequest(){
         std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
     }
 
-	std::cout << BGREEN << "BODY: ";
+	std::cout << BGREEN << "BODY: " << std::endl;
 	if (body.empty())
 		std::cout << BRED << "NONE" WHITE << std::endl;
-	else
-		std::cout << BCYAN << body << WHITE << std::endl;
+	else {
+		for (size_t i=0; i<body.size();i++){
+   			std::cout << body[i];
+ 		}
+		std::cout << std::endl;
+	}
 }
 /* ************************************************************************** */

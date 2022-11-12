@@ -10,15 +10,15 @@
 class Request
 {
 	public:
-		Request(std::string const & toParse);
+		Request(std::vector<unsigned char> & toParse);
 		Request(void);
-		Request(const Request & src);
+		// Request(const Request & src);
 		~Request();
 
 
 		//full unparsed request
-		std::string rawRequest;
-
+		std::vector<unsigned char>	vectorRequest;
+		std::string			rawRequest;
 		//requestLine
 		std::string method;
 		std::string url;
@@ -29,12 +29,11 @@ class Request
 
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		//TODO VECTOR UNSIGNED CHAR
-		std::string body;
-		std::vector<unsigned char> body2;
+		std::vector<unsigned char> body;
 
 		int			parsingCode;
 		
-		void		create(std::string const & toParse);
+		void		create(std::vector<unsigned char> toParse2);
 		void		create(Request const & rhs);
 		Request &	operator=(Request const & rhs);
 		void		printRequest(void);
@@ -42,8 +41,9 @@ class Request
 
 		const	std::string illegalCharacter;
 		const	std::string escapingCharacter;
-		
+		size_t 	posEnd;
 		// Lexer/Parser
+		int				preParsing(void);
 		void			parsingRequest();
 		int				parsingRequestLine();
 		int				parsingFieldLines();

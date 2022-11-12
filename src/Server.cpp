@@ -80,12 +80,12 @@ void	Server::_newConnection(int const& fd) const {
 
 Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
-	char		buffer[BUFFER_SIZE];
-	std::vector<char> buffer2(BUFFER_SIZE);
+	// char		buffer[BUFFER_SIZE];
+	std::vector<unsigned char> buffer2(BUFFER_SIZE);
 	// bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
 	
-	Request currentRequest(static_cast<std::string>(buffer));
+	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";
 	// 	return;
