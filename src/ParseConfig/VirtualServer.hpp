@@ -17,20 +17,20 @@ class VirtualServer {
 		virtual ~VirtualServer();
 
 		// Accessors
-		std::string					getErrorPageByCode(int const& errorCode) const;
-		std::map<int, std::string>	getErrorPages() const;
+		std::string					getErrorPageByCode(int const& errorCode, std::string const& path = "") const;
+		std::map<int, std::string>	getErrorPages(std::string const& path = "") const;
 		std::list<std::string>		getServerNames() const;
 		std::string					getIp() const;
 		short						getPort() const;
-		int							getClientMaxBodySize() const;
+		int							getClientMaxBodySize(std::string const& path = "") const;
 		std::list<Location>			getLocationList() const;
-		std::string					getAutoIndex() const;
-		std::string					getRoot() const;
-		std::string					getIndex() const;
-		std::list<std::string>		getAllowedMethods() const;
-		bool						isAllowedMethod(std::string const& method) const;
-		std::list<std::string>		getAllowedExtCgi() const;
-		bool						isAllowedExtCgi(std::string const& ext) const;
+		std::string					getAutoIndex(std::string const& path = "") const;
+		std::string					getRoot(std::string const& path = "") const;
+		std::string					getIndex(std::string const& path = "") const;
+		std::list<std::string>		getAllowedMethods(std::string const& path = "") const;
+		bool						isAllowedMethod(std::string const& method, std::string const& path = "") const;
+		std::list<std::string>		getAllowedExtCgi(std::string const& path = "") const;
+		bool						isAllowedExtCgi(std::string const& ext, std::string const& path = "") const;
 		std::string					getUploadPath(std::string const& path = "") const;
 		int							getReturnCode(std::string const& path = "") const;
 		std::string					getReturnPath(std::string const& path = "") const;
@@ -70,6 +70,8 @@ class VirtualServer {
 		std::string					_uploadPath;
 		int							_returnCode;
 		std::string					_returnPath;
+
+		std::list<Location>::const_iterator	_getFineLocationIt(std::string const& path) const;
 	};
 
 #endif // VIRTUAL_SERVER_HPP

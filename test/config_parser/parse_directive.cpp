@@ -80,13 +80,13 @@ void	parse_directive() {
 			cp._parseDirective("listen	127.0.0.5", vs);
 			if (vs.getIp() != "127.0.0.5")
 				ctn++;
-			if (vs.getPort() != 0)
+			if (vs.getPort() != 8080)
 				ctn++;
 		}
 		{
 			VirtualServer	vs;
 			cp._parseDirective("listen	4242", vs);
-			if (vs.getIp() != "")
+			if (vs.getIp() != "0.0.0.0")
 				ctn++;
 			if (vs.getPort() != 4242)
 				ctn++;

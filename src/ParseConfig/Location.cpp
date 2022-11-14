@@ -25,7 +25,8 @@ std::string	Location::getPath() const {
 }
 
 std::string	Location::getErrorPageByCode(int const& errorCode) const {
-	return _errorPages.at(errorCode);
+	std::map<int, std::string>::const_iterator	itm = _errorPages.find(errorCode);
+	return (itm == _errorPages.end()) ? "" : (*itm).second;
 }
 
 std::map<int, std::string>	Location::getErrorPages() const {
