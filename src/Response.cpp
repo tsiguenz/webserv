@@ -22,7 +22,7 @@ Response::Response( Request  src, VirtualServer const & virtualServer ): mime(),
 	port = ss.str();
 
 	buildingResponse();
-	// printResponse();
+	printResponse();
 }
 
 

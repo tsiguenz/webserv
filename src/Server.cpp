@@ -81,10 +81,17 @@ void	Server::_newConnection(int const& fd) const {
 Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
 	// char		buffer[BUFFER_SIZE];
-	std::vector<unsigned char> buffer2(BUFFER_SIZE);
+	std::vector<char> buffer2(BUFFER_SIZE);
+	std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
+	std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
+
 	// bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-	
+	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
+	for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.end();it++){
+   			std::cout << (*it);
+ 		}
+		std::cout << std::endl;
 	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";
@@ -157,29 +164,37 @@ VirtualServer const &	Server::selectServer(short const & port, std::string const
 	(void)serverName;
 
 	// std::list<VirtualServer>	candidatVirtualServer = _virtualServerList;
-	// std::list<VirtualServer>::const_iterator it = candidatVirtualServer.begin();
-	// std::list<VirtualServer>::const_iterator end = candidatVirtualServer.end();
-	// for (; it != end; it++)
+	// std::list<VirtualServer>::iterator it = candidatVirtualServer.begin();
+	// std::list<VirtualServer>::iterator end = candidatVirtualServer.end();
+	// std::list<VirtualServer>::iterator itcpy;
+	// if (candidatVirtualServer.size() == 1)
+	// 	return(candidatVirtualServer.front());
+	// for (; it != end;)
 	// {
-	// 	if (port != (*it).getPort())
-	// 		candidatVirtualServer.remove((*it));
+	// 	if (port != (*it).getPort()) {
+	// 		itcpy = it;
+	// 		it++;
+	// 		candidatVirtualServer.erase(itcpy);
+	// 	}
+	// 	else
+	// 		it++;
 	// }
-	// if (candidatVirtualServer.empty())
-	// 	return(_virtualServerList.front());
 	// if (candidatVirtualServer.size() == 1)
 	// 	return(candidatVirtualServer.front());
 
 	// it = candidatVirtualServer.begin();
-	// for (; it != end; it++)
+	// for (; it != end;)
 	// {
-	// 	if (ip != (*it).getIp())
-	// 		candidatVirtualServer.remove((*it));
+	// 	if (ip != (*it).getIp()) {
+	// 		itcpy = it;
+	// 		it++;
+	// 		candidatVirtualServer.erase(itcpy);
+	// 	}
+	// 	else
+	// 		it++;
 	// }
-	// if (candidatVirtualServer.empty())
-	// 	return(_virtualServerList.front());
 	// if (candidatVirtualServer.size() == 1)
 	// 	return(candidatVirtualServer.front());
-	
 	// it = candidatVirtualServer.begin();
 	// if (serverName.empty())
 	// 	return(candidatVirtualServer.front());
@@ -192,9 +207,15 @@ VirtualServer const &	Server::selectServer(short const & port, std::string const
 	// 			isNamePresent = true;
 	// 		}			
 	// 	}
-	// 		if (isNamePresent = false)
-	// 			candidatVirtualServer.remove((*it));
+	// 		if (isNamePresent == false){
+	// 			if (candidatVirtualServer.size() == 1)
+	// 				break ;
+	// 			candidatVirtualServer.erase(it);
+	// 		}
 	// }
+	// std::cout << "SERVOR NAME SELECTED: "<< candidatVirtualServer.front().getServerNames().front() << std::endl;
+	// if (candidatVirtualServer.empty())
+	// 	return(_virtualServerList.front());
 	// return(candidatVirtualServer.front());
 	
 
