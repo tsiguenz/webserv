@@ -3,14 +3,14 @@
 // Object managment
 
 VirtualServer::VirtualServer()
-	: _serverNames(), _ip(), _port(), _clientMaxBodySize(), _locationList(),
+	:  errorHandler(), _serverNames(), _ip(), _port(), _clientMaxBodySize(), _locationList(),
 	_errorPages(), _autoIndex(), _index(), _root(),
 	_allowedMethods(), _allowedExtCgi(), _uploadPath(),
 	_returnCode(), _returnPath()
 { }
 
 VirtualServer::VirtualServer(VirtualServer const& vs)
-	: _serverNames(vs._serverNames), _ip(vs._ip), _port(vs._port),
+	: errorHandler(), _serverNames(vs._serverNames), _ip(vs._ip), _port(vs._port),
 	_clientMaxBodySize(vs._clientMaxBodySize), _locationList(vs._locationList),
 	_errorPages(vs._errorPages), _autoIndex(vs._autoIndex), _index(vs._index),
 	_root(vs._root), _allowedMethods(vs._allowedMethods), _allowedExtCgi(vs._allowedExtCgi),

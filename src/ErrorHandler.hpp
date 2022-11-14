@@ -10,10 +10,13 @@ class ErrorHandler
 	public:
 		ErrorHandler();
 		~ErrorHandler();
-		std::string	generateErrorHtml(int errorCode);
+		std::string generateErrorHtml(int errorCode) const;
+		std::string generateStatusMessage(int errorCode) const;
 	private:
 		std::string templateError;
 		std::map<int , std::string> errorMessage;
+		std::map<int , std::string> statusCodes;
+
 };
 
 
