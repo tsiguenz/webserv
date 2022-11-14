@@ -36,27 +36,21 @@ server {
 	server_name blabla.com;
 	```
 
-- Listen (IP and port)
+- Listen (IP and port) **default: ip = 0.0.0.0 port = 8080**
 	```
 	listen 1024;
-	listen localhost:1025;
+	listen localhost:1024;
 	listen localhost;
 	```
 
-- Error page
-	```
-	error_page 404 /404.html;
-	error_page 500 502 /50x.html;
-	```
-
-- Client max body size (limit the body size)
+- Client max body size (limit the body size) **default: 1048576**
 	```
 	client_max_body_size 1024;
 	```
 
 ### Location
 
-Location is another block (in a server block) where we can apply directives for a specific URI.
+Location is another block (in a server block) where we can apply directives for a specific URI. All of the location directives can be used in server block to be set by default of the locations.
 
 Each location block start like that:
 ```
@@ -65,14 +59,15 @@ location [URI] {
 }
 ```
 
-- Methods allowed
+- Error page
 	```
-	methods GET POST DELETE;
+	error_page 404 /404.html;
+	error_page 500 502 /50x.html;
 	```
 
-- Define HTTP redirection
+- Default file (when request is directory)
 	```
-	return 301 /html/index.html
+	index index.html;
 	```
 
 - Root (if the file searched is index.html, it is rooted to /tmp/www/index.html)
@@ -80,15 +75,15 @@ location [URI] {
 	root /tmp/www
 	```
 
-- Directory listing
+- Directory listing **default: off**
 	```
 	autoindex on;
 	autoindex off;
 	```
 
-- Default file (when request is directory)
+- Define HTTP redirection
 	```
-	index index.html;
+	return 301 /html/index.html
 	```
 
 - Execute CGI with certain file extension
@@ -99,6 +94,11 @@ location [URI] {
 - Directory for the uploaded file
 	```
 	upload-path /download
+	```
+
+- Methods allowed
+	```
+	methods GET POST DELETE;
 	```
 
 ---
@@ -216,3 +216,4 @@ CGI ([Common Gateway Interface](https://en.wikipedia.org/wiki/Common_Gateway_Int
 - [Difference between pipe and socket](https://www.baeldung.com/cs/pipes-vs-sockets)
 - [Understand CGI programing](http://www.whizkidtech.redprince.net/cgi-bin/tutorial)
 - [nginx location block](https://www.digitalocean.com/community/tutorials/nginx-location-directive)
+- [Understand nginx server and location](https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms)
