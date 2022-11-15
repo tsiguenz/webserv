@@ -19,12 +19,12 @@ class Response
 
 		void		printResponse(void) const;
 
-		std::string							method; //  "REQUEST_METHOD="
+		std::string							method; //  "REQUEST_METHOD=" //x
 		std::string							url;
 		std::string							httpVersion;
 		std::map<std::string, std::string>	fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
-		std::vector<char>					body;
-		std::string							root; //pour adam
+		std::vector<char>					body; //x
+		std::string							root; //pour adam/ /x
 		std::string							serverName; //pour adam
 		std::string							port; //pour adam
 		std::string							fileName;

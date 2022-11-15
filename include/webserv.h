@@ -3,6 +3,8 @@
 
 # include <iostream>
 # include <vector>
+# include <map>
+# include <algorithm>
 
 # define WHITE "\033[0m"
 # define BLACK "\033[0;30m"
