@@ -46,6 +46,11 @@ class Response
 		void	checkingMethod(void);
 		void	handleError(void);
 		void	redirectionUrl(void);
+		void	_postFormData();
+		void	_postFormDataBlock();
+		std::vector<char>	_getFormDataBlock();
+//		size_t	_bodyFind(std::string const& toSearch, size_t pos = 0);
+		void	_postFormDataBlock(std::vector<char> const& v);
 
 		std::string getResponse(void);
 		std::string	getTime(void);
@@ -53,6 +58,23 @@ class Response
 		std::string getLength(void);
 		std::string	getConnectionType(void);
 		std::string	getTypeContent(void);
+
+		template<typename It>
+			size_t	_itFind(It const& begin, It const& end, std::string const& toSearch, size_t pos = 0) {
+				if (pos > (size_t) std::distance(begin, end) || toSearch.empty() == true)
+					return std::string::npos;
+				for (It it = begin + pos; it != end; it++) {
+					if (*it != toSearch[0])
+						continue ;
+					for (size_t i = 0; i < toSearch.size(); i++) {
+						if (*(it + i) != toSearch[i])
+							break ;
+						if (i == toSearch.size() - 1)
+							return std::distance(begin, it);
+					}
+				}
+				return std::string::npos;
+			}
 };
 
 #endif /* ******************************************************** RESPONSE_H */

@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 Server::Server(ConfigParser const& cp) {
-	std::cout << "File config is: " << cp.getFileName() << std::endl;
+//	std::cout << "File config is: " << cp.getFileName() << std::endl;
 	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
 	std::list<VirtualServer>::const_iterator	it = _virtualServerList.begin();
@@ -275,6 +275,6 @@ VirtualServer const &	Server::getVirtualServerByHost(Request const & currentRequ
 		port = 8080;
 	if (ip.empty())
 		ip = "0.0.0.0";
-	std::cout << BBLUE "\nIP:" << ip << " PORT:" << port << " SERVER NAME:" << serverName <<  WHITE <<std::endl; //debug
+//	std::cout << BBLUE "\nIP:" << ip << " PORT:" << port << " SERVER NAME:" << serverName <<  WHITE <<std::endl; //debug
 	return(selectServer(port, ip, serverName));
 }

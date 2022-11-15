@@ -17,7 +17,7 @@
 # include "webserv.h"
 # include "ConfigParser.hpp"
 
-# define BUFFER_SIZE 1050576 // TODO change using the max header size and the max body size
+# define BUFFER_SIZE 65000 // TODO change using the max header size and the max body size
 # define EVENTS_MAX 1000
 # define BACKLOG 10
 
