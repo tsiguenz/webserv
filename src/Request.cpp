@@ -19,7 +19,7 @@ Request::Request(std::vector<char> & toParse): vectorRequest(toParse), parsingCo
 
  //DEBUG
 	parsingRequest();
-	printRequest(); //DEBUG
+	// printRequest(); //DEBUG
 	// std::cout << rawRequest << std::endl; //DEBUG
 }
 
@@ -213,9 +213,9 @@ int	Request::parsingBody(void) {
 			return 0;
 	}
 	size_t len = strtod(fieldLines["Content-Length"].c_str(), NULL);
-	std::cout << "COUCOU" << " posend " << posEnd << " len "<<len << " contenue COntent Lenght " <<fieldLines["Content-Length"] << std::endl;
+	// std::cout << "COUCOU" << " posend " << posEnd << " len "<<len << " contenue COntent Lenght " <<fieldLines["Content-Length"] << std::endl;
 	body = std::vector<char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
-	std::cout << "SIZE BODY" <<body.size() << std::endl;
+	// std::cout << "SIZE BODY" <<body.size() << std::endl;
 	std::cout << BYELLOW "\n\n\n\nLEN =" << len << "SIZE BODY =" << body.size() << std::endl;
 	return 0;
 }

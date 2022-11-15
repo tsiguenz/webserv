@@ -1,7 +1,7 @@
 #include "Server.hpp"
-
+#include <signal.h>
 Server::Server(ConfigParser const& cp) {
-	std::cout << "File config is: " << cp.getFileName() << std::endl;
+	// std::cout << "File config is: " << cp.getFileName() << std::endl;
 	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
 	std::list<VirtualServer>::const_iterator	it = _virtualServerList.begin();
@@ -21,6 +21,7 @@ Server::~Server() {
 
 void	Server::run() {
 	while (1) {
+		signal(SIGPIPE, signalHandler); 
 		int	nbEpollFd = epoll_wait(_epFd, _events, EVENTS_MAX, -1);
 		if (nbEpollFd == -1)
 			throw std::runtime_error("error in epoll_wait()\n");
@@ -81,17 +82,17 @@ void	Server::_newConnection(int const& fd) const {
 Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
 	// char		buffer[BUFFER_SIZE];
-	std::vector<char> buffer2(BUFFER_SIZE);
-	std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
-	std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
+	std::vector<char> buffer2(BODY_MAX_SIZE + HEADER_MAX_SIZE, '\0');
+	// std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
+	// std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
 
 	// bzero(buffer, BUFFER_SIZE);
-	recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
-	for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.end();it++){
-   			std::cout << (*it);
- 		}
-		std::cout << std::endl;
+	size_t end = recv(event.data.fd, &buffer2[0], BODY_MAX_SIZE, 0);
+	std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
+	// for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
+	// 	std::cout << (*it);
+	// }
+	std::cout << std::endl;
 	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";
@@ -157,74 +158,87 @@ void	Server::_delEvent(int const& fd) const {
 		throw std::runtime_error("error in _delEvent::epol_ctl()\n");
 }
 
-VirtualServer const &	Server::selectServer(short const & port, std::string const & ip, std::string const & serverName) const {
+VirtualServer const 	Server::selectServer(short const & port, std::string const & ip, std::string const & serverName) const {
 
-	(void)port;
-	(void)ip;
-	(void)serverName;
+	// (void)port;
+	// (void)ip;
+	// (void)serverName;
 
-	// std::list<VirtualServer>	candidatVirtualServer = _virtualServerList;
-	// std::list<VirtualServer>::iterator it = candidatVirtualServer.begin();
-	// std::list<VirtualServer>::iterator end = candidatVirtualServer.end();
-	// std::list<VirtualServer>::iterator itcpy;
-	// if (candidatVirtualServer.size() == 1)
-	// 	return(candidatVirtualServer.front());
-	// for (; it != end;)
-	// {
-	// 	if (port != (*it).getPort()) {
-	// 		itcpy = it;
-	// 		it++;
-	// 		candidatVirtualServer.erase(itcpy);
-	// 	}
-	// 	else
-	// 		it++;
-	// }
-	// if (candidatVirtualServer.size() == 1)
-	// 	return(candidatVirtualServer.front());
+	std::list<VirtualServer>	candidatVirtualServer = _virtualServerList;
+	std::list<VirtualServer>::iterator it = candidatVirtualServer.begin();
+	std::list<VirtualServer>::iterator end = candidatVirtualServer.end();
+	std::list<VirtualServer>::iterator itcpy;
 
-	// it = candidatVirtualServer.begin();
-	// for (; it != end;)
-	// {
-	// 	if (ip != (*it).getIp()) {
-	// 		itcpy = it;
-	// 		it++;
-	// 		candidatVirtualServer.erase(itcpy);
-	// 	}
-	// 	else
-	// 		it++;
-	// }
-	// if (candidatVirtualServer.size() == 1)
-	// 	return(candidatVirtualServer.front());
-	// it = candidatVirtualServer.begin();
-	// if (serverName.empty())
-	// 	return(candidatVirtualServer.front());
-	// for (; it != end; it++)
-	// {
-	// 	bool isNamePresent= false;
-	// 	for (std::list<std::string>::const_iterator itVec = (*it).getServerNames().begin(); itVec != (*it).getServerNames().end(); itVec++)
-	// 	{
-	// 		if (serverName == (*itVec)) {
-	// 			isNamePresent = true;
-	// 		}			
-	// 	}
-	// 		if (isNamePresent == false){
-	// 			if (candidatVirtualServer.size() == 1)
-	// 				break ;
-	// 			candidatVirtualServer.erase(it);
-	// 		}
-	// }
-	// std::cout << "SERVOR NAME SELECTED: "<< candidatVirtualServer.front().getServerNames().front() << std::endl;
-	// if (candidatVirtualServer.empty())
-	// 	return(_virtualServerList.front());
-	// return(candidatVirtualServer.front());
+	if (candidatVirtualServer.size() == 1)
+		return(candidatVirtualServer.front());
+	
+	// std::cout << "COUCOU" <<std::endl;
+	for (; it != end;)
+	{
+		if (port != (*it).getPort()) {
+			itcpy = it;
+			it++;
+			candidatVirtualServer.erase(itcpy);
+		}
+		else
+			it++;
+	}
+	// std::cout << "COUCOU1" <<std::endl;
+
+	if (candidatVirtualServer.size() == 1)
+		return(candidatVirtualServer.front());
+	if (candidatVirtualServer.empty())
+		return(_virtualServerList.front());
+	it = candidatVirtualServer.begin();
+	for (; it != end;)
+	{
+		if (ip != (*it).getIp()) {
+			itcpy = it;
+			it++;
+			candidatVirtualServer.erase(itcpy);
+		}
+		else
+			it++;
+	}
+	// std::cout << "COUCOU2" <<std::endl;
+
+	if (candidatVirtualServer.size() == 1)
+		return(candidatVirtualServer.front());
+	if (candidatVirtualServer.empty())
+		return(_virtualServerList.front());
+	it = candidatVirtualServer.begin();
+	if (serverName.empty())
+		return(candidatVirtualServer.front());
+	for (; it != end; it++)
+	{
+		bool isNamePresent= false;
+		for (std::list<std::string>::const_iterator itVec = (*it).getServerNames().begin(); itVec != (*it).getServerNames().end(); itVec++)
+		{
+			if (serverName == (*itVec)) {
+				isNamePresent = true;
+			}			
+		}
+			if (isNamePresent == false){
+				if (candidatVirtualServer.size() == 1)
+					break ;
+				candidatVirtualServer.erase(it);
+			}
+	}
+	// if (!candidatVirtualServer.empty())
+	// 	std::cout << "SERVOR NAME SELECTEDddddd: "<< candidatVirtualServer.front().getServerNames().front() << std::endl;
+	// else
+	// 	std::cout << "SERVOR NAME SELECTED: "<< _virtualServerList.front().getServerNames().front() << std::endl;
+	if (candidatVirtualServer.empty())
+		return(_virtualServerList.front());
+	return(candidatVirtualServer.front());
 	
 
 	// en attendant le debug:
-	return(_virtualServerList.front());
+	// return(_virtualServerList.front());
 }
 
 
-VirtualServer const &	Server::getVirtualServerByHost(Request const & currentRequest) const {
+VirtualServer const 	Server::getVirtualServerByHost(Request const & currentRequest) const {
 	
 	std::string	ip;
 	std::string	portString;
@@ -272,6 +286,6 @@ VirtualServer const &	Server::getVirtualServerByHost(Request const & currentRequ
 		port = 8080;
 	if (ip.empty())
 		ip = "0.0.0.0";
-	std::cout << BBLUE "\nIP:" << ip << " PORT:" << port << " SERVER NAME:" << serverName <<  WHITE <<std::endl; //debug
+	// std::cout << BBLUE "\nIP:" << ip << " PORT:" << port << " SERVER NAME:" << serverName <<  WHITE <<std::endl; //debug
 	return(selectServer(port, ip, serverName));
 }

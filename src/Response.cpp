@@ -22,7 +22,7 @@ Response::Response( Request  src, VirtualServer const & virtualServer ): mime(),
 	port = ss.str();
 
 	buildingResponse();
-	printResponse();
+	// printResponse();
 }
 
 
@@ -58,6 +58,7 @@ void				Response::buildingResponse(void) {
 	response += getTime();
 	response += getServerName();
 	response += getConnectionType();
+	//redirect
 	if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
 		if (!file.empty())
 			response += getTypeContent();
@@ -74,13 +75,15 @@ void				Response::buildingResponse(void) {
 ** --------------------------------- GET METHODE ----------------------------------
 */
 void		Response::checkingMethod(void) {
-	std::list<std::string> allowedMethods = server.getAllowedMethods();
-	for (std::list<std::string>::iterator itVec = allowedMethods.begin(); itVec != allowedMethods.end(); itVec++)
-	{
-		if (method == (*itVec)) {
-			return ;
-		}			
-	}
+	// std::list<std::string> allowedMethods = server.getAllowedMethods(); //server.
+	// for (std::list<std::string>::iterator itVec = allowedMethods.begin(); itVec != allowedMethods.end(); itVec++)
+	// {
+	// 	if (method == (*itVec)) {
+	// 		return ;
+	// 	}			
+	// }
+	if (server.isAllowedMethod(method))
+		return ;
 	if (method == "DELETE" || method == "GET" || method == "POST" || method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
 		code = 405;
 		return ;
@@ -107,7 +110,7 @@ void		Response::getFile(void) {
     }
 	this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
-	std::cout << "c bon igo lurl mene a qlq chose" << std::endl; // DEBUG
+	// std::cout << "c bon igo lurl mene a qlq chose" << std::endl; // DEBUG
 	fileName = url;
 	//check if its GET and if its in accepted
 	return ;
@@ -116,7 +119,7 @@ void		Response::getFile(void) {
 
 void		Response::redirectionUrl(void) {
 	if (url == "/")
-		url = url + server.getIndex();
+		url = url + server.getIndex(); //si pas dindex renvoie sooit autoindex soit erreur
 }
 
 

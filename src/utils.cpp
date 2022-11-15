@@ -3,10 +3,14 @@
 # include <vector>
 # include <stdio.h>
 # include <stdlib.h>
-
+# include <iostream>
 void	signalHandler(int sig) {
 	if (sig == SIGINT)
 		throw std::runtime_error("\nServer is closed by user\n");
+	if (sig == SIGPIPE) {
+        throw std::runtime_error("\nServer is closed by them\n");
+        std::cout << "SIGPIPE" << std::endl;
+    }
 }
 
 std::string	ltrim(std::string const& s) {
