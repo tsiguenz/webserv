@@ -45,6 +45,8 @@ void	Server::_setNonBlocking(int const& fd) const {
 }
 
 void	Server::_handleEvent(int const& nbEpollFd) const {
+	Request		currentRequest;
+	Response	currentResponse;
 	for (int i = 0; i < nbEpollFd; i++) {
 		epoll_event	currentEvent = _events[i];
 		if (currentEvent.events & EPOLLERR)
@@ -52,11 +54,13 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == true)
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
-//			if (currentEvent.events & EPOLLIN)
-				Request		currentRequest(_parseRequest(currentEvent));
-				Response 	currentResponse(currentRequest, getVirtualServerByHost(currentRequest));
+			if (currentEvent.events & EPOLLIN) {
+				currentRequest = Request(_parseRequest(currentEvent));
+				currentResponse	= Response(currentRequest, getVirtualServerByHost(currentRequest));
+				_modEvent(currentEvent.data.fd, EPOLLOUT);
 				// currentResponse.printResponse();
-//			if (currentEvent.events & EPOLLOUT)
+			}
+			if (currentEvent.events & EPOLLOUT)
 				_sendResponse(currentEvent, currentResponse);
 		}
 	}
@@ -82,23 +86,22 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
 	// char		buffer[BUFFER_SIZE];
 	std::vector<char> buffer2(BUFFER_SIZE);
-	std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
-	std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
+//	std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
+//	std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
 
 	// bzero(buffer, BUFFER_SIZE);
 	recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
-	for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.end();it++){
-   			std::cout << (*it);
- 		}
-		std::cout << std::endl;
+//	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
+//	for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.end();it++){
+//   			std::cout << (*it);
+// 		}
+//		std::cout << std::endl;
 	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";
 	// 	return;
 	// }
 	// currentRequest.printRequest();
-	_modEvent(event.data.fd, EPOLLOUT);
 	return (currentRequest);
 
 }
