@@ -6,9 +6,9 @@
 # include <ctime>
 # include <sstream> 
 # include "Request.hpp"
-# include "Response.hpp"
 # include "MediaType.hpp"
 # include "VirtualServer.hpp"
+# include "Cgi.hpp"
 
 class Response
 {
@@ -17,15 +17,15 @@ class Response
 		Response( Request  src, VirtualServer const & server);
 		~Response();
 
-		void		printResponse(void) const;
+		void		printResponse(void);
 
 		std::string							method; //  "REQUEST_METHOD=" //x
 		std::string							url;
-		std::string							httpVersion;
+		std::string							httpVersion; //x
 		std::map<std::string, std::string>	fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
 		std::vector<char>					body; //x
-		std::string							root; //pour adam/ /x
-		std::string							serverName; //pour adam
+		std::string							root; //pour adam //x
+		std::string							serverName; //pour adam //x
 		std::string							port; //pour adam
 		std::string							fileName;
 		std::vector<char>					file;
@@ -38,7 +38,6 @@ class Response
 		std::map<int, std::pair<std::string, std::string> >	statusCodes;
 
 		void		buildingResponse(void);
-		
 		void		getFile(void); //GET
 		void		postFile(void); //POST
 		void		deleteFile(void); //DELETE

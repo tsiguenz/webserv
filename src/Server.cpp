@@ -212,21 +212,21 @@ VirtualServer const 	Server::selectServer(short const & port, std::string const 
 	it = candidatVirtualServer.begin();
 	if (serverName.empty())
 		return(candidatVirtualServer.front());
-	for (; it != end; it++)
-	{
-		bool isNamePresent= false;
-		for (std::list<std::string>::const_iterator itVec = (*it).getServerNames().begin(); itVec != (*it).getServerNames().end(); itVec++)
-		{
-			if (serverName == (*itVec)) {
-				isNamePresent = true;
-			}			
-		}
-			if (isNamePresent == false){
-				if (candidatVirtualServer.size() == 1)
-					break ;
-				candidatVirtualServer.erase(it);
-			}
-	}
+	// for (; it != end; it++)
+	// {
+	// 	bool isNamePresent= false;
+	// 	for (std::list<std::string>::const_iterator itVec = (*it).getServerNames().begin(); itVec != (*it).getServerNames().end(); itVec++)
+	// 	{
+	// 		if (serverName == (*itVec)) {
+	// 			isNamePresent = true;
+	// 		}			
+	// 	}
+	// 		if (isNamePresent == false){
+	// 			if (candidatVirtualServer.size() == 1)
+	// 				break ;
+	// 			candidatVirtualServer.erase(it);
+	// 		}
+	// }
 	// if (!candidatVirtualServer.empty())
 	// 	std::cout << "SERVOR NAME SELECTEDddddd: "<< candidatVirtualServer.front().getServerNames().front() << std::endl;
 	// else

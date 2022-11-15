@@ -43,13 +43,58 @@ Response::~Response(){
 ** --------------------------------- MAIN METHODS ----------------------------------
 */
 
+char *ft_strcpy(char *dest, const char *src){
+	int i = 0;
+	for (; src[i]; i++) {
+		dest[i] = src[i];
+	}
+	dest[i] = src[i];
+	return (dest);
+}
+
+char **mtoss(std::map<std::string, std::string> map) {
+	char **strs;
+	std::string str;
+	if (!(strs = (char **)malloc(sizeof(char *) * (map.size() + 1))))
+		return (NULL);
+	int	i = -1;
+	for (std::map<std::string, std::string>::const_iterator it = map.begin(); it != map.end(); ++it){
+		++i;
+		// std::cout << "first " << (*it).first << std::endl
+		// 		  << "second " << "=" << std::endl
+		// 		  << "third " << map[(*it).first] << std::endl
+		// 		  << "bob " << ((*it).first + "=" + map[(*it).first]).c_str() << std::endl
+		// 		  << "billy " << (((*it).first + "=" + map[(*it).first]).c_str()) << std::endl
+		// 		  << "bobby " << const_cast<char *>(((*it).first + "=" + map[(*it).first]).c_str()) << std::endl;
+		str = (*it).first + "=" + map[(*it).first];
+		if (!(strs[i] = (char *)malloc(sizeof(char) * (str.length() + 1))))
+			return (NULL);
+		strs[i] = ft_strcpy(strs[i], str.c_str());
+	}
+	strs[++i] = NULL;
+	return (strs);
+}
+
 void				Response::buildingResponse(void) {
 
 	if (code == 200)
 		checkingMethod();
-	//tu peux faire ton bail entre ici
+	
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
+
+	Cgi bob(*this);
+	std::map<std::string, std::string> map = bob.create_env();
+	std::cout << RED "Printing map : " << std::endl;
+	for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it)
+		std::cout << CYAN << (*it).first << " : " WHITE << map[(*it).first] << std::endl;
+	std::cout << std::endl << WHITE;
+
+	char **envp = mtoss(map);
+	for (int i = 0; envp && envp[i]; i++)
+		std::cout << envp[i] << std::endl;
+	// bob.executeCGI(fileName, )
+
 	if (code == 200 && method == "DELETE") {
 
 		deleteFile();
@@ -228,7 +273,17 @@ std::string Response::getResponse(void) {
 	return line;
 }
 
-void	Response::printResponse(void) const {
-	std::cout << response << std::endl;
+void	Response::printResponse(void) {
+	std::cout << RED "fileName : " WHITE << fileName << std::endl
+			  << CYAN "CONTENT_TYPE : " WHITE << mime.getMediaType(fileName) << std::endl
+			  << CYAN "httpVersion : " WHITE << httpVersion << std::endl
+			  << CYAN "method : " WHITE << method << std::endl
+			  << CYAN "port : " WHITE << port << std::endl
+			  << CYAN "serverName : " WHITE << serverName << std::endl
+			  << RED "root : " WHITE << root << std::endl
+			  << RED "url : " WHITE << url << std::endl;
+	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); ++it)
+		std::cout << CYAN << (*it).first << " : " WHITE << fieldLines[(*it).first] << std::endl;
+	std::cout << std::endl;
 }
 /* ************************************************************************** */
