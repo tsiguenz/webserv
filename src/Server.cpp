@@ -46,6 +46,8 @@ void	Server::_setNonBlocking(int const& fd) const {
 }
 
 void	Server::_handleEvent(int const& nbEpollFd) const {
+	Request		currentRequest;
+	Response	currentResponse;
 	for (int i = 0; i < nbEpollFd; i++) {
 		epoll_event	currentEvent = _events[i];
 		if (currentEvent.events & EPOLLERR)
@@ -53,11 +55,13 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 		else if (_isServer(currentEvent.data.fd) == true)
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
-//			if (currentEvent.events & EPOLLIN)
-				Request		currentRequest(_parseRequest(currentEvent));
-				Response 	currentResponse(currentRequest, getVirtualServerByHost(currentRequest));
+			if (currentEvent.events & EPOLLIN) {
+				currentRequest = Request(_parseRequest(currentEvent));
+				currentResponse	= Response(currentRequest, getVirtualServerByHost(currentRequest));
+				_modEvent(currentEvent.data.fd, EPOLLOUT);
 				// currentResponse.printResponse();
-//			if (currentEvent.events & EPOLLOUT)
+			}
+			if (currentEvent.events & EPOLLOUT)
 				_sendResponse(currentEvent, currentResponse);
 		}
 	}
@@ -99,7 +103,6 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 	// 	return;
 	// }
 	// currentRequest.printRequest();
-	_modEvent(event.data.fd, EPOLLOUT);
 	return (currentRequest);
 
 }

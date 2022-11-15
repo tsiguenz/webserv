@@ -6,6 +6,11 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
+Response::Response()
+	: method(), url(), httpVersion(), fieldLines(), body(), root(),
+	serverName(), port(), fileName(), file(), response(), mime(), server(), statusCodes()
+{ }
+
 //: mime()
 Response::Response( Request  src, VirtualServer const & virtualServer ): mime(), server(virtualServer){
 
