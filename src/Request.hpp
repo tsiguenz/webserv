@@ -10,14 +10,14 @@
 class Request
 {
 	public:
-		Request(std::vector<char> & toParse);
+		Request(std::vector<unsigned char> & toParse);
 		Request(void);
 		// Request(const Request & src);
 		~Request();
 
 
 		//full unparsed request
-		std::vector<char>	vectorRequest;
+		std::vector<unsigned char>	vectorRequest;
 		std::string			rawRequest;
 		//requestLine
 		std::string method;
@@ -29,11 +29,11 @@ class Request
 
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		//TODO VECTOR UNSIGNED CHAR
-		std::vector<char> body;
+		std::vector<unsigned char> body;
 
 		int			parsingCode;
 		
-		void		create(std::vector<char> toParse2);
+		void		create(std::vector<unsigned char> toParse2);
 		void		create(Request const & rhs);
 		Request &	operator=(Request const & rhs);
 		void		printRequest(void);

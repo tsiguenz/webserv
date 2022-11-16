@@ -17,8 +17,7 @@
 # include "webserv.h"
 # include "ConfigParser.hpp"
 
-# define HEADER_MAX_SIZE 4096 // nginx max header size
-# define BODY_MAX_SIZE 550576 // TODO change using the max header size and the max body size
+# define BUFFER_SIZE 16384 // TODO change using the max header size and the max body size
 # define EVENTS_MAX 1000
 # define BACKLOG 10
 

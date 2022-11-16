@@ -11,11 +11,9 @@ Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escap
 	parsingCode = 2;
 }
 
-Request::Request(std::vector<char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::vector<unsigned char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
-	// printRequest(); //DEBUG
-	// std::cout << rawRequest << std::endl; //DEBUG
 }
 
 /*
@@ -186,8 +184,7 @@ int	Request::parsingBody(void) {
 			return 0;
 	}
 	size_t len = strtod(fieldLines["Content-Length"].c_str(), NULL);
-	body = std::vector<char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
-	std::cout << BYELLOW "\n\n\n\nLEN =" << len << "SIZE BODY =" << body.size() << std::endl;
+	body = std::vector<unsigned char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
 	return 0;
 }
 
@@ -199,27 +196,6 @@ void	Request::trimingFieldLines() {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void	Request::printRequest(){
 
@@ -233,13 +209,13 @@ void	Request::printRequest(){
 	if (body.empty())
 		std::cout << BRED << "NONE" WHITE << std::endl;
 	else {
-		for (std::vector<char>::iterator it = body.begin(); it != body.end();it++){
+		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
    			std::cout << (*it);
  		}
 		std::cout << std::endl;
 	}
 	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
-	for (std::vector<char>::iterator it = vectorRequest.begin(); it != vectorRequest.end();it++){
+	for (std::vector<unsigned char>::iterator it = vectorRequest.begin(); it != vectorRequest.end();it++){
    			std::cout << (*it);
  		}
 		std::cout << std::endl;

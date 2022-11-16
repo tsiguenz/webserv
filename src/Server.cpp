@@ -1,7 +1,6 @@
 #include "Server.hpp"
 #include <signal.h>
 Server::Server(ConfigParser const& cp) {
-	// std::cout << "File config is: " << cp.getFileName() << std::endl;
 	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
 	std::list<VirtualServer>::const_iterator	it = _virtualServerList.begin();
@@ -86,12 +85,12 @@ void	Server::_newConnection(int const& fd) const {
 Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
 	// char		buffer[BUFFER_SIZE];
-	std::vector<char> buffer2(32768, '\0');
+	std::vector<unsigned char> buffer2(BUFFER_SIZE, '\0');
 	// std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
 	// std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
 
 	// bzero(buffer, BUFFER_SIZE);
-	size_t end = recv(event.data.fd, &buffer2[0], 32768, 0);
+	size_t end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
 	(void)end;
 	// std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
 	// for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
@@ -291,6 +290,5 @@ VirtualServer const 	Server::getVirtualServerByHost(Request const & currentReque
 		port = 8080;
 	if (ip.empty())
 		ip = "0.0.0.0";
-	// std::cout << BBLUE "\nIP:" << ip << " PORT:" << port << " SERVER NAME:" << serverName <<  WHITE <<std::endl; //debug
 	return(selectServer(port, ip, serverName));
 }

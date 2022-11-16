@@ -27,7 +27,7 @@ Response::Response( Request  src, VirtualServer const & virtualServer ): mime(),
 	port = ss.str();
 
 	buildingResponse();
-	// printResponse();
+//	printResponse();
 }
 
 
@@ -50,9 +50,10 @@ void				Response::buildingResponse(void) {
 	//tu peux faire ton bail entre ici
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
-	if (code == 200 && method == "DELETE") {
-
+	if (code == 200 && method == "DELETE")
 		deleteFile();
+	if (code == 200 && method == "POST") {
+		postFile();
 	}
 	//et la
 	if (server.getReturnCode(url) == code)
@@ -60,7 +61,6 @@ void				Response::buildingResponse(void) {
 	if (code > 399)
 		handleError();
 
-	std::cout << code << " " <<  server.getReturnCode(url) << "url :" << url << std::endl;
 	response = getResponse();
 	redirectionUrl();
 	response += getTime();
@@ -122,9 +122,6 @@ void		Response::getFile(void) {
 }
 
 void		Response::redirectionIndex(void) {
-	
-	std::cout << url << " :ITS A DIR| " << server.getIndex(url +"/") << " -> server.getIndex(url+\"/\")" << std::endl;
-
 	if (url[url.length() - 1] == '/')
 		url = url + server.getIndex(url);
 	else
@@ -137,6 +134,77 @@ void		Response::redirectionUrl(void) {
 	response += "Location: ";
 	response += server.getReturnPath(url);
 	response += "\r\n";
+}
+
+/*
+** --------------------------------- POST METHODE ----------------------------------
+*/
+
+void		Response::postFile(void) {
+	if (fieldLines["Content-Type"].find("multipart/form-data") == 0)
+		_postFormData();
+}
+
+void	Response::_postFormData() {
+	size_t	pos = fieldLines["Content-Type"].find("boundary=");
+	if (pos == std::string::npos) { code = 400; return ; }
+	for (std::vector<unsigned char> v = _getFormDataBlock(); v.empty() == false; v = _getFormDataBlock()) {
+		if (code == 400)
+			return ;
+		_postFormDataBlock(v);
+	}
+}
+
+std::vector<unsigned char>	Response::_getFormDataBlock() {
+	static size_t	pos = 0;
+	std::vector<unsigned char>	ret;
+	size_t	posDelim = fieldLines["Content-Type"].find("boundary=");
+	if (posDelim == std::string::npos) { code = 400; return ret; }
+	std::string	delim = fieldLines["Content-Type"].substr(posDelim + 9);
+	size_t	startBlock = _itFind(body.begin(), body.end(), delim, pos);
+	size_t	endBlock = _itFind(body.begin(), body.end(), delim, startBlock + delim.size());
+	if (startBlock == std::string::npos || endBlock == std::string::npos) {
+		pos = 0;
+		return ret;
+	}
+	endBlock += delim.size();
+	pos = endBlock;
+	for (; startBlock != endBlock; startBlock++)
+		ret.push_back(body[startBlock]);
+	return ret;
+}
+
+void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
+	std::string	fileName;
+	// get delim
+	size_t	posDelim = fieldLines["Content-Type"].find("boundary=");
+	if (posDelim == std::string::npos) { code = 400; return ; }
+	std::string	delim = fieldLines["Content-Type"].substr(posDelim + 9);
+	// get upload path
+	std::string	uploadPath = server.getUploadPath(root + url);
+	if (*(uploadPath.end() - 1) != '/' && uploadPath.empty() == false)
+		uploadPath.push_back('/');
+	// get filename
+	size_t	pos = _itFind(v.begin(), v.end(), "filename=\"");
+	if (pos == std::string::npos) { code = 400; return ; }
+	pos += 10;
+	while (v[pos] != '"')
+		fileName.push_back(v[pos++]);
+	// get file content
+	size_t	posStart = _itFind(v.begin(), v.end(), "\r\n\r\n");
+	if (posStart == std::string::npos) { code = 400; return ; }
+	posStart += 4;
+	size_t	posEnd = _itFind(v.begin() + posStart, v.end(), delim);
+	if (posEnd == std::string::npos) { code = 400; return ; }
+	// 4 is the lenght of the "\r\n" and "--"
+	posEnd += posStart - 4;
+	fileName = root + uploadPath + fileName;
+	// write in file
+	std::ofstream	of(fileName.c_str());
+	if (of.good() == false) { code = 400; of.close(); return ; }
+	for (std::vector<unsigned char>::const_iterator it = v.begin(); posStart != posEnd && of.good() == true; posStart++)
+		of.put(it[posStart]);
+	of.close();
 }
 
 /*

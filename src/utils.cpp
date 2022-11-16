@@ -10,8 +10,7 @@ void	signalHandler(int sig) {
 	if (sig == SIGINT)
 		throw std::runtime_error("\nServer is closed by user\n");
 	if (sig == SIGPIPE) {
-        throw std::runtime_error("\nServer is closed by them\n");
-        std::cout << "SIGPIPE" << std::endl;
+        throw std::runtime_error("\nServer catch SIGPIPE\n");
     }
 }
 
@@ -87,7 +86,6 @@ bool validateIP(std::string & ip)
 bool isADir(const std::string & url) {
     DIR *d;
     d = opendir(url.c_str());
-    std::cout << "url demandé: "<< url << std::endl;
     if (d == NULL)
         return 0;
     closedir(d);
