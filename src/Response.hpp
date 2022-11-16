@@ -45,8 +45,9 @@ class Response
 
 		void	checkingMethod(void);
 		void	handleError(void);
-		void	redirectionUrl(void);
 
+		void	redirectionIndex(void);
+		void	redirectionUrl(void);
 		std::string getResponse(void);
 		std::string	getTime(void);
 		std::string	getServerName(void);

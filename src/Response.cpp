@@ -55,16 +55,19 @@ void				Response::buildingResponse(void) {
 		deleteFile();
 	}
 	//et la
-	if (code != 200)  {
+	if (server.getReturnCode(url) == code)
+		code = 302;
+	if (code > 399)
 		handleError();
-	}
 
+	std::cout << code << " " <<  server.getReturnCode(url) << "url :" << url << std::endl;
 	response = getResponse();
+	redirectionUrl();
 	response += getTime();
 	response += getServerName();
 	response += getConnectionType();
-	//redirect
-	if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
+
+	if ((method == "GET" && code != 302) || (code != 200 && (method == "DELETE" || method == "POST"))) {
 		if (!file.empty())
 			response += getTypeContent();
 		response += getLength();
@@ -80,14 +83,7 @@ void				Response::buildingResponse(void) {
 ** --------------------------------- GET METHODE ----------------------------------
 */
 void		Response::checkingMethod(void) {
-	// std::list<std::string> allowedMethods = server.getAllowedMethods(); //server.
-	// for (std::list<std::string>::iterator itVec = allowedMethods.begin(); itVec != allowedMethods.end(); itVec++)
-	// {
-	// 	if (method == (*itVec)) {
-	// 		return ;
-	// 	}			
-	// }
-	if (server.isAllowedMethod(method))
+	if (server.isAllowedMethod(method, url))
 		return ;
 	if (method == "DELETE" || method == "GET" || method == "POST" || method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
 		code = 405;
@@ -98,10 +94,15 @@ void		Response::checkingMethod(void) {
 }
 void		Response::getFile(void) {
 
+	if (isADir(server.getRoot() + url))
+	{
+		if (server.getAutoIndex() == "on") {
+			
+			//return ;
+		}
+		redirectionIndex();
+	}
 	std::string pathRepertoire = server.getRoot(); 
-	redirectionUrl();
-	// redirectionUrl(); // en faire un qui redir //SELON CONFIG
-	// redirectionUrl(); // en faire un spé root //SELON CONFIG
 	if (!mime.isExtensionSupported(url)) {	
 		code = 415;
 		return;
@@ -110,23 +111,33 @@ void		Response::getFile(void) {
 	std::ifstream file(path.c_str());
     if(file.fail()) {
         code = 404;
-		std::cout << "404 mon PETIT REUF\n" << std::endl; // DEBUG
         return ;
     }
-	this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
+	if (method == "GET")
+		this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
-	// std::cout << "c bon igo lurl mene a qlq chose" << std::endl; // DEBUG
 	fileName = url;
-	//check if its GET and if its in accepted
 	return ;
 
 }
 
-void		Response::redirectionUrl(void) {
-	if (url == "/")
-		url = url + server.getIndex(); //si pas dindex renvoie sooit autoindex soit erreur
+void		Response::redirectionIndex(void) {
+	
+	std::cout << url << " :ITS A DIR| " << server.getIndex(url +"/") << " -> server.getIndex(url+\"/\")" << std::endl;
+
+	if (url[url.length() - 1] == '/')
+		url = url + server.getIndex(url);
+	else
+		url = url + server.getIndex(url+"/");
 }
 
+void		Response::redirectionUrl(void) {
+	if (code != 302)
+		return ;
+	response += "Location: ";
+	response += server.getReturnPath(url);
+	response += "\r\n";
+}
 
 /*
 ** --------------------------------- DELETE METHODE ----------------------------------
@@ -150,8 +161,8 @@ void		Response::redirectionUrl(void) {
 */
 
 void		Response::handleError(void) {
-	if(server.getErrorPages().count(code)) {
-		fileName = server.getRoot() + server.getErrorPageByCode(code);
+	if(server.getErrorPages(url).count(code)) {
+		fileName = server.getRoot(url) + server.getErrorPageByCode(code, url);
 		std::ifstream fileBuffer(fileName.c_str());
    		if(fileBuffer.fail()) {
         	fileName = "error.html";

@@ -4,6 +4,8 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <iostream>
+# include <dirent.h>
+
 void	signalHandler(int sig) {
 	if (sig == SIGINT)
 		throw std::runtime_error("\nServer is closed by user\n");
@@ -54,7 +56,7 @@ std::vector<std::string> split(const std::string &str, char delim)
     return list;
 }
 
-bool validateIP(std::string ip)
+bool validateIP(std::string & ip)
 {
     int value;
     std::vector<std::string> list = split(ip, '.');
@@ -80,4 +82,14 @@ bool validateIP(std::string ip)
     }
  
     return true;
+}
+
+bool isADir(const std::string & url) {
+    DIR *d;
+    d = opendir(url.c_str());
+    std::cout << "url demandé: "<< url << std::endl;
+    if (d == NULL)
+        return 0;
+    closedir(d);
+    return 1;
 }

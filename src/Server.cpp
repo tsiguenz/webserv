@@ -86,17 +86,18 @@ void	Server::_newConnection(int const& fd) const {
 Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
 	// char		buffer[BUFFER_SIZE];
-	std::vector<char> buffer2(BODY_MAX_SIZE + HEADER_MAX_SIZE, '\0');
+	std::vector<char> buffer2(32768, '\0');
 	// std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
 	// std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
 
 	// bzero(buffer, BUFFER_SIZE);
-	size_t end = recv(event.data.fd, &buffer2[0], BODY_MAX_SIZE, 0);
-	std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
+	size_t end = recv(event.data.fd, &buffer2[0], 32768, 0);
+	(void)end;
+	// std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
 	// for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
 	// 	std::cout << (*it);
 	// }
-	std::cout << std::endl;
+	// std::cout << std::endl;
 	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";
@@ -212,22 +213,23 @@ VirtualServer const 	Server::selectServer(short const & port, std::string const 
 	it = candidatVirtualServer.begin();
 	if (serverName.empty())
 		return(candidatVirtualServer.front());
-	for (; it != end; it++)
-	{
-		bool isNamePresent= false;
-		for (std::list<std::string>::const_iterator itVec = (*it).getServerNames().begin(); itVec != (*it).getServerNames().end(); itVec++)
-		{
-			if (serverName == (*itVec)) {
-				isNamePresent = true;
-			}			
-		}
-			if (isNamePresent == false){
-				if (candidatVirtualServer.size() == 1)
-					break ;
-				candidatVirtualServer.erase(it);
-			}
-	}
-	// if (!candidatVirtualServer.empty())
+	// for (; it != end; it++) ERROR COMPILATOR----------------
+	// {
+	// 	bool isNamePresent= false;
+	// 	std::list<std::string>::iterator itList((*it).getServerNames().begin());
+	// 	for (; itList != (*it).getServerNames().end(); itList++)
+	// 	{
+	// 		if (serverName == (*itList)) {
+	// 			isNamePresent = true;
+	// 		}			
+	// 	}
+	// 		if (isNamePresent == false){
+	// 			if (candidatVirtualServer.size() == 1)
+	// 				break ;
+	// 			candidatVirtualServer.erase(it);
+	// 		}
+	// } ----------------
+	// if (!candidatVirtualServer.empty()) DEBUGG
 	// 	std::cout << "SERVOR NAME SELECTEDddddd: "<< candidatVirtualServer.front().getServerNames().front() << std::endl;
 	// else
 	// 	std::cout << "SERVOR NAME SELECTED: "<< _virtualServerList.front().getServerNames().front() << std::endl;

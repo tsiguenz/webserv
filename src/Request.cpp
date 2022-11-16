@@ -13,20 +13,11 @@ Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escap
 
 Request::Request(std::vector<char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
-   
-	// std::cout << "size:" << std::distance(rawRequest.begin(), rawRequest.end()) << std::endl;
-	// std::cout << "count:" << rawRequest.size() << std::endl;
-
- //DEBUG
 	parsingRequest();
 	// printRequest(); //DEBUG
 	// std::cout << rawRequest << std::endl; //DEBUG
 }
 
-// Request::Request( const Request & src )
-// {
-// 	*this = src;
-// }
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
@@ -39,8 +30,6 @@ Request::~Request()
 /*
 ** --------------------------------- OVERLOAD ---------------------------------
 */
-
-
 
 Request &				Request::operator=( Request const & rhs )
 {
@@ -84,7 +73,6 @@ void	Request::parsingRequest(void) {
 		return ;
 
 }
-
 
 int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP request-target SP HTTP-version CRLF
 
@@ -142,8 +130,6 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 	}	
 	line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);	
 	while (!line.empty() && line != "\r\n") {
-
-		// std::cout << "line= " << line << std::endl; //DEBUG
 		if (line.find_first_of(':') == std::string::npos || line.find("\r\n") == std::string::npos ) {
 		
 			parsingCode = 400;
@@ -170,7 +156,6 @@ int	Request::parsingFieldLines(void) { // [RFC] header-field   = field-name ":" 
 			return 1;
 		}	
 		fieldLines[fieldName] = fieldValue;
-		// std::cout << "fieldName= " << fieldName << " fieldValue= " << fieldValue << std::endl; //DEBUG
 		line = copyRequest.substr(0, copyRequest.find_first_of('\n') + 1);
 	}
 	trimingFieldLines();
@@ -187,18 +172,6 @@ int	Request::parsingFieldName(std::string fieldName) {
 	return 0;
 }
 
-// int	Request::parsingBody2(void) {
-// 	if (rawRequest.find("\r\n\r\n", 4) == std::string::npos) {
-// 			parsingCode = 400;
-// 			return 1;
-// 	}
-// 	std::string::iterator it = rawRequest.begin() + rawRequest.find("\r\n\r\n", 4) + 4;
-// 	std::cout << BYELLOW "TAILLE POTENTIEL BODY:" << std::distance(it, rawRequest.end()) << std::endl;
-// 	// body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<char>
-
-// 	return 0;
-// }
-
 int	Request::parsingBody(void) {
 	
 	std::map<std::string,std::string>::iterator it;
@@ -213,9 +186,7 @@ int	Request::parsingBody(void) {
 			return 0;
 	}
 	size_t len = strtod(fieldLines["Content-Length"].c_str(), NULL);
-	// std::cout << "COUCOU" << " posend " << posEnd << " len "<<len << " contenue COntent Lenght " <<fieldLines["Content-Length"] << std::endl;
 	body = std::vector<char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
-	// std::cout << "SIZE BODY" <<body.size() << std::endl;
 	std::cout << BYELLOW "\n\n\n\nLEN =" << len << "SIZE BODY =" << body.size() << std::endl;
 	return 0;
 }
@@ -228,16 +199,6 @@ void	Request::trimingFieldLines() {
 	}
 	
 }
-// void				Request::create(std::string const & toParse) {
-// 	rawRequest 	= toParse;
-// 	parsingCode = 200;
-// 	parsingRequest();
-// }
-
-// void				Request::create(Request const & rhs) {
-// 	*this = rhs;
-// }
-
 
 
 

@@ -28,6 +28,7 @@ std::string	ltrim(const std::string &s);
 std::string	rtrim(const std::string &s);
 std::string	trim(const std::string &s);
 bool        is_digits(const std::string &str);
-bool        validateIP(std::string ip);
+bool        validateIP(std::string &ip);
+bool        isADir(const std::string &url);
 std::vector<std::string> split(const std::string &str, char delim);
 #endif // WEBSERV_H

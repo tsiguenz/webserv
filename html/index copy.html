@@ -60,16 +60,33 @@
                 padding: 0 25px;
               }
             }
-
             </style>
     </head>
    
     <body>
         <div class="background"></div>
-        <div style= "text-align: center">
+        <div style= "text-align:right">
+          <button type="button" onclick="changeColor()">Dark mode</button>
+        </div>
+
+        <div style= "text-align:center">
             <img src="images/index_photo_album.png" style="width: 50%; height: 50%">
+            <!-- <p>by Tsiguenz, Adben-mc and Aboudjel</p> -->
             <div class="gap-10"></div> 
-            <button class="button-74" onclick="location.href='pages/page1.html'" role="button">nos supers photos</button>
+            <button class="button-74" role="button">Button 74</button>
         </div>
     </body>
+
+    <div></div>
+    <script>
+
+      function changeColor() {
+        var element = document.body;
+        element.classList.toggle("dark-mode");
+      }
+    </script>
 </html>
+
+
+<!-- HTML !-->
+
