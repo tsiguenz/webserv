@@ -1,0 +1,1 @@
+print(f"{[i for i in range(100)]}")

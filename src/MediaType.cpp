@@ -366,6 +366,16 @@ MediaType::MediaType(){
 MediaType::~MediaType(){
 }
 
+bool	MediaType::isCgi(std::string extension) {
+    std::map<std::string, t_data>::iterator it;
+    it = mime.find(extension);
+    if (it == mime.end())
+        return (false);
+    // std::cout << "yes" << std::endl;
+    // std::cout << it->second.isCGI;
+    return (it->second.isCGI);
+}
+
 std::string MediaType::getMediaType(std::string requestedExtension) {
     // std::cout << std::endl << RED "Request : " << requestedExtension << WHITE << std::endl;
     requestedExtension.erase(std::remove_if(requestedExtension.begin(), requestedExtension.end(), ::isspace),
@@ -482,7 +492,7 @@ std::string MediaType::getProgName(std::string &extension) {
     std::map<std::string, t_data>::iterator it;
     it = mime.find(extension);
     if (it != mime.end())
-        return (it->second.mimeType);
+        return (it->second.path);
     exit(123); //throw
 }
 

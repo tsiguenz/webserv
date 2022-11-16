@@ -65,6 +65,7 @@ class Cgi
 		int					get_fd (void) const 					{ return _fd; }
 		Response *			get_response (void) const 				{ return _response; }
 		std::string 		get_output (void) const 				{ return _output; }
+		std::string 		get_final (void) const 				{ return final_body; }
 		std::string			getProgName(std::string &path);
 		void				executeCGI(std::string &path, char **envp);
 		std::string			get_length(void);

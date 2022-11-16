@@ -27,6 +27,7 @@ class MediaType
 		bool		isExtensionSupported(std::string requestedExtension);
 		void		add(std::string s, bool isCgi, std::string path, std::string mimeType);
 		std::string getProgName(std::string &extension);
+		bool		isCgi(std::string extension);
 
 	private:
 		std::map<std::string, t_data> mime;

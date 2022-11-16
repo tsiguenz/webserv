@@ -59,15 +59,8 @@ char **mtoss(std::map<std::string, std::string> map) {
 		return (NULL);
 	int	i = -1;
 	for (std::map<std::string, std::string>::const_iterator it = map.begin(); it != map.end(); ++it){
-		++i;
-		// std::cout << "first " << (*it).first << std::endl
-		// 		  << "second " << "=" << std::endl
-		// 		  << "third " << map[(*it).first] << std::endl
-		// 		  << "bob " << ((*it).first + "=" + map[(*it).first]).c_str() << std::endl
-		// 		  << "billy " << (((*it).first + "=" + map[(*it).first]).c_str()) << std::endl
-		// 		  << "bobby " << const_cast<char *>(((*it).first + "=" + map[(*it).first]).c_str()) << std::endl;
 		str = (*it).first + "=" + map[(*it).first];
-		if (!(strs[i] = (char *)malloc(sizeof(char) * (str.length() + 1))))
+		if (!(strs[++i] = (char *)malloc(sizeof(char) * (str.length() + 1))))
 			return (NULL);
 		strs[i] = ft_strcpy(strs[i], str.c_str());
 	}
@@ -83,20 +76,27 @@ void				Response::buildingResponse(void) {
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
 
-	Cgi bob(*this);
-	std::map<std::string, std::string> map = bob.create_env();
-	std::cout << RED "Printing map : " << std::endl;
-	for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it)
-		std::cout << CYAN << (*it).first << " : " WHITE << map[(*it).first] << std::endl;
-	std::cout << std::endl << WHITE;
+	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
+	if (mime.isCgi(extension))
+	{
+		Cgi bob(*this);
+		std::map<std::string, std::string> map = bob.create_env();
+		// std::cout << RED "Printing map : " << std::endl;
+		// for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it)
+		// 	std::cout << CYAN << (*it).first << " : " WHITE << map[(*it).first] << std::endl;
+		// std::cout << std::endl << WHITE;
 
-	char **envp = mtoss(map);
-	for (int i = 0; envp && envp[i]; i++)
-		std::cout << envp[i] << std::endl;
-	// bob.executeCGI(fileName, )
-
+		char **envp = mtoss(map);
+		if (!envp)
+			throw std::runtime_error("1");
+		for (int i = 0; envp && envp[i]; i++)
+			std::cout << RED << envp[i] << WHITE << std::endl;
+		std::cout << "fileName : " << fileName.substr(fileName.find_last_of(".") + 1) << std::endl;
+		std::string path = "./" + root + fileName;
+		bob.executeCGI(path, envp);
+	}
+	
 	if (code == 200 && method == "DELETE") {
-
 		deleteFile();
 	}
 	//et la
