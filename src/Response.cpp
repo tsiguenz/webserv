@@ -52,8 +52,11 @@ void				Response::buildingResponse(void) {
 	    getFile();
 	if (code == 200 && method == "DELETE")
 		deleteFile();
-	if (code == 200 && method == "POST")
+	if (code == 200 && method == "POST") {
 		postFile();
+		for (std::vector<char>::iterator it = body.begin(); it != body.end(); it++)
+			std::cout << *it;
+	}
 	//et la
 	if (code != 200)
 		handleError();
@@ -129,19 +132,13 @@ void		Response::redirectionUrl(void) {
 */
 
 void		Response::postFile(void) {
-	for (std::vector<char>::iterator it = body.begin(); it != body.end(); it++)
-		std::cout << *it;
-	std::cout << std::endl;
 	if (fieldLines["Content-Type"].find("multipart/form-data") == 0)
 		_postFormData();
 }
 
 void	Response::_postFormData() {
 	size_t	pos = fieldLines["Content-Type"].find("boundary=");
-	if (pos == std::string::npos) {
-		code = 400;
-		return ;
-	}
+	if (pos == std::string::npos) { code = 400; return ; }
 	for (std::vector<char> v = _getFormDataBlock(); v.empty() == false; v = _getFormDataBlock()) {
 		if (code == 400)
 			return ;
@@ -149,25 +146,8 @@ void	Response::_postFormData() {
 	}
 }
 
-void	Response::_postFormDataBlock(std::vector<char> const& v) {
-	std::string	fileName;
-	std::cout << "---------- Enter in _postBoundaryBlock() ----------\n";
-	for (std::vector<char>::const_iterator it = v.begin(); it != v.end(); it++)
-		std::cout << *it;
-	std::cout << std::endl;
-	size_t	pos = _itFind(v.begin(), v.end(), "filename=\"");
-	std::cout << "pos = " << pos << std::endl;
-	if (pos == std::string::npos) {
-		code = 400;
-		return ;
-	}
-	pos += 10;
-	while (v[pos] != '"')
-		fileName.push_back(v[pos++]);
-	std::cout << "fileName = " << fileName << std::endl;
-}
-
 std::vector<char>	Response::_getFormDataBlock() {
+	std::cout << "enter in get form data block 000000000000\n";
 	static size_t	pos = 0;
 	std::vector<char>	ret;
 	size_t	posDelim = fieldLines["Content-Type"].find("boundary=");
@@ -176,29 +156,45 @@ std::vector<char>	Response::_getFormDataBlock() {
 	std::string	delim = fieldLines["Content-Type"].substr(posDelim + 9);
 	size_t	startBlock = _itFind(body.begin(), body.end(), delim, pos);
 	size_t	endBlock = _itFind(body.begin(), body.end(), delim, startBlock + delim.size());
-	pos = endBlock;
-	if (startBlock == std::string::npos || endBlock == std::string::npos)
+	if (startBlock == std::string::npos || endBlock == std::string::npos) {
+		pos = 0;
 		return ret;
+	}
+	pos = endBlock;
 	for (; startBlock != endBlock; startBlock++)
 		ret.push_back(body[startBlock]);
 	return ret;
 }
 
-//size_t	Response::_itFind(It it, It end, std::string const& toSearch, size_t pos) {
-//	if (pos > (size_t) std::distance(body.begin(), body.end()) || toSearch.empty() == true)
-//		return std::string::npos;
-//	for (std::vector<char>::iterator it = body.begin() + pos; it != body.end(); it++) {
-//		if (*it != toSearch[0])
-//			continue ;
-//		for (size_t i = 0; i < toSearch.size(); i++) {
-//			if (*(it + i) != toSearch[i])
-//				break ;
-//			if (i == toSearch.size() - 1)
-//				return std::distance(body.begin(), it);
-//		}
-//	}
-//	return std::string::npos;
-//}
+void	Response::_postFormDataBlock(std::vector<char> const& v) {
+	std::cout << "enter in post form data block 11111111111\n";
+	std::string	fileName;
+	std::string	uploadPath = server.getUploadPath(root + url);
+	if (*(uploadPath.end() - 1) != '/' && uploadPath.empty() == false)
+		uploadPath.push_back('/');
+	size_t	pos = _itFind(v.begin(), v.end(), "filename=\"");
+	if (pos == std::string::npos) {
+		code = 400;
+		return ;
+	}
+	pos += 10;
+	while (v[pos] != '"')
+		fileName.push_back(v[pos++]);
+	size_t	posStart = _itFind(v.begin(), v.end(), "\r\n\r\n");
+	if (posStart == std::string::npos) { code = 400; return ; }
+	posStart += 4;
+	size_t	posEnd = _itFind(v.begin() + posStart, v.end(), "\r\n");
+	if (posEnd == std::string::npos) { code = 400; return ; }
+	posEnd += posStart;
+	fileName = root + uploadPath + fileName;
+	std::cout << fileName << std::endl;
+	std::ofstream	of(fileName.c_str());
+	// TODO what error if open fail
+	if (of.good() == false) { code = 400; of.close(); return ; }
+	for (std::vector<char>::const_iterator it = v.begin(); posStart != posEnd && of.good() == true; posStart++)
+		of.put(it[posStart]);
+	of.close();
+}
 
 /*
 ** --------------------------------- DELETE METHODE ----------------------------------
