@@ -23,7 +23,7 @@ class Response
 		std::string							url;
 		std::string							httpVersion;
 		std::map<std::string, std::string>	fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
-		std::vector<char>					body;
+		std::vector<unsigned char>					body;
 		std::string							root; //pour adam
 		std::string							serverName; //pour adam
 		std::string							port; //pour adam
@@ -48,9 +48,9 @@ class Response
 		void	redirectionUrl(void);
 		void	_postFormData();
 		void	_postFormDataBlock();
-		std::vector<char>	_getFormDataBlock();
+		std::vector<unsigned char>	_getFormDataBlock();
 //		size_t	_bodyFind(std::string const& toSearch, size_t pos = 0);
-		void	_postFormDataBlock(std::vector<char> const& v);
+		void	_postFormDataBlock(std::vector<unsigned char> const& v);
 
 		std::string getResponse(void);
 		std::string	getTime(void);

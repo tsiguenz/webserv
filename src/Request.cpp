@@ -11,7 +11,7 @@ Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escap
 	parsingCode = 2;
 }
 
-Request::Request(std::vector<char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::vector<unsigned char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
    
 	// std::cout << "size:" << std::distance(rawRequest.begin(), rawRequest.end()) << std::endl;
@@ -194,7 +194,7 @@ int	Request::parsingFieldName(std::string fieldName) {
 // 	}
 // 	std::string::iterator it = rawRequest.begin() + rawRequest.find("\r\n\r\n", 4) + 4;
 // 	std::cout << BYELLOW "TAILLE POTENTIEL BODY:" << std::distance(it, rawRequest.end()) << std::endl;
-// 	// body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<char>
+// 	// body = rawRequest.substr(rawRequest.find("\r\n\r\n") + 4); //mettre en vector<unsigned char>
 
 // 	return 0;
 // }
@@ -214,7 +214,7 @@ int	Request::parsingBody(void) {
 	}
 	size_t len = strtod(fieldLines["Content-Length"].c_str(), NULL);
 //	std::cout << "COUCOU" << " posend " << posEnd << " len "<<len << " contenue COntent Lenght " <<fieldLines["Content-Length"] << std::endl;
-	body = std::vector<char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
+	body = std::vector<unsigned char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
 //	std::cout << "SIZE BODY" <<body.size() << std::endl;
 //	std::cout << BYELLOW "\n\n\n\nLEN =" << len << "SIZE BODY =" << body.size() << std::endl;
 	return 0;
@@ -272,13 +272,13 @@ void	Request::printRequest(){
 	if (body.empty())
 		std::cout << BRED << "NONE" WHITE << std::endl;
 	else {
-		for (std::vector<char>::iterator it = body.begin(); it != body.end();it++){
+		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
    			std::cout << (*it);
  		}
 		std::cout << std::endl;
 	}
 	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
-	for (std::vector<char>::iterator it = vectorRequest.begin(); it != vectorRequest.end();it++){
+	for (std::vector<unsigned char>::iterator it = vectorRequest.begin(); it != vectorRequest.end();it++){
    			std::cout << (*it);
  		}
 		std::cout << std::endl;

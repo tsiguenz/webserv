@@ -85,17 +85,31 @@ void	Server::_newConnection(int const& fd) const {
 Request	Server::_parseRequest(epoll_event const& event) const {
 	// TODO: warning if recv don't return all the request
 	// char		buffer[BUFFER_SIZE];
-	std::vector<char> buffer2(BUFFER_SIZE);
+	std::vector<unsigned char> buffer2;
+	unsigned char tmp[BUFFER_SIZE + 1];
+	tmp[BUFFER_SIZE] = '\0';
 //	std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
 //	std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
 
 	// bzero(buffer, BUFFER_SIZE);
-	recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
+	
+	unsigned long tot = 0;
+	size_t	ret = recv(event.data.fd, tmp, BUFFER_SIZE, 0);
+	for (size_t i = 0; i < ret; i++)
+		buffer2.push_back(tmp[i]);
+	tot += ret;
+	while (ret == BUFFER_SIZE) {
+		ret = recv(event.data.fd, tmp, BUFFER_SIZE, 0);
+		for (size_t i = 0; i < ret; i++)
+			buffer2.push_back(tmp[i]);
+		tot += ret;
+	}
+	std::cout << tot << std::endl;
 //	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
-//	for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.end();it++){
-//   			std::cout << (*it);
-// 		}
-//		std::cout << std::endl;
+//	for (std::vector<unsigned char>::iterator it = buffer2.begin(); it != buffer2.end();it++){
+//		std::cout << (*it);
+//	}
+		std::cout << std::endl;
 	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";

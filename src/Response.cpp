@@ -54,8 +54,8 @@ void				Response::buildingResponse(void) {
 		deleteFile();
 	if (code == 200 && method == "POST") {
 		postFile();
-		for (std::vector<char>::iterator it = body.begin(); it != body.end(); it++)
-			std::cout << *it;
+//		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end(); it++)
+//			std::cout << *it;
 	}
 	//et la
 	if (code != 200)
@@ -139,20 +139,19 @@ void		Response::postFile(void) {
 void	Response::_postFormData() {
 	size_t	pos = fieldLines["Content-Type"].find("boundary=");
 	if (pos == std::string::npos) { code = 400; return ; }
-	for (std::vector<char> v = _getFormDataBlock(); v.empty() == false; v = _getFormDataBlock()) {
+	for (std::vector<unsigned char> v = _getFormDataBlock(); v.empty() == false; v = _getFormDataBlock()) {
 		if (code == 400)
 			return ;
 		_postFormDataBlock(v);
 	}
 }
 
-std::vector<char>	Response::_getFormDataBlock() {
-	std::cout << "enter in get form data block 000000000000\n";
+std::vector<unsigned char>	Response::_getFormDataBlock() {
+//	std::cout << "enter in get form data block 000000000000\n";
 	static size_t	pos = 0;
-	std::vector<char>	ret;
+	std::vector<unsigned char>	ret;
 	size_t	posDelim = fieldLines["Content-Type"].find("boundary=");
-	if (posDelim == std::string::npos)
-		return ret;
+	if (posDelim == std::string::npos) { code = 400; return ret; }
 	std::string	delim = fieldLines["Content-Type"].substr(posDelim + 9);
 	size_t	startBlock = _itFind(body.begin(), body.end(), delim, pos);
 	size_t	endBlock = _itFind(body.begin(), body.end(), delim, startBlock + delim.size());
@@ -160,38 +159,48 @@ std::vector<char>	Response::_getFormDataBlock() {
 		pos = 0;
 		return ret;
 	}
+	endBlock += delim.size();
 	pos = endBlock;
 	for (; startBlock != endBlock; startBlock++)
 		ret.push_back(body[startBlock]);
 	return ret;
 }
 
-void	Response::_postFormDataBlock(std::vector<char> const& v) {
-	std::cout << "enter in post form data block 11111111111\n";
+void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
+//	std::cout << "enter in post form data block 11111111111\n";
+//	for (std::vector<unsigned char>::const_iterator it = v.begin(); it != v.end(); it++)
+//		std::cout << *it;
 	std::string	fileName;
+	// get delim
+	size_t	posDelim = fieldLines["Content-Type"].find("boundary=");
+	if (posDelim == std::string::npos) { code = 400; return ; }
+	std::string	delim = fieldLines["Content-Type"].substr(posDelim + 9);
+//	std::cout << "delim = " << delim << std::endl;
+	// get upload path
 	std::string	uploadPath = server.getUploadPath(root + url);
 	if (*(uploadPath.end() - 1) != '/' && uploadPath.empty() == false)
 		uploadPath.push_back('/');
+	// get filename
 	size_t	pos = _itFind(v.begin(), v.end(), "filename=\"");
-	if (pos == std::string::npos) {
-		code = 400;
-		return ;
-	}
+	if (pos == std::string::npos) { code = 400; return ; }
 	pos += 10;
 	while (v[pos] != '"')
 		fileName.push_back(v[pos++]);
+	// get file content
 	size_t	posStart = _itFind(v.begin(), v.end(), "\r\n\r\n");
 	if (posStart == std::string::npos) { code = 400; return ; }
 	posStart += 4;
-	size_t	posEnd = _itFind(v.begin() + posStart, v.end(), "\r\n");
+	size_t	posEnd = _itFind(v.begin() + posStart, v.end(), delim);
+//	std::cout << "posEnd " << posEnd << std::endl;
 	if (posEnd == std::string::npos) { code = 400; return ; }
-	posEnd += posStart;
+	// 4 is the lenght of the "\r\n" and "--"
+	posEnd += posStart - 4;
 	fileName = root + uploadPath + fileName;
-	std::cout << fileName << std::endl;
+	// write in file
+//	std::cout << fileName << std::endl;
 	std::ofstream	of(fileName.c_str());
-	// TODO what error if open fail
 	if (of.good() == false) { code = 400; of.close(); return ; }
-	for (std::vector<char>::const_iterator it = v.begin(); posStart != posEnd && of.good() == true; posStart++)
+	for (std::vector<unsigned char>::const_iterator it = v.begin(); posStart != posEnd && of.good() == true; posStart++)
 		of.put(it[posStart]);
 	of.close();
 }
