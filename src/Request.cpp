@@ -11,9 +11,10 @@ Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escap
 	parsingCode = 2;
 }
 
-Request::Request(std::vector<unsigned char> & toParse): vectorRequest(toParse), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
+Request::Request(std::vector<unsigned char> & toParse):  vectorRequest(toParse), isRequestComplete(false), isParsingComplete(false), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
+	// printRequest();
 }
 
 /*
@@ -26,7 +27,7 @@ Request::~Request()
 
 
 /*
-** --------------------------------- OVERLOAD ---------------------------------
+** --------------------------------- AddingBuffer ---------------------------------
 */
 
 Request &				Request::operator=( Request const & rhs )
@@ -40,6 +41,11 @@ Request &				Request::operator=( Request const & rhs )
 	this->parsingCode = rhs.parsingCode;
 
 	return *this;
+}
+
+void				Request::addingBuffer(std::vector<unsigned char> toAdd ) {
+	vectorRequest.insert(vectorRequest.begin(), toAdd.begin(), toAdd.end());
+	parsingRequest();
 }
 
 
@@ -60,16 +66,42 @@ int	Request::preParsing(void) {
 }
 
 void	Request::parsingRequest(void) {
-	if (preParsing()) {
-		return ;
+	if (isParsingComplete == false) {
+		if (preParsing()) {
+			isParsingComplete = true;
+			isRequestComplete = true;
+			return ;
+		}
+		if (parsingRequestLine()) {
+			isParsingComplete = true;
+			isRequestComplete = true;
+			return ;
+		}
+		if (parsingFieldLines()) {
+			isParsingComplete = true;
+			isRequestComplete = true;
+			return ;
+		}
+		if (definingBody()) {
+			isParsingComplete = true;
+			isRequestComplete = true;
+			return ;
+		}
+		isParsingComplete = true;
 	}
-	if (parsingRequestLine())
-		return ;
-	if (parsingFieldLines())
-		return ;
+	if ( vectorRequest.size() >= requestLen)
+		isRequestComplete = true;
+	if (isRequestComplete == true) {
 	if (parsingBody())
 		return ;
+	}
 
+}
+
+void Request::completingBody(void) {
+	if ( vectorRequest.size() >= requestLen)
+		isRequestComplete = true;
+	return ;
 }
 
 int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP request-target SP HTTP-version CRLF
@@ -170,21 +202,23 @@ int	Request::parsingFieldName(std::string fieldName) {
 	return 0;
 }
 
-int	Request::parsingBody(void) {
-	
+int	Request::definingBody() {
+
 	std::map<std::string,std::string>::iterator it;
 	it = fieldLines.find("Content-Length");
-	
-  	if (it == fieldLines.end()) {	
-		if (method == "POST") {
+
+  	if (it == fieldLines.end()) {
+		isRequestComplete = true;
+		if (method == "POST")
 			parsingCode = 411;
-			return 1;
-		}
-		else
-			return 0;
+		return 1;
 	}
-	size_t len = strtod(fieldLines["Content-Length"].c_str(), NULL);
-	body = std::vector<unsigned char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + posEnd + len);
+	requestLen = strtod(fieldLines["Content-Length"].c_str(), NULL) + posEnd;
+	return 0;
+}
+
+int	Request::parsingBody(void) {
+	body = std::vector<unsigned char>(vectorRequest.begin() + posEnd, vectorRequest.begin() + requestLen);
 	return 0;
 }
 

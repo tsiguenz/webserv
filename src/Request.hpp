@@ -26,13 +26,15 @@ class Request
 
 		//fieldLines
 		std::map<std::string, std::string> fieldLines;
-
+		bool	isRequestComplete;
+		bool	isParsingComplete;
+		size_t	requestLen;
 		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		//TODO VECTOR UNSIGNED CHAR
 		std::vector<unsigned char> body;
 
 		int			parsingCode;
-		
+		void		addingBuffer(std::vector<unsigned char> toAdd );
 		void		create(std::vector<unsigned char> toParse2);
 		void		create(Request const & rhs);
 		Request &	operator=(Request const & rhs);
@@ -46,6 +48,8 @@ class Request
 		int				preParsing(void);
 		void			parsingRequest();
 		int				parsingRequestLine();
+		int				definingBody();
+		void			completingBody();
 		int				parsingFieldLines();
 		int				parsingFieldName(std::string fieldName);
 		std::string		parsingFieldValue(std::string fieldValue);
