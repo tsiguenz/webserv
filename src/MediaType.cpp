@@ -351,6 +351,13 @@ MediaType::MediaType(){
     mime["ico"] = "image/x-icon";
 }
 
+MediaType::MediaType(MediaType const& mt)
+{ *this = mt; }
+
+MediaType&	MediaType::operator=(MediaType const& rhs) {
+	mime = rhs.mime;
+	return *this;
+}
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------

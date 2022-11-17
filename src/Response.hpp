@@ -15,6 +15,8 @@ class Response
 	public:
 		Response();
 		Response( Request  src, VirtualServer const & server);
+		Response(Response const& rhs);
+		Response&	operator=(Response const& rhs);
 		~Response();
 
 		void		printResponse(void) const;
@@ -23,7 +25,7 @@ class Response
 		std::string							url;
 		std::string							httpVersion;
 		std::map<std::string, std::string>	fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
-		std::vector<unsigned char>					body;
+		std::vector<unsigned char>			body;
 		std::string							root; //pour adam
 		std::string							serverName; //pour adam
 		std::string							port; //pour adam

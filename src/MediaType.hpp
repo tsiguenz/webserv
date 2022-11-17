@@ -13,6 +13,8 @@ class MediaType
 	public:
 
 		MediaType();
+		MediaType(MediaType const& mt);
+		MediaType&	operator=(MediaType const& rhs);
 		~MediaType();
 
 		// bool 	isInAccepted(std::string requestedTypes, std::string fileFormat); //(recoit la ligne complete de "Accepted: " et la parse (du coup fait les ordre de prio et tout)) et check si ce quon sapprete a renvoyer et dans accepted //TODO

@@ -30,6 +30,27 @@ Response::Response( Request  src, VirtualServer const & virtualServer ): mime(),
 //	printResponse();
 }
 
+Response::Response(Response const& rhs)
+{ *this = rhs; }
+
+Response&	Response::operator=(Response const& rhs) {
+	method = rhs.method;
+	url = rhs.url;
+	httpVersion = rhs.httpVersion;
+	fieldLines = rhs.fieldLines;
+	body = rhs.body;
+	root = rhs.root;
+	serverName = rhs.serverName;
+	port = rhs.port;
+	fileName = rhs.fileName;
+	file = rhs.file;
+	response = rhs.response;
+	code = rhs.code;
+	mime = rhs.mime;
+	server = rhs.server;
+	statusCodes = rhs.statusCodes;
+	return *this;
+}
 
 /*
 ** -------------------------------- DESTRUCTOR --------------------------------

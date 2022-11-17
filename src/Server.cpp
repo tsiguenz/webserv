@@ -1,6 +1,6 @@
 #include "Server.hpp"
 #include <signal.h>
-Server::Server(ConfigParser const& cp) {
+Server::Server(ConfigParser const& cp): _reqNotComplete(), _fdsServer(), _epFd(), _events() {
 	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
 	std::list<VirtualServer>::const_iterator	it = _virtualServerList.begin();
@@ -44,8 +44,8 @@ void	Server::_setNonBlocking(int const& fd) const {
 		throw std::runtime_error("error in _setNonBlocking::fcntl()\n");
 }
 
-void	Server::_handleEvent(int const& nbEpollFd) const {
-	Request		currentRequest;
+void	Server::_handleEvent(int const& nbEpollFd) {
+	static Request		currentRequest;
 	Response	currentResponse;
 	for (int i = 0; i < nbEpollFd; i++) {
 		epoll_event	currentEvent = _events[i];
@@ -55,13 +55,16 @@ void	Server::_handleEvent(int const& nbEpollFd) const {
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
 			if (currentEvent.events & EPOLLIN) {
-				currentRequest = Request(_parseRequest(currentEvent));
-				currentResponse	= Response(currentRequest, getVirtualServerByHost(currentRequest));
-				_modEvent(currentEvent.data.fd, EPOLLOUT);
-				// currentResponse.printResponse();
+				currentRequest = _parseRequest(currentEvent);
+				if (currentRequest.isRequestComplete == true) {
+					_modEvent(currentEvent.data.fd, EPOLLOUT);
+				}
 			}
-			if (currentEvent.events & EPOLLOUT)
+			else if (currentEvent.events & EPOLLOUT) {
+				currentResponse = Response(currentRequest, getVirtualServerByHost(currentRequest));
 				_sendResponse(currentEvent, currentResponse);
+				currentRequest = Request();
+			}
 		}
 	}
 }
@@ -82,43 +85,54 @@ void	Server::_newConnection(int const& fd) const {
 	_addEvent(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
-Request	Server::_parseRequest(epoll_event const& event) const {
-	// TODO: warning if recv don't return all the request
-	// char		buffer[BUFFER_SIZE];
-	std::vector<unsigned char> buffer2(BUFFER_SIZE, '\0');
-	// std::cout << "SIZE BUFFER" << buffer2.size() << std::endl;
-	// std::cout << "SIZE BUFFER" << buffer2.max_size() << std::endl;
-
-	// bzero(buffer, BUFFER_SIZE);
-	size_t end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-	std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
-	Request currentRequest(buffer3);
-	while (currentRequest.isRequestComplete == false) {
-		std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
-		end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-		std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
-		// buffer2.resize(end);
-		currentRequest.addingBuffer(buffer3);
+Request	Server::_parseRequest(epoll_event const& event) {
+	int	fd = event.data.fd;
+	std::vector<unsigned char>	buffer(BUFFER_SIZE, '\0');
+	recv(fd, &buffer[0], BUFFER_SIZE, 0);
+	Request	req(buffer);
+	if (_reqNotComplete.find(fd) != _reqNotComplete.end()) {
+		_reqNotComplete[fd].addingBuffer(buffer);
+		if (_reqNotComplete[fd].isRequestComplete == true) {
+			req = _reqNotComplete[fd];
+			_reqNotComplete.erase(fd);
+			return req;
+		}
 	}
-	// (void)end;s
+	if (req.isRequestComplete == false) {
+		std::cout << "insert in map ----------------------\n";
+		_reqNotComplete.insert(std::make_pair(fd, req));
+		_reqNotComplete[fd].printRequest();
+	}
+	return req;
+//	std::vector<unsigned char> buffer2(BUFFER_SIZE, '\0');
+//	size_t end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
+//	std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
+//	Request currentRequest(buffer3);
+//	while (currentRequest.isRequestComplete == false) {
+//		end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
+//		std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
+//		currentRequest.addingBuffer(buffer3);
+//	}
 
-	// std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
-	// for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
-	// 	std::cout << (*it);
-	// }
-	// std::cout << std::endl;
+//	 std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
+//	 for (std::vector<unsigned char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
+//	 	std::cout << (*it);
+//	 }
+//	 std::cout << std::endl;
 
-	// if (currentRequest.badRequest == true) {
-	// 	std::cout << "400 \n";
-	// 	return;
-	// }
-	// currentRequest.printRequest();
-	return (currentRequest);
-
+//	 if (currentRequest.badRequest == true) {
+//	 	std::cout << "400 \n";
+//	 	return;
+//	 }
+//	 currentRequest.printRequest();
+//	return (currentRequest);
 }
 
 void	Server::_sendResponse(epoll_event const& event, Response const& currentResponse) const {
+	std::cout << "print response : \n";
+	currentResponse.printResponse();
 	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);
+	std::cout << "close\n";
 	close(event.data.fd);
 }
 

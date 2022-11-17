@@ -39,6 +39,8 @@ Request &				Request::operator=( Request const & rhs )
 	this->fieldLines = rhs.fieldLines;
 	this->body = rhs.body;
 	this->parsingCode = rhs.parsingCode;
+	this->isParsingComplete = rhs.isParsingComplete;
+	this->isRequestComplete = rhs.isRequestComplete;
 
 	return *this;
 }

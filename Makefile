@@ -1,7 +1,7 @@
 NAME = webserv
 TEST_NAME = $(NAME)_test
 
-CC = clang++
+CC = c++
 FLAGS = -g3 -Wall -Wextra -Werror -std=c++98
 
 SRC_PATH = src/
