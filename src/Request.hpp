@@ -34,7 +34,7 @@ class Request
 		std::vector<unsigned char> body;
 
 		int			parsingCode;
-		void		addingBuffer(std::vector<unsigned char> toAdd );
+		void		addingBuffer(std::vector<unsigned char> toAdd, size_t const& len);
 		void		create(std::vector<unsigned char> toParse2);
 		void		create(Request const & rhs);
 		Request &	operator=(Request const & rhs);

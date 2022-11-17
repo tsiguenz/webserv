@@ -1,6 +1,6 @@
 #include "Server.hpp"
 #include <signal.h>
-Server::Server(ConfigParser const& cp): _reqNotComplete(), _fdsServer(), _epFd(), _events() {
+Server::Server(ConfigParser const& cp): _requests(), _fdsServer(), _epFd(), _events() {
 	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
 	std::list<VirtualServer>::const_iterator	it = _virtualServerList.begin();
@@ -55,14 +55,13 @@ void	Server::_handleEvent(int const& nbEpollFd) {
 			_newConnection(currentEvent.data.fd);
 		else if (_isServer(currentEvent.data.fd) == false) {
 			if (currentEvent.events & EPOLLIN) {
-				currentRequest = _parseRequest(currentEvent);
+				_parseRequest(currentEvent);
 				if (currentRequest.isRequestComplete == true) {
 					_modEvent(currentEvent.data.fd, EPOLLOUT);
 				}
 			}
 			else if (currentEvent.events & EPOLLOUT) {
-				currentResponse = Response(currentRequest, getVirtualServerByHost(currentRequest));
-				_sendResponse(currentEvent, currentResponse);
+				_sendResponse(currentEvent);
 				currentRequest = Request();
 			}
 		}
@@ -85,54 +84,28 @@ void	Server::_newConnection(int const& fd) const {
 	_addEvent(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
-Request	Server::_parseRequest(epoll_event const& event) {
+void	Server::_parseRequest(epoll_event const& event) {
+	size_t	ret = 0;
 	int	fd = event.data.fd;
-	std::vector<unsigned char>	buffer(BUFFER_SIZE, '\0');
-	recv(fd, &buffer[0], BUFFER_SIZE, 0);
-	Request	req(buffer);
-	if (_reqNotComplete.find(fd) != _reqNotComplete.end()) {
-		_reqNotComplete[fd].addingBuffer(buffer);
-		if (_reqNotComplete[fd].isRequestComplete == true) {
-			req = _reqNotComplete[fd];
-			_reqNotComplete.erase(fd);
-			return req;
-		}
-	}
-	if (req.isRequestComplete == false) {
-		std::cout << "insert in map ----------------------\n";
-		_reqNotComplete.insert(std::make_pair(fd, req));
-		_reqNotComplete[fd].printRequest();
-	}
-	return req;
-//	std::vector<unsigned char> buffer2(BUFFER_SIZE, '\0');
-//	size_t end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-//	std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
-//	Request currentRequest(buffer3);
-//	while (currentRequest.isRequestComplete == false) {
-//		end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-//		std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
-//		currentRequest.addingBuffer(buffer3);
-//	}
-
-//	 std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
-//	 for (std::vector<unsigned char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
-//	 	std::cout << (*it);
-//	 }
-//	 std::cout << std::endl;
-
+	std::vector<unsigned char>	buffer(BUFFER_SIZE);
+	ret = recv(fd, &buffer[0], BUFFER_SIZE, 0);
+	if (_requests.find(fd) == _requests.end())
+		_requests.insert(std::make_pair(fd, Request(buffer)));
+	else
+		_requests[fd].addingBuffer(buffer, ret);
 //	 if (currentRequest.badRequest == true) {
 //	 	std::cout << "400 \n";
 //	 	return;
 //	 }
-//	 currentRequest.printRequest();
-//	return (currentRequest);
 }
 
-void	Server::_sendResponse(epoll_event const& event, Response const& currentResponse) const {
-	std::cout << "print response : \n";
-	currentResponse.printResponse();
-	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);
-	std::cout << "close\n";
+void	Server::_sendResponse(epoll_event const& event) {
+	std::map<int, Request>::iterator	itReq = _requests.find(event.data.fd);
+	if (itReq == _requests.end() || (*itReq).second.isRequestComplete == false)
+		return ;
+	Response	currentResponse2((*itReq).second, getVirtualServerByHost((*itReq).second));
+	send(event.data.fd, currentResponse2.response.c_str(), currentResponse2.response.size(), 0);
+	_requests.erase(itReq);
 	close(event.data.fd);
 }
 
@@ -307,10 +280,10 @@ VirtualServer const 	Server::getVirtualServerByHost(Request const & currentReque
 			return(_virtualServerList.front());
 		
 	}
-	//securiser overflow port
+	//protect overflow
 	if (port > 65535)
 		return(_virtualServerList.front());
-	//set les val par defaut
+	//default values
 	if (port == -1)
 		port = 8080;
 	if (ip.empty())

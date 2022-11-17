@@ -34,7 +34,7 @@ class Server {
 		std::vector<int>	getFdsclient() const;
 	private:
 		// TODO replace by class Parser
-		std::map<int, Request>		_reqNotComplete;
+		std::map<int, Request>		_requests;
 		std::vector<int>			_fdsServer;
 		std::list<VirtualServer>	_virtualServerList;
 		int							_epFd;
@@ -54,8 +54,8 @@ class Server {
 		// Main loop who handle I/O events
 		void	_newConnection(int const& fd) const;
 		void	_handleEvent(int const& nbEpollFd);
-		Request	_parseRequest(epoll_event const& event);
-		void	_sendResponse(epoll_event const& event, Response const& currentResponse) const;
+		void	_parseRequest(epoll_event const& event);
+		void	_sendResponse(epoll_event const& event);
 
 		VirtualServer const 	selectServer(short const & port, std::string const & ip, std::string const & name) const;
 };

@@ -65,7 +65,6 @@ Response::~Response(){
 */
 
 void				Response::buildingResponse(void) {
-
 	if (code == 200)
 		checkingMethod();
 	//tu peux faire ton bail entre ici

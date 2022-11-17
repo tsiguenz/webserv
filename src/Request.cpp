@@ -45,8 +45,8 @@ Request &				Request::operator=( Request const & rhs )
 	return *this;
 }
 
-void				Request::addingBuffer(std::vector<unsigned char> toAdd ) {
-	vectorRequest.insert(vectorRequest.end(), toAdd.begin(), toAdd.end());
+void	Request::addingBuffer(std::vector<unsigned char> toAdd, size_t const& len) {
+	vectorRequest.insert(vectorRequest.end(), toAdd.begin(), toAdd.begin() + len);
 	parsingRequest();
 }
 
