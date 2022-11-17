@@ -68,6 +68,10 @@ char **mtoss(std::map<std::string, std::string> map) {
 	return (strs);
 }
 
+std::string Response::autoindex_nocgi() {
+
+}
+
 void				Response::buildingResponse(void) {
 
 	if (code == 200)
@@ -76,26 +80,6 @@ void				Response::buildingResponse(void) {
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
 
-	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
-	if (mime.isCgi(extension))
-	{
-		Cgi bob(*this);
-		std::map<std::string, std::string> map = bob.create_env();
-		// std::cout << RED "Printing map : " << std::endl;
-		// for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it)
-		// 	std::cout << CYAN << (*it).first << " : " WHITE << map[(*it).first] << std::endl;
-		// std::cout << std::endl << WHITE;
-
-		char **envp = mtoss(map);
-		if (!envp)
-			throw std::runtime_error("1");
-		for (int i = 0; envp && envp[i]; i++)
-			std::cout << RED << envp[i] << WHITE << std::endl;
-		std::cout << "fileName : " << fileName.substr(fileName.find_last_of(".") + 1) << std::endl;
-		std::string path = "./" + root + fileName;
-		bob.executeCGI(path, envp);
-	}
-	
 	if (code == 200 && method == "DELETE") {
 		deleteFile();
 	}
@@ -108,8 +92,23 @@ void				Response::buildingResponse(void) {
 	response += getTime();
 	response += getServerName();
 	response += getConnectionType();
+	// response += "Set-Cookie: bobby=bobba\r\n";
+	
+	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
+	if (mime.isCgi(extension))
+	{
+		Cgi bob(*this);
+		std::map<std::string, std::string> map = bob.create_env();
+		char **envp = mtoss(map);
+		if (!envp)
+			throw std::runtime_error("1");
+		std::string path = root + fileName;
+		bob.executeCGI(path, envp);
+		response += bob.get_final();
+		response += "\r\n";
+	}
 	//redirect
-	if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
+	else if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
 		if (!file.empty())
 			response += getTypeContent();
 		response += getLength();
@@ -119,6 +118,10 @@ void				Response::buildingResponse(void) {
 	}
 	else
 		response += "\r\n";
+	std::cout << RED "-----------------------------------------" WHITE << std::endl;
+	std::cout << CYAN << response << WHITE << std::endl;
+	std::cout << RED "-----------------------------------------" WHITE << std::endl;
+
 }
 
 /*

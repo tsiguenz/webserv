@@ -19,7 +19,7 @@ Request::Request(std::vector<char> & toParse): vectorRequest(toParse), parsingCo
 
  //DEBUG
 	parsingRequest();
-	// printRequest(); //DEBUG
+	printRequest(); //DEBUG
 	// std::cout << rawRequest << std::endl; //DEBUG
 }
 

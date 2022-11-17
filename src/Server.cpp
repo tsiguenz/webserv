@@ -92,11 +92,12 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 
 	// bzero(buffer, BUFFER_SIZE);
 	size_t end = recv(event.data.fd, &buffer2[0], BODY_MAX_SIZE, 0);
-	std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
+	(void)end;
+	// std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
 	// for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
 	// 	std::cout << (*it);
 	// }
-	std::cout << std::endl;
+	// std::cout << std::endl;
 	Request currentRequest(buffer2);
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";

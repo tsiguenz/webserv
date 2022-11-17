@@ -46,6 +46,7 @@ class Response
 		void	handleError(void);
 		void	redirectionUrl(void);
 
+		std::string autoindex_nocgi(void);
 		std::string getResponse(void);
 		std::string	getTime(void);
 		std::string	getServerName(void);

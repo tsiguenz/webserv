@@ -76,10 +76,10 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 	envs["SERVER_PORT"] = _response->port;
 	envs["REQUEST_METHOD"] = _response->method;
 	envs["REDIRECT_STATUS"] = get_code();
-	envs["PATH_INFO"] = std::string(".") + _response->url;//./app/demo/galery.php 
-	envs["PATH_TRANSLATED"] = std::string(".") + _response->url;//./app/demo/galery.php
-	envs["SCRIPT_NAME"] = std::string(".") + _response->url;//./app/demo/galery.php
-	envs["SCRIPT_FILENAME"] = std::string(".") + _response->url;//./app/demo/galery.php
+	envs["PATH_INFO"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php 
+	envs["PATH_TRANSLATED"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
+	envs["SCRIPT_NAME"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
+	envs["SCRIPT_FILENAME"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
 	envs["QUERY_STRING"] = "";//
 	envs["REMOTE_HOST"] = _response->fieldLines["Host"]; // REMOTE_HOST=207.0.0.1
 	envs["REMOTE_ADDR"] = "";//
@@ -115,7 +115,7 @@ void Cgi::executeCGI(std::string &path, char **envp)
 		throw std::runtime_error("503"); //throw
 	pid = fork();
 	if (pid == -1){
-		puts("boobbbb");
+		// puts("boobbbb");
 		throw std::runtime_error("500"); //throw
 	}
 	if (pid == 0) // child process
@@ -131,29 +131,35 @@ void Cgi::executeCGI(std::string &path, char **envp)
 		std::rewind(tmpf);
 		if (dup2(fileno(tmpf), STDIN_FILENO) == -1)
 		{
-			std::cerr << "dup failed 1" << std::endl;
+			// std::cerr << "dup failed 1" << std::endl;
 			exit(1);
 		}
 
 
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
 		{
-			std::cerr << "dup failed 2" << std::endl;
+			// std::cerr << "dup failed 2" << std::endl;
 			exit(1);
 		}
 		close(fd[1]);
 		char* binPath = strdup(getProgName(path).c_str());
 		char* progPath = strdup(path.c_str());
 		char* argv[3] = { binPath, progPath, NULL };
+		std::cerr << CYAN "binPath : " << binPath << std::endl;
 		for (int i = 0; argv[i]; i++)
 			std::cerr << "argv[" << i << "] : " << argv[i] << std::endl;
+		for (int i = 0; envp[i]; i++)
+			std::cerr << "envp[" << i << "] : " << envp[i] << std::endl;
+		std::cerr << RED "im dying ????" WHITE << std::endl;
+		std::cerr << GREEN << getcwd(0,0) << WHITE << std::endl;
 		execve(binPath, argv, envp);
+		std::cerr << RED "im dead" WHITE << std::endl;
 		for (int i = 0 ; envp[i] != NULL ; i++)
 			free(envp[i]);
 		free(envp);
 		free(binPath);
 		free(progPath);
-		std::cerr << "bobby is alive  ? " << std::endl;
+		std::cerr << RED "bobby is alive  ? " WHITE << std::endl;
 		exit(1);
 	}
 	else // parent process
@@ -175,10 +181,14 @@ void Cgi::executeCGI(std::string &path, char **envp)
 			final_body.insert(final_body.end(), buff.begin(), buff.begin() + ret);
 		if (ret < 0)
 		{
-			puts("billy");
+			// puts("billy");
 			throw std::runtime_error("500"); //throw
 		}
-		std::cout << "'" << final_body << "'" << std::endl;
+		// std::cout << RED "-----------------------------------------" WHITE << std::endl;
+
+		// std::cout << "'" << final_body << "'" << std::endl;
+		// std::cout  << RED "-----------------------------------------" WHITE<<  std::endl;
+
 		close(fd[0]);
 	}
 }
