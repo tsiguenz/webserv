@@ -185,7 +185,7 @@ void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
 	if (*(uploadPath.end() - 1) != '/' && uploadPath.empty() == false)
 		uploadPath.push_back('/');
 	// get filename
-	size_t	pos = _itFind(v.begin(), v.end(), "filename=\"");
+	size_t	pos = _itFind(v.begin(), v.end(), "filename=\""); //prlb la
 	if (pos == std::string::npos) { code = 400; return ; }
 	pos += 10;
 	while (v[pos] != '"')
@@ -201,7 +201,7 @@ void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
 	fileName = root + uploadPath + fileName;
 	// write in file
 	std::ofstream	of(fileName.c_str());
-	if (of.good() == false) { code = 400; of.close(); return ; }
+	if (of.good() == false) { code = 400; of.close(); return ; } //prbl la
 	for (std::vector<unsigned char>::const_iterator it = v.begin(); posStart != posEnd && of.good() == true; posStart++)
 		of.put(it[posStart]);
 	of.close();

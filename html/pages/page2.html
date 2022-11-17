@@ -25,13 +25,58 @@
             .dark-mode {
               background-color: rgb(33, 32, 32);
             }
+            .gap-10 { 
+              width:100%; 
+              height:10px; 
+			      }  
+            .gap-20 { 
+              width:100%; 
+              height:20px; 
+			      }  
+            .button-74 {
+              background-color: #fbeee0;
+              border: 2px solid #422800;
+              border-radius: 30px;
+              box-shadow: #422800 4px 4px 0 0;
+              color: #422800;
+              cursor: pointer;
+              display: inline-block;
+              font-weight: 600;
+              font-size: 18px;
+              padding: 0 18px;
+              line-height: 50px;
+              text-align: center;
+              text-decoration: none;
+              user-select: none;
+              -webkit-user-select: none;
+              touch-action: manipulation;
+            }
+
+            .button-74:hover {
+              background-color: #fff;
+            }
+
+            .button-74:active {
+              box-shadow: #422800 2px 2px 0 0;
+              transform: translate(2px, 2px);
+            }
+
+            @media (min-width: 768px) {
+              .button-74 {
+                min-width: 120px;
+                padding: 0 25px;
+              }
+            }
             </style>
     </head>
    
     <body>
-        <div style= "text-align:center">
-            <img src="../images/photos_vac/photo_mall.png" style="width: 30%; height: 30%">
-            <a href="page3.html">Nos vacances à la montagne</a>
-        </div>
+      <div style= "text-align:center">  
+        <h1 style= "color: #5a72c0;font-size: 60px;">Nous au centre commercial de Cergy</h1>
+        <div class="gap-10"></div> 
+        <img src="../images/photos_vac/photo_mall.png" style="width: 40%; height: 40%">
+        <div class="gap-10"></div> 
+        <button class="button-74" onclick="location.href='page3.html'" role="button">photo suivante</button>
+      </div>
     </body>
 </html>

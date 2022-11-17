@@ -91,13 +91,23 @@ Request	Server::_parseRequest(epoll_event const& event) const {
 
 	// bzero(buffer, BUFFER_SIZE);
 	size_t end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
-	(void)end;
+	std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
+	Request currentRequest(buffer3);
+	while (currentRequest.isRequestComplete == false) {
+		std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
+		end = recv(event.data.fd, &buffer2[0], BUFFER_SIZE, 0);
+		std::vector<unsigned char> buffer3(buffer2.begin(), buffer2.begin() + end);
+		// buffer2.resize(end);
+		currentRequest.addingBuffer(buffer3);
+	}
+	// (void)end;s
+
 	// std::cout << "--------------RAWREQUEST----------------"<< end << std::endl;
 	// for (std::vector<char>::iterator it = buffer2.begin(); it != buffer2.begin() + end;it++){
 	// 	std::cout << (*it);
 	// }
 	// std::cout << std::endl;
-	Request currentRequest(buffer2);
+
 	// if (currentRequest.badRequest == true) {
 	// 	std::cout << "400 \n";
 	// 	return;
@@ -111,6 +121,7 @@ void	Server::_sendResponse(epoll_event const& event, Response const& currentResp
 	send(event.data.fd, currentResponse.response.c_str(),  currentResponse.response.size(), 0);
 	close(event.data.fd);
 }
+
 
 
 void	Server::_initVirtualServer(VirtualServer const& vs) {
