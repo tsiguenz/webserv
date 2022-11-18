@@ -45,7 +45,8 @@ class Response
 		void	checkingMethod(void);
 		void	handleError(void);
 		void	redirectionUrl(void);
-
+		void	redirectionIndex(void);
+		bool		isAutoIndex;
 		std::string autoindex_nocgi(void);
 		std::string getResponse(void);
 		std::string	getTime(void);

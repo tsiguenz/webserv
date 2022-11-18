@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>autoindex.html</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: 'Caveat', sans-serif;
+				font-size: 50px;
+			}
+			body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 100vh;
+				background: url("https://wallpaperaccess.com/full/173243.jpg");
+			}
+			.box {
+				width: 80%;
+				text-align: center;
+				display: block;
+				border-bottom: 20px solid rgb(154, 221, 235);
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+				border-top-left-radius: 10px;
+				border-top-right-radius: 10px;
+				background: linear-gradient(180deg, rgb(218, 159, 120) 50%, rgb(154, 221, 235) 100%);
+
+			}
+			.box h2 {
+				color: rgb(109, 47, 180);
+				background: rgb(218, 159, 120);
+				padding: 10px 20px;
+				font-size: 70px;
+				font-weight: 700;
+				border-top-left-radius: 10px;
+				border-top-right-radius: 10px;
+			}
+			li {
+				list-style: none
+			}
+			.box u1 {
+				position: relative;
+				background: #fff;
+			}
+			.box u1 li{
+				list-style: none;
+				padding: 10px;
+				width: 100%;
+				background: #fff;
+				box-shadow: 0 5px 25px rgba(0, 0, 0, .1);
+				transition: transform 0.5s;
+			}
+
+			.box ul li:hover {
+				transform: scale(1.1);
+				z-index: 100;
+				background: #25bcff;
+				box-shadow: 0 5px 25px rgba(0,0,0,.2);
+				color: #fff;
+			}
+			.box ul li span img {
+				width: 50px;
+				height: auto;
+				justify-content: center;
+				text-align: center;
+				line-height: 20px;
+				margin: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<h2>Auto Index</h2>
+			<ul>
+				<li><span><img src="https://img.icons8.com/dusk/2x/000000/file--v2.png"></span> List Item</li>
+				<li><span><img src="https://img.icons8.com/dusk/2x/000000/file--v2.png"></span> List Item</li>
+				<li><span><img src="https://i.pinimg.com/originals/67/75/9e/67759e3a6a1dd544deffe5673d021174.png"></span> List Item</li>
+				<li><span><img src="https://img.icons8.com/dusk/2x/000000/file--v2.png"></span> List Item</li>
+				<li><span><img src="https://i.pinimg.com/originals/67/75/9e/67759e3a6a1dd544deffe5673d021174.png"></span> List Item</li>
+			</ul>
+		</div>
+	</body>
+</html>

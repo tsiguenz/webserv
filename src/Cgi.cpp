@@ -74,6 +74,7 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 	envs["GATEWAY_INTERFACE"] = "CGI/1.1";
 	envs["SERVER_PROTOCOL"] =  "HTTP/1.1";
 	envs["SERVER_PORT"] = _response->port;
+	std::cout << RED << "YESYES\n" << WHITE;
 	envs["REQUEST_METHOD"] = _response->method;
 	envs["REDIRECT_STATUS"] = get_code();
 	envs["PATH_INFO"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php 
@@ -81,17 +82,25 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 	envs["SCRIPT_NAME"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
 	envs["SCRIPT_FILENAME"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
 	envs["QUERY_STRING"] = "";//
+	std::cout << RED << "YESYESYES\n" << WHITE;
 	envs["REMOTE_HOST"] = _response->fieldLines["Host"]; // REMOTE_HOST=207.0.0.1
 	envs["REMOTE_ADDR"] = "";//
 	envs["AUTH_TYPE"] = "";//
 	envs["REMOTE_USER"] = "";//
-	envs["CONTENT_TYPE"] = Mediatype.getMediaType(_response->fileName);//application/x-www-form-urlencoded
+	if (Mediatype.isTypeSupported(_response->fileName))
+		envs["CONTENT_TYPE"] = Mediatype.getMediaType(_response->fileName);//application/x-www-form-urlencoded
+	else
+		envs["CONTENT_TYPE"] = "";
+	std::cout << BLUE << "YESYESYES\n" << _response->fileName << WHITE;
+
 	envs["CONTENT_LENGTH"] = get_length();
 	envs["HTTP_ACCEPT"] = _response->fieldLines["Accept"]; //*/*
 	envs["HTTP_ACCEPT_LANGUAGE"] = _response->fieldLines["Accept-Language"];
+	std::cout << RED << "YESYES\n" << WHITE;
 	envs["HTTP_USER_AGENT"] = _response->httpVersion;
 	envs["HTTP_COOKIE"] = _response->fieldLines["Cookie"];//PHPSESSID=rbp9ts7miftn1h5jmja928v58u,
 	envs["HTTP_REFERER"] = _response->fieldLines["Referer"];//
+	std::cout << RED << "YESYES\n" << WHITE;
 	return (envs);
 }
 
@@ -107,17 +116,13 @@ void Cgi::executeCGI(std::string &path, char **envp)
 {
 	int pid, stat, fd[2];
 
-	if (access(path.c_str(), X_OK) == -1){
-		std::cerr << "Pas autorise a execute" << std::endl;
+	if (access(path.c_str(), X_OK) == -1)
 		throw std::runtime_error("403"); //throw
-	}
 	if (pipe(fd) != 0)
 		throw std::runtime_error("503"); //throw
 	pid = fork();
-	if (pid == -1){
-		// puts("boobbbb");
+	if (pid == -1)
 		throw std::runtime_error("500"); //throw
-	}
 	if (pid == 0) // child process
 	{
 		close(fd[0]);
@@ -130,36 +135,19 @@ void Cgi::executeCGI(std::string &path, char **envp)
 		std::fputs(&copy[0], tmpf);
 		std::rewind(tmpf);
 		if (dup2(fileno(tmpf), STDIN_FILENO) == -1)
-		{
-			// std::cerr << "dup failed 1" << std::endl;
 			exit(1);
-		}
-
-
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
-		{
-			// std::cerr << "dup failed 2" << std::endl;
 			exit(1);
-		}
 		close(fd[1]);
 		char* binPath = strdup(getProgName(path).c_str());
 		char* progPath = strdup(path.c_str());
 		char* argv[3] = { binPath, progPath, NULL };
-		std::cerr << CYAN "binPath : " << binPath << std::endl;
-		for (int i = 0; argv[i]; i++)
-			std::cerr << "argv[" << i << "] : " << argv[i] << std::endl;
-		for (int i = 0; envp[i]; i++)
-			std::cerr << "envp[" << i << "] : " << envp[i] << std::endl;
-		std::cerr << RED "im dying ????" WHITE << std::endl;
-		std::cerr << GREEN << getcwd(0,0) << WHITE << std::endl;
 		execve(binPath, argv, envp);
-		std::cerr << RED "im dead" WHITE << std::endl;
 		for (int i = 0 ; envp[i] != NULL ; i++)
 			free(envp[i]);
 		free(envp);
 		free(binPath);
 		free(progPath);
-		std::cerr << RED "bobby is alive  ? " WHITE << std::endl;
 		exit(1);
 	}
 	else // parent process
@@ -170,25 +158,14 @@ void Cgi::executeCGI(std::string &path, char **envp)
 		waitpid(pid, &stat, 0);
 		stat = WEXITSTATUS(stat);
 		if (stat != 0)
-		{
-			std::cout << "Error here : " << stat << std::endl;
 			throw std::runtime_error("500");  //throw
-		}
 		close(fd[1]);
 		int	 ret = 0;
 		std::vector<char> buff(1024, 0);
 		while ((ret = read(fd[0], &buff[0], 1024)) > 0)
 			final_body.insert(final_body.end(), buff.begin(), buff.begin() + ret);
 		if (ret < 0)
-		{
-			// puts("billy");
 			throw std::runtime_error("500"); //throw
-		}
-		// std::cout << RED "-----------------------------------------" WHITE << std::endl;
-
-		// std::cout << "'" << final_body << "'" << std::endl;
-		// std::cout  << RED "-----------------------------------------" WHITE<<  std::endl;
-
 		close(fd[0]);
 	}
 }
