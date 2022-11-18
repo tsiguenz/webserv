@@ -6,9 +6,9 @@
 # include <ctime>
 # include <sstream> 
 # include "Request.hpp"
-# include "Response.hpp"
 # include "MediaType.hpp"
 # include "VirtualServer.hpp"
+# include "Cgi.hpp"
 
 class Response
 {
@@ -21,9 +21,9 @@ class Response
 
 		void		printResponse(void) const;
 
-		std::string							method; //  "REQUEST_METHOD="
+		std::string							method; //  "REQUEST_METHOD=" //x
 		std::string							url;
-		std::string							httpVersion;
+		std::string							httpVersion; //x
 		std::map<std::string, std::string>	fieldLines; // TT CE DONT TAS BESOIN EST DEDANS
 		std::vector<unsigned char>			body;
 		std::string							root; //pour adam
@@ -40,21 +40,22 @@ class Response
 		std::map<int, std::pair<std::string, std::string> >	statusCodes;
 
 		void		buildingResponse(void);
-		
 		void		getFile(void); //GET
 		void		postFile(void); //POST
 		void		deleteFile(void); //DELETE
 
+		// POST
 		void	checkingMethod(void);
 		void	handleError(void);
 		void	redirectionUrl(void);
-
 		void	_postFormData();
 		void	_postFormDataBlock();
 		std::vector<unsigned char>	_getFormDataBlock();
 		void	_postFormDataBlock(std::vector<unsigned char> const& v);
 
-		void	redirectionIndex(void);
+		void		redirectionIndex(void);
+		bool		isAutoIndex;
+		std::string autoindex_nocgi(void);
 		std::string getResponse(void);
 		std::string	getTime(void);
 		std::string	getServerName(void);

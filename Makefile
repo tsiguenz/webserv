@@ -19,7 +19,8 @@ SRC_NAME = 	main.cpp \
 			Request.cpp \
 			Response.cpp \
 			MediaType.cpp \
-			ErrorHandler.cpp
+			ErrorHandler.cpp \
+			Cgi.cpp
 
 TEST_SRC_NAME = test_main.cpp \
 				config_parser/config_parser_tests.cpp \

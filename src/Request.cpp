@@ -8,13 +8,14 @@
 
 Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
+	isRequestComplete = false;
 	parsingCode = 2;
 }
 
 Request::Request(std::vector<unsigned char> & toParse):  vectorRequest(toParse), isRequestComplete(false), isParsingComplete(false), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
-	// printRequest();
+//	printRequest();
 }
 
 /*
@@ -225,21 +226,21 @@ void	Request::trimingFieldLines() {
 
 void	Request::printRequest(){
 
-	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << WHITE <<  std::endl << std::endl;
-
-	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++) {
-        std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
-    }
-
-	std::cout << BGREEN << "BODY: " << std::endl;
-	if (body.empty())
-		std::cout << BRED << "NONE" WHITE << std::endl;
-	else {
-		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
-   			std::cout << (*it);
- 		}
-		std::cout << std::endl;
-	}
+//	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << WHITE <<  std::endl << std::endl;
+//
+//	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++) {
+//        std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
+//    }
+//
+//	std::cout << BGREEN << "BODY: " << std::endl;
+//	if (body.empty())
+//		std::cout << BRED << "NONE" WHITE << std::endl;
+//	else {
+//		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
+//   			std::cout << (*it);
+// 		}
+//		std::cout << std::endl;
+//	}
 	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
 	for (std::vector<unsigned char>::iterator it = vectorRequest.begin(); it != vectorRequest.end();it++){
    			std::cout << (*it);

@@ -30,7 +30,6 @@ class Request
 		bool	isRequestComplete;
 		bool	isParsingComplete;
 		size_t	requestLen;
-		//TODO VECTOR UNSIGNED CHAR
 		std::vector<unsigned char> body;
 
 		int			parsingCode;

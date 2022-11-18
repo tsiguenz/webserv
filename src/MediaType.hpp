@@ -1,11 +1,13 @@
-
 #ifndef MEDIATYPE_HPP
 # define MEDIATYPE_HPP
 
-# include <iostream>
-# include <vector>
-# include <map>
-# include <algorithm>
+# include "webserv.h"
+
+typedef struct s_data {
+	bool	isCGI;
+	std::string path;
+	std::string mimeType;
+}	t_data;
 
 class MediaType
 {
@@ -25,9 +27,12 @@ class MediaType
 		bool 		isInAccepted(std::string accepted, std::string fileFormat);
 		bool		isTypeSupported(std::string	requestedType);
 		bool		isExtensionSupported(std::string requestedExtension);
+		void		add(std::string s, bool isCgi, std::string path, std::string mimeType);
+		std::string getProgName(std::string &extension);
+		bool		isCgi(std::string extension);
 
 	private:
-		std::map<std::string, std::string> mime;
+		std::map<std::string, t_data> mime;
 
 };
 

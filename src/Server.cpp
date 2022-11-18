@@ -208,11 +208,11 @@ VirtualServer const 	Server::_selectServer(short const& port, std::string const&
 			if (serverName == (*itList))
 				isNamePresent = true;
 		}
-			if (isNamePresent == false) {
-				if (candidatVirtualServer.size() == 1)
-					break ;
-				candidatVirtualServer.erase(it);
-			}
+		if (isNamePresent == false) {
+			if (candidatVirtualServer.size() == 1)
+				break ;
+			candidatVirtualServer.erase(it);
+		}
 	}
 	if (candidatVirtualServer.empty())
 		return(_virtualServerList.front());
@@ -221,7 +221,7 @@ VirtualServer const 	Server::_selectServer(short const& port, std::string const&
 
 
 VirtualServer const	Server::_getVirtualServerByHost(Request const& currentRequest) const {
-	
+
 	std::string	ip;
 	std::string	portString;
 	std::string	serverName;
