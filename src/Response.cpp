@@ -56,8 +56,7 @@ Response&	Response::operator=(Response const& rhs) {
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-Response::~Response(){
-}
+Response::~Response() { }
 
 
 /*
@@ -67,26 +66,21 @@ Response::~Response(){
 void				Response::buildingResponse(void) {
 	if (code == 200)
 		checkingMethod();
-	//tu peux faire ton bail entre ici
     if (code == 200 && (method == "GET" || method == "DELETE"))
 	    getFile();
 	if (code == 200 && method == "DELETE")
 		deleteFile();
-	if (code == 200 && method == "POST") {
+	if (code == 200 && method == "POST")
 		postFile();
-	}
-	//et la
 	if (server.getReturnCode(url) == code)
 		code = 302;
 	if (code > 399)
 		handleError();
-
 	response = getResponse();
 	redirectionUrl();
 	response += getTime();
 	response += getServerName();
 	response += getConnectionType();
-
 	if ((method == "GET" && code != 302) || (code != 200 && (method == "DELETE" || method == "POST"))) {
 		if (!file.empty())
 			response += getTypeContent();
@@ -105,7 +99,9 @@ void				Response::buildingResponse(void) {
 void		Response::checkingMethod(void) {
 	if (server.isAllowedMethod(method, url))
 		return ;
-	if (method == "DELETE" || method == "GET" || method == "POST" || method == "HEAD" || method == "PATCH" || method == "PUT" || method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
+	if (method == "DELETE" || method == "GET" || method == "POST"
+			|| method == "HEAD" || method == "PATCH" || method == "PUT"
+			|| method == "OPTIONS" || method == "CONNECT" || method == "TRACE") {
 		code = 405;
 		return ;
 	}
@@ -113,7 +109,6 @@ void		Response::checkingMethod(void) {
 	return ;
 }
 void		Response::getFile(void) {
-
 	if (isADir(server.getRoot() + url))
 	{
 		if (server.getAutoIndex() == "on") {
@@ -138,7 +133,6 @@ void		Response::getFile(void) {
 	file.close();
 	fileName = url;
 	return ;
-
 }
 
 void		Response::redirectionIndex(void) {
@@ -194,6 +188,7 @@ std::vector<unsigned char>	Response::_getFormDataBlock() {
 	return ret;
 }
 
+// create new file with data block informations
 void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
 	std::string	fileName;
 	// get delim
@@ -238,10 +233,8 @@ void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
 			code = 400;
 			return;
 		}
-
-		if (remove((pathRepertoire +fileName).c_str()) != 0) {
+		if (remove((pathRepertoire +fileName).c_str()) != 0)
      		code = 403;
-		}
 	}
 
 /*
@@ -327,7 +320,7 @@ std::string Response::getResponse(void) {
 	return line;
 }
 
-void	Response::printResponse(void) const {
-	std::cout << response << std::endl;
-}
+void	Response::printResponse(void) const
+{ std::cout << response << std::endl; }
+
 /* ************************************************************************** */

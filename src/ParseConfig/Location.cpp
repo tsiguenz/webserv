@@ -15,39 +15,32 @@ Location::Location(Location const& l)
 	_returnCode(l._returnCode), _returnPath(l._returnPath)
 { }
 
-Location::~Location() {
-}
+Location::~Location() { }
 
 // Accessors
 
-std::string	Location::getPath() const {
-	return _path;
-}
+std::string	Location::getPath() const
+{ return _path; }
 
 std::string	Location::getErrorPageByCode(int const& errorCode) const {
 	std::map<int, std::string>::const_iterator	itm = _errorPages.find(errorCode);
 	return (itm == _errorPages.end()) ? "" : (*itm).second;
 }
 
-std::map<int, std::string>	Location::getErrorPages() const {
-	return _errorPages;
-}
+std::map<int, std::string>	Location::getErrorPages() const
+{ return _errorPages; }
 
-std::string	Location::getAutoIndex() const {
-	return _autoIndex;
-}
+std::string	Location::getAutoIndex() const
+{ return _autoIndex; }
 
-std::string	Location::getRoot() const {
-	return _root;
-}
+std::string	Location::getRoot() const
+{ return _root; }
 
-std::string	Location::getIndex() const {
-	return _index;
-}
+std::string	Location::getIndex() const
+{ return _index; }
 
-std::list<std::string>	Location::getAllowedMethods() const {
-	return _allowedMethods;
-}
+std::list<std::string>	Location::getAllowedMethods() const
+{ return _allowedMethods; }
 
 bool	Location::isAllowedMethod(std::string const& method) const {
 	std::list<std::string>::const_iterator it = _allowedMethods.begin();
@@ -58,9 +51,8 @@ bool	Location::isAllowedMethod(std::string const& method) const {
 	return false;
 }
 
-std::list<std::string>	Location::getAllowedExtCgi() const {
-	return _allowedExtCgi;
-}
+std::list<std::string>	Location::getAllowedExtCgi() const
+{ return _allowedExtCgi; }
 
 bool	Location::isAllowedExtCgi(std::string const& cgi) const {
 	std::list<std::string>::const_iterator it = _allowedExtCgi.begin();
@@ -71,37 +63,29 @@ bool	Location::isAllowedExtCgi(std::string const& cgi) const {
 	return false;
 }
 
-std::string	Location::getUploadPath() const {
-	return _uploadPath;
-}
+std::string	Location::getUploadPath() const
+{ return _uploadPath; }
 
-int	Location::getReturnCode() const {
-	return _returnCode;
-}
+int	Location::getReturnCode() const
+{ return _returnCode; }
 
-std::string	Location::getReturnPath() const {
-	return _returnPath;
-}
+std::string	Location::getReturnPath() const
+{ return _returnPath; }
 
-void	Location::setPath(std::string const& path) {
-	_path = path;
-}
+void	Location::setPath(std::string const& path)
+{ _path = path; }
 
-void	Location::setErrorPage(int const& errorCode, std::string const& path) {
-	_errorPages.insert(std::make_pair(errorCode, path));
-}
+void	Location::setErrorPage(int const& errorCode, std::string const& path)
+{ _errorPages.insert(std::make_pair(errorCode, path)); }
 
-void	Location::setAutoIndex(std::string const& autoIndex) {
-	_autoIndex = autoIndex;
-}
+void	Location::setAutoIndex(std::string const& autoIndex)
+{ _autoIndex = autoIndex; }
 
-void	Location::setRoot(std::string const& root) {
-	_root = root;
-}
+void	Location::setRoot(std::string const& root)
+{ _root = root; }
 
-void	Location::setIndex(std::string const& index) {
-	_index = index;
-}
+void	Location::setIndex(std::string const& index)
+{ _index = index; }
 
 void	Location::setAllowedMethod(std::string const& method) {
 	if (isAllowedMethod(method) == false)
@@ -113,9 +97,8 @@ void	Location::setAllowedExtCgi(std::string const& ext) {
 		_allowedExtCgi.push_back(ext);
 }
 
-void	Location::setUploadPath(std::string const& path) {
-	_uploadPath = path;
-}
+void	Location::setUploadPath(std::string const& path)
+{ _uploadPath = path; }
 
 void	Location::setReturn(int const& code, std::string const& path) {
 	_returnCode = code;

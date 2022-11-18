@@ -4,6 +4,7 @@
 # include "webserv.h"
 # include <map>
 # include <vector>
+# include <sys/types.h>
 
 // class MediaType;
 
@@ -29,12 +30,11 @@ class Request
 		bool	isRequestComplete;
 		bool	isParsingComplete;
 		size_t	requestLen;
-		//body //TODO: adding body if needs, and if body come later, add a isRequestFinishBool and a fnct to add the body later when the rest is coming
 		//TODO VECTOR UNSIGNED CHAR
 		std::vector<unsigned char> body;
 
 		int			parsingCode;
-		void		addingBuffer(std::vector<unsigned char> toAdd, size_t const& len);
+		void		addingBuffer(std::vector<unsigned char> toAdd, ssize_t const& len);
 		void		create(std::vector<unsigned char> toParse2);
 		void		create(Request const & rhs);
 		Request &	operator=(Request const & rhs);
@@ -44,8 +44,8 @@ class Request
 		const	std::string illegalCharacter;
 		const	std::string escapingCharacter;
 		size_t 	posEnd;
-		// Lexer/Parser
-		int				preParsing(void);
+		// Parser
+		bool			preParsing();
 		void			parsingRequest();
 		int				parsingRequestLine();
 		int				definingBody();
@@ -53,8 +53,8 @@ class Request
 		int				parsingFieldLines();
 		int				parsingFieldName(std::string fieldName);
 		std::string		parsingFieldValue(std::string fieldValue);
-		int				parsingBody(void);
-		int				parsingBody2(void);
+		int				parsingBody();
+		int				parsingBody2();
 
 		void			trimingFieldLines();
 

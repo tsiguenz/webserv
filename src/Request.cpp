@@ -45,7 +45,7 @@ Request &				Request::operator=( Request const & rhs )
 	return *this;
 }
 
-void	Request::addingBuffer(std::vector<unsigned char> toAdd, size_t const& len) {
+void	Request::addingBuffer(std::vector<unsigned char> toAdd, ssize_t const& len) {
 	vectorRequest.insert(vectorRequest.end(), toAdd.begin(), toAdd.begin() + len);
 	parsingRequest();
 }
@@ -55,16 +55,16 @@ void	Request::addingBuffer(std::vector<unsigned char> toAdd, size_t const& len) 
 // ** --------------------------------- METHODS ----------------------------------
 // */
 
-int	Request::preParsing(void) {
+bool	Request::preParsing(void) {
 	rawRequest = std::string(vectorRequest.begin(), vectorRequest.end());
 	posEnd = rawRequest.find("\r\n\r\n", 4);
 	if (posEnd == std::string::npos) {
 			parsingCode = 400;
-			return 1;
+			return true;
 	}
 	else
 		posEnd = posEnd + 4;
-	return 0;
+	return false;
 }
 
 void	Request::parsingRequest(void) {
@@ -101,9 +101,8 @@ void	Request::parsingRequest(void) {
 }
 
 void Request::completingBody(void) {
-	if ( vectorRequest.size() >= requestLen)
+	if (vectorRequest.size() >= requestLen)
 		isRequestComplete = true;
-	return ;
 }
 
 int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP request-target SP HTTP-version CRLF
@@ -115,20 +114,15 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 		parsingCode = 400;
 		return 1;
 	}
-	
 	method = firstLine.substr(0, nextSpace);
 	firstLine = firstLine.erase(0, nextSpace + 1);
 	nextSpace = firstLine.find_first_of(' ');
 	if (nextSpace == std::string::npos){
-	
 		parsingCode = 400;
 		return 1;
 	}
-
 	url =  firstLine.substr(0, nextSpace);
-
 	if (url.find(illegalCharacter) != std::string::npos) {
-	
 		parsingCode = 400;
 		return 1;
 	}
@@ -137,16 +131,12 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 		return 1;
 	}
 	firstLine = firstLine.erase(0, nextSpace + 1);
-
 	if (firstLine != "HTTP/1.1\r\n" && firstLine != "HTTP/1.0\r\n" && firstLine != "HTTP/0.9\r\n"){
-	
 		parsingCode = 400;
 		return 1;
 	}
-
 	nextSpace = firstLine.find_first_of('\r');
 	httpVersion = firstLine.substr(0, nextSpace);;
-
 	return 0;
 }
 

@@ -38,9 +38,9 @@ void	ConfigParser::parseFile(std::string const& fileName) {
 
 void	ConfigParser::_checkFileName(std::string const& fileName) const {
 	if (fileName.size() <= 5)
-		throw std::invalid_argument("Invalid argument: file is too short in _checkFileName()\n");
+		throw std::invalid_argument("Invalid argument: file is too short in _checkFileName()");
 	if (fileName.substr(fileName.size() - 5, 5) != ".conf")
-		throw std::invalid_argument("Invalid argument: file extention is bad in _checkFileName()\n");
+		throw std::invalid_argument("Invalid argument: file extention is bad in _checkFileName()");
 }
 
 void	ConfigParser::_initAllowedDirectives() {
@@ -92,7 +92,7 @@ void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
 	std::string	tLine = trim(line);
 	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
 	if (_isServerDirective(directiveName) == false)
-		throw std::invalid_argument("Bad directive name in server block\n");
+		throw std::invalid_argument("Bad directive name in server block");
 	if (directiveName == "server_name")
 		_parseServerNames(tLine, vs);
 	if (directiveName == "listen")
@@ -119,11 +119,10 @@ void	ConfigParser::_parseDirective(std::string const& line, VirtualServer& vs) {
 
 // location overload
 void	ConfigParser::_parseDirective(std::string const& line, Location& location) {
-	(void) location;
 	std::string	tLine = trim(line);
 	std::string	directiveName = tLine.substr(0, tLine.find_first_of(_WHITESPACES));
 	if (_isLocationDirective(tLine.substr(0, tLine.find_first_of(_WHITESPACES))) == false)
-		throw std::invalid_argument("Bad directive name in location block\n");
+		throw std::invalid_argument("Bad directive name in location block");
 	if (directiveName == "error_page")
 		_parseErrorPage(tLine, location);
 	if (directiveName == "index")
@@ -147,12 +146,12 @@ void	ConfigParser::_readFile(std::string const& fileName) {
 
 	std::ifstream	file(fileName.c_str());
 	if (file.good() == false)
-		throw std::invalid_argument("Invalid argument: bad file name in _readFile()\n");
+		throw std::invalid_argument("Invalid argument: bad file name in _readFile()");
 	while (file.good() == true && std::getline(file, buffer))
 		_fileContent += (buffer += "\n");
 	file.close();
 	if (_fileContent.empty() == true)
-		throw std::invalid_argument("Invalid argument: file is empty in _readFile()\n");
+		throw std::invalid_argument("Invalid argument: file is empty in _readFile()");
 }
 
 // return the next block in { } and update the stringstream
@@ -165,9 +164,8 @@ std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) const {
 	std::getline(sContent, line);
 	vLine = _splitInVector(line);
 	if (vLine.size() != 2 || vLine.at(0) != "server" || vLine.at(1) != "{")
-			throw std::invalid_argument("First line of block is bad in _getServerBlock()\n");
+			throw std::invalid_argument("First line of block is bad in _getServerBlock()");
 	ret += line + "\n";
-	// stop condition for iterate on the function
 	while (std::getline(sContent, line)) {
 		if (trim(line).empty() == true)
 			continue ;
@@ -179,7 +177,7 @@ std::string	ConfigParser::_getServerBlock(std::stringstream& sContent) const {
 		if (trim(line) == "}" && inBlock == true)
 			inBlock = false;
 	}
-	throw std::invalid_argument("Block is not closed in _getServerBlock()\n");
+	throw std::invalid_argument("Block is not closed in _getServerBlock()");
 }
 
 std::string	ConfigParser::_getLocationBlock(std::stringstream& sContent) const {
@@ -190,18 +188,18 @@ std::string	ConfigParser::_getLocationBlock(std::stringstream& sContent) const {
 	std::getline(sContent, line);
 	vLine = _splitInVector(line);
 	if (vLine.size() != 3 || vLine.at(0) != "location" || vLine.at(2) != "{")
-			throw std::invalid_argument("First line of block is bad in _getLocationBlock()\n");
+			throw std::invalid_argument("First line of block is bad in _getLocationBlock()");
 	ret += line + "\n";
 	while (std::getline(sContent, line)) {
 		if (trim(line).empty() == true)
 			continue ;
 		ret += line + "\n";
 		if (line.find("{") != std::string::npos)
-			throw std::invalid_argument("No block can be in location block _getLocationBlock()\n");
+			throw std::invalid_argument("No block can be in location block _getLocationBlock()");
 		if (trim(line) == "}")
 			return ret;
 	}
-	throw std::invalid_argument("Block is not closed in _getLocationBlock()\n");
+	throw std::invalid_argument("Block is not closed in _getLocationBlock()");
 }
 
 void	ConfigParser::_parseFileContent(std::string const& fileContent) {
@@ -214,14 +212,14 @@ void	ConfigParser::_parseFileContent(std::string const& fileContent) {
 		if (vLine.empty() == true)
 			continue ;
 		if (vLine.size() != 2)
-			throw std::invalid_argument("Bad syntax for server block in _parseFileContent()\n");
+			throw std::invalid_argument("Bad syntax for server block in _parseFileContent()");
 		if (vLine.at(0) == "server" && vLine.at(1) == "{") {
 			for (size_t i = 0; i < line.size() + 1; i++)
 				sContent.unget();
 			_virtualServerList.push_back(_parseServerBlock(_getServerBlock(sContent)));
 		}
 		else
-			throw std::invalid_argument("Bad syntax for server block in _parseFileContent()\n");
+			throw std::invalid_argument("Bad syntax for server block in _parseFileContent()");
 	}
 }
 
@@ -249,7 +247,7 @@ VirtualServer	ConfigParser::_parseServerBlock(std::string const& serverBlock) {
 		} else
 			_parseDirective(line, vs);
 	}
-	throw std::invalid_argument("Block is not closed in _parseServerBlock()\n");
+	throw std::invalid_argument("Block is not closed in _parseServerBlock()");
 }
 
 Location	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
@@ -269,7 +267,7 @@ Location	ConfigParser::_parseLocationBlock(std::string const& locationBlock) {
 			return location;
 		_parseDirective(line, location);
 	}
-	throw std::invalid_argument("Block is not closed in _parseLocationBlock()\n");
+	throw std::invalid_argument("Block is not closed in _parseLocationBlock()");
 }
 
 std::vector<std::string>	ConfigParser::_splitInVector(std::string const& line) const {

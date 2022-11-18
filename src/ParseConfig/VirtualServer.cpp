@@ -36,26 +36,20 @@ std::map<int, std::string>	VirtualServer::getErrorPages(std::string const& path)
 	return (*it).getErrorPages();
 }
 
-std::list<std::string>	VirtualServer::getServerNames() const {
-	return _serverNames;
-}
+std::list<std::string>	VirtualServer::getServerNames() const
+{ return _serverNames; }
 
-std::string	VirtualServer::getIp() const {
-	return _ip;
-}
+std::string	VirtualServer::getIp() const
+{ return _ip; }
 
-short	VirtualServer::getPort() const {
-	return _port;
-}
+short	VirtualServer::getPort() const
+{ return _port; }
 
-int	VirtualServer::getClientMaxBodySize(std::string const& path) const {
-	(void) path;
-	return _clientMaxBodySize;
-}
+int	VirtualServer::getClientMaxBodySize(std::string const& path) const
+{ (void) path; return _clientMaxBodySize; }
 
-std::list<Location>	VirtualServer::getLocationList() const {
-	return _locationList;
-}
+std::list<Location>	VirtualServer::getLocationList() const
+{ return _locationList; }
 
 std::string	VirtualServer::getAutoIndex(std::string const& path) const {
 	std::list<Location>::const_iterator	it = _getFineLocationIt(path);
@@ -137,41 +131,32 @@ std::string	VirtualServer::getReturnPath(std::string const& path) const {
 	return (*it).getReturnPath();
 }
 
-void	VirtualServer::setErrorPage(int const& errorCode, std::string const& path) {
-	_errorPages.insert(std::make_pair(errorCode, path));
-}
+void	VirtualServer::setErrorPage(int const& errorCode, std::string const& path)
+{ _errorPages.insert(std::make_pair(errorCode, path)); }
 
-void	VirtualServer::setServerName(std::string const& serverName) {
-	_serverNames.push_back(serverName);
-}
+void	VirtualServer::setServerName(std::string const& serverName)
+{ _serverNames.push_back(serverName); }
 
-void	VirtualServer::setIp(std::string const& ip) {
-	_ip = ip;
-}
+void	VirtualServer::setIp(std::string const& ip)
+{ _ip = ip; }
 
-void	VirtualServer::setPort(short const& port) {
-	_port = port;
-}
+void	VirtualServer::setPort(short const& port)
+{ _port = port; }
 
-void	VirtualServer::setClientMaxBodySize(int const& size) {
-	_clientMaxBodySize = size;
-}
+void	VirtualServer::setClientMaxBodySize(int const& size)
+{ _clientMaxBodySize = size; }
 
-void	VirtualServer::setNewLocation(Location location) {
-	_locationList.push_back(location);
-}
+void	VirtualServer::setNewLocation(Location location)
+{ _locationList.push_back(location); }
 
-void	VirtualServer::setAutoIndex(std::string const& autoIndex) {
-	_autoIndex = autoIndex;
-}
+void	VirtualServer::setAutoIndex(std::string const& autoIndex)
+{ _autoIndex = autoIndex; }
 
-void	VirtualServer::setRoot(std::string const& root) {
-	_root = root;
-}
+void	VirtualServer::setRoot(std::string const& root)
+{ _root = root; }
 
-void	VirtualServer::setIndex(std::string const& index) {
-	_index = index;
-}
+void	VirtualServer::setIndex(std::string const& index)
+{ _index = index; }
 
 void	VirtualServer::setAllowedMethod(std::string const& method) {
 	if (isAllowedMethod(method) == false)

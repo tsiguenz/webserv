@@ -54,7 +54,7 @@ class	ConfigParser {
 			void	_parseErrorPage(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() < 3)
-					throw std::invalid_argument("error_page directive number of arguments (ex: error_page 400 404 4xx.html)\n");
+					throw std::invalid_argument("error_page directive number of arguments (ex: error_page 400 404 4xx.html)");
 				v.erase(v.begin());
 				std::string	path = v.back();
 				for (std::vector<std::string>::const_iterator it = v.begin(); it != v.end() -1; it++)
@@ -65,7 +65,7 @@ class	ConfigParser {
 			void	_parseServerNames(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() < 2)
-					throw std::invalid_argument("server_name directive bad number of arguments (ex: server_name webserv.com\n");
+					throw std::invalid_argument("server_name directive bad number of arguments (ex: server_name webserv.com");
 				for (std::vector<std::string>::const_iterator it = v.begin() + 1; it != v.end(); it++)
 					vs.setServerName(*it);
 			}
@@ -74,7 +74,7 @@ class	ConfigParser {
 			void	_parseListen(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
-					throw std::invalid_argument("listen directive bad number of arguments (ex: listen 127.0.0.1:8080)\n");
+					throw std::invalid_argument("listen directive bad number of arguments (ex: listen 127.0.0.1:8080)");
 				std::string	str = v.back();
 				size_t	sepPos = str.find(":");
 				// only port case
@@ -95,11 +95,11 @@ class	ConfigParser {
 			void	_parseClientMaxBodySize(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
-					throw std::invalid_argument("client_max_body directive bad syntax\n");
+					throw std::invalid_argument("client_max_body directive bad syntax");
 				int	maxBodySize = strtod(v.back().c_str(), NULL);
 				// 10 MB limit
 				if (maxBodySize <= 0 || maxBodySize > 1048576)
-					throw std::invalid_argument("client_max_body bad value\n");
+					throw std::invalid_argument("client_max_body bad value");
 				vs.setClientMaxBodySize(maxBodySize);
 			}
 
@@ -107,14 +107,14 @@ class	ConfigParser {
 			void	_parseAutoIndex(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
-					throw std::invalid_argument("autoindex directive bad number of arguments (ex: autoindex on)\n");
+					throw std::invalid_argument("autoindex directive bad number of arguments (ex: autoindex on)");
 				std::string	autoIndex;
 				if (v.back() == "on")
 					autoIndex = "on";
 				else if (v.back() == "off")
 					autoIndex = "off";
 				else
-					throw std::invalid_argument("autoindex directive bad argument (argument must be on or off\n");
+					throw std::invalid_argument("autoindex directive bad argument (argument must be on or off");
 				vs.setAutoIndex(autoIndex);
 			}
 
@@ -122,7 +122,7 @@ class	ConfigParser {
 			void	_parseRoot(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
-					throw std::invalid_argument("root directive bad number of arguments (ex: root /var/www)\n");
+					throw std::invalid_argument("root directive bad number of arguments (ex: root /var/www)");
 				vs.setRoot(v.back());
 			}
 
@@ -130,7 +130,7 @@ class	ConfigParser {
 			void	_parseIndex(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
-					throw std::invalid_argument("index directive number of arguments (ex: index index.html)\n");
+					throw std::invalid_argument("index directive number of arguments (ex: index index.html)");
 				vs.setIndex(v.back());
 			}
 
@@ -138,12 +138,12 @@ class	ConfigParser {
 			void	_parseMethods(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() == 1)
-					throw std::invalid_argument("methods directive number of arguments (ex: methods GET POST DELETE\n");
+					throw std::invalid_argument("methods directive number of arguments (ex: methods GET POST DELETE");
 				for (std::vector<std::string>::const_iterator it = v.begin() + 1; it != v.end(); it++) {
 					if (*it == "GET" || *it == "POST" || *it == "DELETE")
 						vs.setAllowedMethod(*it);
 					else
-						throw std::invalid_argument("methods directive bad argument (must be GET or/and POST or/and DELETE\n");
+						throw std::invalid_argument("methods directive bad argument (must be GET or/and POST or/and DELETE");
 				}
 			}
 
@@ -151,10 +151,10 @@ class	ConfigParser {
 			void	_parseReturn(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 3)
-					throw std::invalid_argument("return directive bad number of arguments (ex: return 404 google.com)\n");
+					throw std::invalid_argument("return directive bad number of arguments (ex: return 404 google.com)");
 				int	code = std::strtod(v.at(1).c_str(), NULL);
 				if (code == 0)
-					throw std::invalid_argument("return directive bad code (ex: return 404 google.com)\n");
+					throw std::invalid_argument("return directive bad code (ex: return 404 google.com)");
 				vs.setReturn(code, v.at(2));
 			}
 
@@ -162,12 +162,12 @@ class	ConfigParser {
 			void	_parseCgiAllowed(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() == 1)
-					throw std::invalid_argument("cgi_allowed_ext directive bad number of arguments (ex: cgi_allowed_ext .py .php)\n");
+					throw std::invalid_argument("cgi_allowed_ext directive bad number of arguments (ex: cgi_allowed_ext .py .php)");
 				for (std::vector<std::string>::const_iterator it = v.begin() + 1; it != v.end(); it++) {
 					if ((*it).at(0) == '.')
 						vs.setAllowedExtCgi(*it);
 					else
-						throw std::invalid_argument("cgi_allowed_ext directive bad argument (must start by .)\n");
+						throw std::invalid_argument("cgi_allowed_ext directive bad argument (must start by .)");
 				}
 			}
 
@@ -175,7 +175,7 @@ class	ConfigParser {
 			void	_parseUploadPath(std::string const& line, T& vs) {
 				std::vector<std::string>	v = _splitInVector(line);
 				if (v.size() != 2)
-					throw std::invalid_argument("upload_path directive bad number of arguments (ex: upload_path html/download)\n");
+					throw std::invalid_argument("upload_path directive bad number of arguments (ex: upload_path html/download)");
 				vs.setUploadPath(v.back());
 			}
 };

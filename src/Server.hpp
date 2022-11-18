@@ -17,7 +17,7 @@
 # include "webserv.h"
 # include "ConfigParser.hpp"
 
-# define BUFFER_SIZE 1000 // TODO change using the max header size and the max body size
+# define BUFFER_SIZE 4096
 # define EVENTS_MAX 1000
 # define BACKLOG 10
 
@@ -32,8 +32,8 @@ class Server {
 		void	run();
 		std::vector<int>	getFdsServer() const;
 		std::vector<int>	getFdsclient() const;
+
 	private:
-		// TODO replace by class Parser
 		std::map<int, Request>		_requests;
 		std::vector<int>			_fdsServer;
 		std::list<VirtualServer>	_virtualServerList;
@@ -42,8 +42,6 @@ class Server {
 
 		// Member functions
 		void	_initEpoll();
-		// Initialize new socket (fd) who can listen on a specific port
-		VirtualServer const  getVirtualServerByHost(Request const & currentRequest) const;
 		void	_initVirtualServer(VirtualServer const& vs);
 		void	_setNonBlocking(int const& fd) const;
 		void	_addEvent(int const& fd, long const& events) const;
@@ -57,7 +55,8 @@ class Server {
 		void	_parseRequest(epoll_event const& event);
 		void	_sendResponse(epoll_event const& event);
 
-		VirtualServer const 	selectServer(short const & port, std::string const & ip, std::string const & name) const;
+		VirtualServer const	_getVirtualServerByHost(Request const& currentRequest) const;
+		VirtualServer const	_selectServer(short const& port, std::string const& ip, std::string const& name) const;
 };
 
 #endif // SERVER_HPP

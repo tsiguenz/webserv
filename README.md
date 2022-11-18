@@ -20,6 +20,8 @@ Run the dev test:
 
 ## Configuration file
 
+### Virtual servers
+
 Virtual server contain multiple directive like server name, port used to listen, default error page and so forth.
 
 Each virtual server is defined by a server block who start like that:
@@ -29,23 +31,21 @@ server {
 }
 ```
 
-### Directives
-
 - Server name
 	```
-	server_name blabla.com;
+	server_name webserv.com www.webserv.com
 	```
 
 - Listen (IP and port) **default: ip = 0.0.0.0 port = 8080**
 	```
-	listen 1024;
-	listen localhost:1024;
-	listen localhost;
+	listen 1024
+	listen localhost:1024
+	listen localhost
 	```
 
 - Client max body size (limit the body size) **default: 1048576**
 	```
-	client_max_body_size 1024;
+	client_max_body 1024
 	```
 
 ### Location
@@ -61,13 +61,13 @@ location [URI] {
 
 - Error page
 	```
-	error_page 404 /404.html;
-	error_page 500 502 /50x.html;
+	error_page 404 /404.html
+	error_page 500 502 /50x.html
 	```
 
 - Default file (when request is directory)
 	```
-	index index.html;
+	index index.html
 	```
 
 - Root (if the file searched is index.html, it is rooted to /tmp/www/index.html)
@@ -77,8 +77,8 @@ location [URI] {
 
 - Directory listing **default: off**
 	```
-	autoindex on;
-	autoindex off;
+	autoindex on
+	autoindex off
 	```
 
 - Define HTTP redirection
@@ -98,7 +98,7 @@ location [URI] {
 
 - Methods allowed
 	```
-	methods GET POST DELETE;
+	methods GET POST DELETE
 	```
 
 ---
