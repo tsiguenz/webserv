@@ -176,7 +176,6 @@ std::string ft_getenv(char **envp, const char *str) {
 		std::string env = std::string(envp[i]);
 		std::string key = env.substr(0, env.find('='));
 		std::string value = env.substr(env.find('=') + 1);
-		// std::cout << key << std::endl << value << std::endl << std::endl;
 		if (!key.compare(str))
 			return (value);
 	}
@@ -384,11 +383,8 @@ void				Response::buildingResponse(void) {
 	response += getTime();
 	response += getServerName();
 	response += getConnectionType();
-	// response += "Set-Cookie: bobby=bobba\r\n";
-				std::cout << RED << "SOSOSO\n" << WHITE;
 
 	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
-	std::cout << RED << root + fileName << WHITE << std::endl;
 	if (fileName.find_last_of(".") != std::string::npos && mime.isCgi(extension))
 	{
 		
@@ -407,16 +403,13 @@ void				Response::buildingResponse(void) {
 	else if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
 		if (!file.empty())
 			response += getTypeContent();
-		std::cout << RED << "SISISISISI\n" << WHITE;
 		response += getLength();
-		std::cout << RED << "sasasasa\n" << WHITE;
 		response += "\r\n";
 		if (!file.empty())
 			response += std::string(file.begin(), file.end());
 	}
 	else
 		response += "\r\n";
-	std::cout << RED << "Sasasasas\n" << WHITE;
 }
 
 /*
@@ -455,15 +448,14 @@ void		Response::getFile(void) {
 			isAutoIndex = true;
 			fileName = server.getRoot()+ url;
 			Cgi bob(*this);
-			std::cout << RED << "YESYES\n" << WHITE;
 			std::map<std::string, std::string> map = bob.create_env();
 			char **envp = mtoss(map);
 			if (!envp)
 				throw std::runtime_error("1");
 			std::string htmlAutoIndex = auto_index(envp);
 			this->file = std::vector<char>(htmlAutoIndex.begin(), htmlAutoIndex.end());
-			for(std::vector<char>::iterator it = file.begin(); it != file.end(); ++it)
-				std::cout << CYAN << (*it);
+//			for(std::vector<char>::iterator it = file.begin(); it != file.end(); ++it)
+//				std::cout << CYAN << (*it);
 			return ;
 		}
 		redirectionIndex();
@@ -480,12 +472,10 @@ void		Response::getFile(void) {
 	std::ifstream file(path.c_str());
     if(file.fail()) {
         code = 404;
-		std::cout << "404 mon PETIT REUF\n" << std::endl; // DEBUG
         return ;
     }
 	this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
-	// std::cout << "c bon igo lurl mene a qlq chose" << std::endl; // DEBUG
 	fileName = url;
 	//check if its GET and if its in accepted
 	return ;

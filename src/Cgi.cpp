@@ -74,7 +74,6 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 	envs["GATEWAY_INTERFACE"] = "CGI/1.1";
 	envs["SERVER_PROTOCOL"] =  "HTTP/1.1";
 	envs["SERVER_PORT"] = _response->port;
-	std::cout << RED << "YESYES\n" << WHITE;
 	envs["REQUEST_METHOD"] = _response->method;
 	envs["REDIRECT_STATUS"] = get_code();
 	envs["PATH_INFO"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php 
@@ -82,7 +81,6 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 	envs["SCRIPT_NAME"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
 	envs["SCRIPT_FILENAME"] = std::string("./") + _response->root + _response->url;//./app/demo/galery.php
 	envs["QUERY_STRING"] = "";//
-	std::cout << RED << "YESYESYES\n" << WHITE;
 	envs["REMOTE_HOST"] = _response->fieldLines["Host"]; // REMOTE_HOST=207.0.0.1
 	envs["REMOTE_ADDR"] = "";//
 	envs["AUTH_TYPE"] = "";//
@@ -91,16 +89,13 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 		envs["CONTENT_TYPE"] = Mediatype.getMediaType(_response->fileName);//application/x-www-form-urlencoded
 	else
 		envs["CONTENT_TYPE"] = "";
-	std::cout << BLUE << "YESYESYES\n" << _response->fileName << WHITE;
 
 	envs["CONTENT_LENGTH"] = get_length();
 	envs["HTTP_ACCEPT"] = _response->fieldLines["Accept"]; //*/*
 	envs["HTTP_ACCEPT_LANGUAGE"] = _response->fieldLines["Accept-Language"];
-	std::cout << RED << "YESYES\n" << WHITE;
 	envs["HTTP_USER_AGENT"] = _response->httpVersion;
 	envs["HTTP_COOKIE"] = _response->fieldLines["Cookie"];//PHPSESSID=rbp9ts7miftn1h5jmja928v58u,
 	envs["HTTP_REFERER"] = _response->fieldLines["Referer"];//
-	std::cout << RED << "YESYES\n" << WHITE;
 	return (envs);
 }
 
