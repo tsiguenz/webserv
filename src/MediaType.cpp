@@ -15,10 +15,6 @@ MediaType::MediaType(){
     add("php", true, "/usr/bin/php-cgi", "application/x-httpd-php");
     add("pl", true, "/usr/bin/perl", "application/x-perl");
 
-    add("py", false, "", "text/plain");
-    add("php", false, "", "text/plain");
-    add("pl", false, "", "text/plain");
-    add("cpp", false, "", "text/plain");
     add("txt", false, "", "text/plain");
     add("hello", false, "", "hello");
     add("3g2", false, "", "video/3gpp2");
@@ -383,8 +379,6 @@ bool	MediaType::isCgi(std::string extension) {
     it = mime.find(extension);
     if (it == mime.end())
         return (false);
-    // std::cout << "yes" << std::endl;
-    // std::cout << it->second.isCGI;
     return (it->second.isCGI);
 }
 

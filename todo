@@ -1,6 +1,12 @@
-[X] Check cgi extention
+// thibaut
+[X] Check cgi extension
 [X] Fd leak when quit before first read of the request
 [X] Handle query string
+
+// adnan
 [ ] Check body size in handle event
-[ ] Unsupported media type ?
+[ ] Unsupported media type in file without extension
+
+// adam
 [ ] Understand why form action do not work with cgi
+[ ] Change malloc with new
