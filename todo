@@ -6,7 +6,7 @@
 // adnan
 [X] Check body size in handle event
 [X] Unsupported media type in file without extension
-[ ] rajouter un slash a la fin du dossier si ya pas
+[X] rajouter un slash a la fin du dossier si ya pas
 [ ] faire le site
 
 // adam

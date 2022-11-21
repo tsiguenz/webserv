@@ -428,7 +428,8 @@ void		Response::redirectionIndex(void) {
 void		Response::getFile(void) {
 	if (isADir(server.getRoot() + url))
 	{
-
+		if (url[url.size() - 1] != '/')
+			url.push_back('/');
 		if (server.getAutoIndex(url) == "on") {
 			isAutoIndex = true;
 			fileName = server.getRoot()+ url;
