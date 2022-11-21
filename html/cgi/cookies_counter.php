@@ -3,11 +3,25 @@
 ?>
 <!DOCTYPE html>
 <html>
+	<style>
+		body {
+                background-image: url(https://wallpaperaccess.com/full/427004.jpg);
+                background-position: center center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: cover;
+            }
+		.gap-50 { 
+            		width:100%; 
+            		height:50px; 
+			    }  
+	</style>
 	<head>
-		<title>Upload files</title>
+		<title>compteur de cookies</title>
 	</head>
-	<body>
-		<h1>Upload files</h1> 
+	<body style= "text-align:center">
+		<div class="gap-50"></div> 
+		<h1>compteur de cookies</h1> 
 		<?php
 			//TODO faire une page un peu styley
 			if (!isset($_SESSION["compt"]))
@@ -15,7 +29,7 @@
 			else
 				$_SESSION["compt"] += 1;
 			$compt = $_SESSION["compt"];
-			echo "<p>$compt</p>";
+			echo "<p style= \"text-align:center\">$compt</p>";
 		?>
 	</body>
 </html>
