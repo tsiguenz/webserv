@@ -12,14 +12,14 @@ Response::Response()
 { }
 
 //: mime()
-Response::Response( Request  src, VirtualServer const & virtualServer ): mime(), server(virtualServer), isAutoIndex(false){
+Response::Response( Request  src): mime(), isAutoIndex(false){
 
-	std::cout << src.parsingCode << std::endl;
 	code = src.parsingCode;
 	method = src.method;
 	url = src.url;
 	httpVersion = src.httpVersion;
 	fieldLines = src.fieldLines;
+	server = src.server;
 	body = src.body;
 	root = server.getRoot();
 	queryString = src.queryString;

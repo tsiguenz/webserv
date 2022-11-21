@@ -6,11 +6,15 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(void): parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0") {
+Request::Request(std::list<VirtualServer>	 & virtualServerList): _virtualServerList(virtualServerList), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0") {
 	isRequestComplete = false;
 	isParsingComplete = false;
 }
 
+Request::Request(): _virtualServerList(), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0") {
+	isRequestComplete = false;
+	isParsingComplete = false;
+}
 Request::Request(std::vector<unsigned char> & toParse):  vectorRequest(toParse), isRequestComplete(false), isParsingComplete(false), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
@@ -32,6 +36,7 @@ Request::~Request()
 
 Request &				Request::operator=( Request const & rhs )
 {
+	this->_virtualServerList = rhs._virtualServerList;
 	this->rawRequest = rhs.rawRequest;
 	this->method = rhs.method;
 	this->url = rhs.url;
@@ -84,6 +89,7 @@ void	Request::parsingRequest(void) {
 			isRequestComplete = true;
 			return ;
 		}
+		definingServer();
 		if (definingBody()) {
 			isParsingComplete = true;
 			isRequestComplete = true;
@@ -202,6 +208,9 @@ int	Request::parsingFieldName(std::string fieldName) {
 	return 0;
 }
 
+void	Request::definingServer() {
+	server = _getVirtualServerByHost();
+}
 int	Request::definingBody() {
 
 	std::map<std::string,std::string>::iterator it;
@@ -213,8 +222,119 @@ int	Request::definingBody() {
 			parsingCode = 411;
 		return 1;
 	}
-	requestLen = strtod(fieldLines["Content-Length"].c_str(), NULL) + posEnd;
+	int contentLenght = strtod(fieldLines["Content-Length"].c_str(), NULL) ;
+	if (contentLenght > server.getClientMaxBodySize()) {
+		parsingCode = 413;
+		return 1;
+	}
+	requestLen = contentLenght + posEnd;
 	return 0;
+}
+
+
+VirtualServer const 	Request::_selectServer(short const& port, std::string const& ip, std::string const& serverName) const {
+	std::list<VirtualServer>	candidatVirtualServer = _virtualServerList;
+	std::list<VirtualServer>::iterator it = candidatVirtualServer.begin();
+	std::list<VirtualServer>::iterator end = candidatVirtualServer.end();
+	std::list<VirtualServer>::iterator itcpy;
+
+	if (candidatVirtualServer.size() == 1)
+		return(candidatVirtualServer.front());
+	while (it != end)
+	{
+		if (port != (*it).getPort()) {
+			itcpy = it;
+			it++;
+			candidatVirtualServer.erase(itcpy);
+		}
+		else
+			it++;
+	}
+	if (candidatVirtualServer.size() == 1)
+		return(candidatVirtualServer.front());
+	if (candidatVirtualServer.empty())
+		return(_virtualServerList.front());
+	it = candidatVirtualServer.begin();
+	while (it != end)
+	{
+		if (ip != (*it).getIp()) {
+			itcpy = it;
+			it++;
+			candidatVirtualServer.erase(itcpy);
+		}
+		else
+			it++;
+	}
+	if (candidatVirtualServer.size() == 1)
+		return(candidatVirtualServer.front());
+	if (candidatVirtualServer.empty())
+		return(_virtualServerList.front());
+	it = candidatVirtualServer.begin();
+	if (serverName.empty())
+		return(candidatVirtualServer.front());
+	std::list<std::string>::iterator itList;
+	for (; it != end; it++) {
+		bool	isNamePresent = false;
+		itList = (*it).getServerNames().begin();
+		for (; itList != (*it).getServerNames().end(); itList++)
+		{
+			if (serverName == (*itList))
+				isNamePresent = true;
+		}
+		if (isNamePresent == false) {
+			if (candidatVirtualServer.size() == 1)
+				break ;
+			candidatVirtualServer.erase(it);
+		}
+	}
+	if (candidatVirtualServer.empty())
+		return(_virtualServerList.front());
+	return(candidatVirtualServer.front());
+}
+
+
+VirtualServer const	Request::_getVirtualServerByHost() const {
+
+	std::string	ip;
+	std::string	portString;
+	std::string	serverName;
+	int			port = -1;
+
+	std::map<std::string, std::string>::const_iterator itFields = fieldLines.find("Host");
+	if (itFields == fieldLines.end())
+		return(_virtualServerList.front());
+	std::string	hostName = (*itFields).second;
+	size_t	posLocalHost = hostName.find("localhost");
+	if (posLocalHost != std::string::npos)
+		hostName.replace(posLocalHost, 9, "127.0.0.1");
+	size_t	posSeparator = hostName.find_last_of(':');
+	if (posSeparator == std::string::npos) {
+		if (is_digits(hostName) && hostName.size() < 6)
+			port = atoi(hostName.c_str());
+		else if (validateIP(hostName))
+			ip = hostName;
+		else
+			serverName = hostName;
+	}
+	else {
+		std::string	firstPart = hostName.substr(0, posSeparator);
+		std::string	secondPart = hostName.substr(posSeparator + 1);
+		if(validateIP(firstPart))
+			ip = firstPart;
+		else
+			serverName =firstPart;
+		if (is_digits(secondPart) && secondPart.size() < 6)
+			port = atoi(secondPart.c_str());
+		else
+			return(_virtualServerList.front());
+	}
+	if (port > 65535)
+		return(_virtualServerList.front());
+	if (port == -1)
+		port = 8080;
+	if (ip.empty())
+		ip = "0.0.0.0";
+	return(_selectServer(port, ip, serverName));
 }
 
 int	Request::parsingBody(void) {

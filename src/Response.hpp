@@ -14,7 +14,7 @@ class Response
 {
 	public:
 		Response();
-		Response( Request  src, VirtualServer const & server);
+		Response( Request  src);
 		Response(Response const& rhs);
 		Response&	operator=(Response const& rhs);
 		~Response();

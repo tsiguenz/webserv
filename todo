@@ -4,8 +4,10 @@
 [X] Handle query string
 
 // adnan
-[ ] Check body size in handle event
-[ ] Unsupported media type in file without extension
+[X] Check body size in handle event
+[X] Unsupported media type in file without extension
+[ ] rajouter un slash a la fin du dossier si ya pas
+[ ] faire le site
 
 // adam
 [ ] Understand why form action do not work with cgi

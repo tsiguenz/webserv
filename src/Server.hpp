@@ -54,9 +54,6 @@ class Server {
 		void	_handleEvent(int const& nbEpollFd);
 		void	_parseRequest(epoll_event const& event);
 		void	_sendResponse(epoll_event const& event);
-
-		VirtualServer const	_getVirtualServerByHost(Request const& currentRequest) const;
-		VirtualServer const	_selectServer(short const& port, std::string const& ip, std::string const& name) const;
 };
 
 #endif // SERVER_HPP

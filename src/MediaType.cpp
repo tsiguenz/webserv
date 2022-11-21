@@ -487,6 +487,8 @@ bool	MediaType::isExtensionSupported(std::string requestedExtension)
 {
     requestedExtension.erase(std::remove_if(requestedExtension.begin(), requestedExtension.end(), ::isspace),
         requestedExtension.end()); // remove all space
+    if (requestedExtension.find('.') == std::string::npos)
+        return (true);
     requestedExtension = requestedExtension.substr(requestedExtension.find_last_of('.') + 1); //reach the extension
     if (mime.find(requestedExtension) == mime.end())
         return (false);

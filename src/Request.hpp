@@ -5,14 +5,16 @@
 # include <map>
 # include <vector>
 # include <sys/types.h>
+# include "VirtualServer.hpp"
 
 // class MediaType;
 
 class Request
 {
 	public:
+		Request();
 		Request(std::vector<unsigned char> & toParse);
-		Request(void);
+		Request(std::list<VirtualServer>	 & virtualServerList);
 		// Request(const Request & src);
 		~Request();
 
@@ -30,6 +32,8 @@ class Request
 		std::map<std::string, std::string> fieldLines;
 		bool	isRequestComplete;
 		bool	isParsingComplete;
+		std::list<VirtualServer>	_virtualServerList;
+		VirtualServer	server;
 		size_t	requestLen;
 		std::vector<unsigned char> body;
 
@@ -49,6 +53,7 @@ class Request
 		void			parsingRequest();
 		int				parsingRequestLine();
 		int				definingBody();
+		void			definingServer();
 		void			completingBody();
 		int				parsingFieldLines();
 		int				parsingFieldName(std::string fieldName);
@@ -57,6 +62,9 @@ class Request
 		int				parsingBody2();
 
 		void			trimingFieldLines();
+
+		VirtualServer const	_getVirtualServerByHost() const;
+		VirtualServer const	_selectServer(short const& port, std::string const& ip, std::string const& name) const;
 
 		// Response Checking
 		int				checkingFile();
