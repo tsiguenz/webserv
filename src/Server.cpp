@@ -80,7 +80,7 @@ void	Server::_newConnection(int const& fd) {
 	if (clientSocket == -1)
 		throw std::runtime_error("error in accept()");
 	_requests[clientSocket] = Request(_virtualServerList);
-	_addEvent(clientSocket, EPOLLIN | EPOLLOUT);
+	_addEvent(clientSocket, EPOLLIN);
 }
 
 void	Server::_parseRequest(epoll_event const& event) {
@@ -93,7 +93,6 @@ void	Server::_parseRequest(epoll_event const& event) {
 		close(fd);
 		return ;
 	}
-	// TODO check body size
 	_requests[fd].addingBuffer(buffer, ret);
 }
 

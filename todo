@@ -10,5 +10,5 @@
 [ ] faire le site
 
 // adam
-[ ] Understand why form action do not work with cgi
 [ ] Change malloc with new
+[ ] Change the error handler
