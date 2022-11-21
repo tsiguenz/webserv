@@ -97,8 +97,7 @@ class	ConfigParser {
 				if (v.size() != 2)
 					throw std::invalid_argument("client_max_body directive bad syntax");
 				int	maxBodySize = strtod(v.back().c_str(), NULL);
-				// 10 MB limit
-				if (maxBodySize <= 0 || maxBodySize > 1048576)
+				if (maxBodySize <= 0)
 					throw std::invalid_argument("client_max_body bad value");
 				vs.setClientMaxBodySize(maxBodySize);
 			}

@@ -24,6 +24,7 @@ class Request
 		std::string method;
 		std::string url;
 		std::string	httpVersion;
+		std::string	queryString;
 
 		//fieldLines
 		std::map<std::string, std::string> fieldLines;

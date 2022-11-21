@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include <signal.h>
+
 Server::Server(ConfigParser const& cp): _requests(), _fdsServer(), _epFd(), _events() {
 	_virtualServerList = cp.getVirtualServerList();
 	_initEpoll();
@@ -19,7 +20,7 @@ Server::~Server() {
 		std::cerr << "nb request not finished: " << _requests.size() << std::endl;
 		std::map<int, Request>::iterator	it = _requests.begin();
 		for (; it != _requests.end(); it++)
-			close((*it).first);
+			close(it->first);
 	}
 }
 
@@ -78,10 +79,11 @@ bool	Server::_isServer(int const& fd) const {
 	return false;
 }
 
-void	Server::_newConnection(int const& fd) const {
+void	Server::_newConnection(int const& fd) {
 	int	clientSocket = accept(fd, (sockaddr *) NULL, NULL);
 	if (clientSocket == -1)
 		throw std::runtime_error("error in accept()");
+	_requests[clientSocket] = Request();
 	_addEvent(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
@@ -95,18 +97,18 @@ void	Server::_parseRequest(epoll_event const& event) {
 		close(fd);
 		return ;
 	}
-	if (_requests.find(fd) == _requests.end())
-		_requests.insert(std::make_pair(fd, Request(buffer)));
-	else
-		_requests[fd].addingBuffer(buffer, ret);
+	// TODO check body size
+	_requests[fd].addingBuffer(buffer, ret);
 }
 
 void	Server::_sendResponse(epoll_event const& event) {
 	std::map<int, Request>::iterator	itReq = _requests.find(event.data.fd);
-	if (itReq == _requests.end() || (*itReq).second.isRequestComplete == false)
+	if (itReq == _requests.end() || itReq->second.isRequestComplete == false)
 		return ;
-	Response	currentResponse2((*itReq).second, _getVirtualServerByHost((*itReq).second));
-	send(event.data.fd, currentResponse2.response.c_str(), currentResponse2.response.size(), 0);
+	itReq->second.printRequest();
+	Response	currentResponse(itReq->second, _getVirtualServerByHost((*itReq).second));
+	std::cout << currentResponse.response.c_str() << std::endl;
+	send(event.data.fd, currentResponse.response.c_str(), currentResponse.response.size(), 0);
 	_requests.erase(itReq);
 	close(event.data.fd);
 }

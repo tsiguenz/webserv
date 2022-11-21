@@ -50,7 +50,7 @@ class Server {
 		bool	_isServer(int const& fd) const;
 
 		// Main loop who handle I/O events
-		void	_newConnection(int const& fd) const;
+		void	_newConnection(int const& fd);
 		void	_handleEvent(int const& nbEpollFd);
 		void	_parseRequest(epoll_event const& event);
 		void	_sendResponse(epoll_event const& event);

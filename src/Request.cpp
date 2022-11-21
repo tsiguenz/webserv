@@ -6,10 +6,9 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-Request::Request(void): parsingCode(500), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
-{
+Request::Request(void): parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0") {
 	isRequestComplete = false;
-	parsingCode = 2;
+	isParsingComplete = false;
 }
 
 Request::Request(std::vector<unsigned char> & toParse):  vectorRequest(toParse), isRequestComplete(false), isParsingComplete(false), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
@@ -95,8 +94,8 @@ void	Request::parsingRequest(void) {
 	if ( vectorRequest.size() >= requestLen)
 		isRequestComplete = true;
 	if (isRequestComplete == true) {
-	if (parsingBody())
-		return ;
+		if (parsingBody())
+			return ;
 	}
 
 }
@@ -109,8 +108,7 @@ void Request::completingBody(void) {
 int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP request-target SP HTTP-version CRLF
 
 	std::string	firstLine = rawRequest.substr(0, rawRequest.find_first_of('\n') + 1);
-	std::size_t nextSpace = firstLine.find_first_of(' ');
-
+	size_t		nextSpace = firstLine.find(" ");
 	if (nextSpace == std::string::npos){
 		parsingCode = 400;
 		return 1;
@@ -122,7 +120,16 @@ int	Request::parsingRequestLine(void) { // [RFC]request-line   = method SP reque
 		parsingCode = 400;
 		return 1;
 	}
-	url =  firstLine.substr(0, nextSpace);
+	size_t		startQueryString = firstLine.find("?");
+	if (startQueryString != std::string::npos) {
+		size_t	endQueryString = firstLine.find("HTTP");
+		if (endQueryString == std::string::npos) {
+			parsingCode = 400;
+			return 1;
+		}
+		queryString = firstLine.substr(startQueryString + 1, (endQueryString - 1) - (startQueryString + 1));
+	}
+	url = (startQueryString == std::string::npos) ? firstLine.substr(0, nextSpace) : firstLine.substr(0, startQueryString);
 	if (url.find(illegalCharacter) != std::string::npos) {
 		parsingCode = 400;
 		return 1;

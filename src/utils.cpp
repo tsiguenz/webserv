@@ -9,9 +9,8 @@
 void	signalHandler(int sig) {
 	if (sig == SIGINT)
 		throw std::runtime_error("\nServer is closed by user");
-	if (sig == SIGPIPE) {
+	if (sig == SIGPIPE)
         throw std::runtime_error("Server catch SIGPIPE");
-    }
 }
 
 std::string	ltrim(std::string const& s) {

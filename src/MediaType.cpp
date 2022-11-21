@@ -13,7 +13,12 @@ void MediaType::add(std::string s, bool isCgi, std::string path, std::string mim
 MediaType::MediaType(){
     add("py", true, "/usr/bin/python3", "application/x-python-code");
     add("php", true, "/usr/bin/php-cgi", "application/x-httpd-php");
+    add("pl", true, "/usr/bin/perl", "application/x-perl");
 
+    add("py", false, "", "text/plain");
+    add("php", false, "", "text/plain");
+    add("pl", false, "", "text/plain");
+    add("cpp", false, "", "text/plain");
     add("txt", false, "", "text/plain");
     add("hello", false, "", "hello");
     add("3g2", false, "", "video/3gpp2");

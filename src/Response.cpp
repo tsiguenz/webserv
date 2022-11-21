@@ -14,6 +14,7 @@ Response::Response()
 //: mime()
 Response::Response( Request  src, VirtualServer const & virtualServer ): mime(), server(virtualServer), isAutoIndex(false){
 
+	std::cout << src.parsingCode << std::endl;
 	code = src.parsingCode;
 	method = src.method;
 	url = src.url;
@@ -21,6 +22,7 @@ Response::Response( Request  src, VirtualServer const & virtualServer ): mime(),
 	fieldLines = src.fieldLines;
 	body = src.body;
 	root = server.getRoot();
+	queryString = src.queryString;
 	serverName = server.getServerNames().front();
 	std::stringstream ss;
 	ss << server.getPort();
@@ -41,6 +43,7 @@ Response&	Response::operator=(Response const& rhs) {
 	body = rhs.body;
 	root = rhs.root;
 	serverName = rhs.serverName;
+	queryString = rhs.queryString;
 	port = rhs.port;
 	fileName = rhs.fileName;
 	file = rhs.file;
@@ -62,19 +65,6 @@ Response::~Response() { }
 /*
  ** --------------------------------- AUTO INDEX HTML ----------------------------------
  */
-
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <unistd.h>
-#include <fcntl.h>
-#include <iostream>
-#include <string>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <vector>
-#include <sstream>
-#include <fstream>
 
 std::string readFile(std::string path)
 {
@@ -227,7 +217,7 @@ std::string auto_index(char **env){
 		content_body += "<html>";
 		content_body += "	<head>";
 		content_body += "		<meta charset=\"utf-8\">";
-		content_body += "		<title>autoindex.html</title>";
+		content_body += "		<title>autoindex</title>";
 		content_body += "		<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css\">";
 		content_body += "		<style>";
 		content_body += "			@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');";
@@ -386,7 +376,8 @@ void	Response::buildingResponse(void) {
 	response += getServerName();
 	response += getConnectionType();
 	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
-	if (fileName.find_last_of(".") != std::string::npos && mime.isCgi(extension)) {
+	if (fileName.find_last_of(".") != std::string::npos && mime.isCgi(extension)
+			&& server.isAllowedExtCgi(std::string(".") + extension)) {
 		Cgi	cgi(*this);
 		std::map<std::string, std::string>	map = cgi.create_env();
 		char	**envp = mtoss(map);
@@ -437,7 +428,7 @@ void		Response::getFile(void) {
 	if (isADir(server.getRoot() + url))
 	{
 
-		if (server.getAutoIndex() == "on") {
+		if (server.getAutoIndex(url) == "on") {
 			isAutoIndex = true;
 			fileName = server.getRoot()+ url;
 			Cgi	cgi(*this);

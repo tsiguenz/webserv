@@ -29,6 +29,7 @@ class Response
 		std::string							root; //pour adam
 		std::string							serverName; //pour adam
 		std::string							port; //pour adam
+		std::string							queryString; //pour adam
 		std::string							fileName;
 		std::vector<char>					file;
 		std::string 						response;
