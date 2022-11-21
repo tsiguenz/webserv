@@ -100,9 +100,9 @@ void	Server::_sendResponse(epoll_event const& event) {
 	std::map<int, Request>::iterator	itReq = _requests.find(event.data.fd);
 	if (itReq == _requests.end() || itReq->second.isRequestComplete == false)
 		return ;
-	itReq->second.printRequest();
 	Response	currentResponse(itReq->second);
-	std::cout << currentResponse.response.c_str() << std::endl;
+	itReq->second.printRequest();
+//	std::cout << currentResponse.response.c_str() << std::endl;
 	send(event.data.fd, currentResponse.response.c_str(), currentResponse.response.size(), 0);
 	_requests.erase(itReq);
 	close(event.data.fd);
@@ -115,7 +115,7 @@ void	Server::_initVirtualServer(VirtualServer const& vs) {
 	bzero(&my_addr, sizeof(sockaddr_in));
 	my_addr.sin_family = AF_INET;
 	my_addr.sin_port = htons(vs.getPort());
-	my_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	my_addr.sin_addr.s_addr = inet_addr(vs.getIp().c_str());
 	bzero(&(my_addr.sin_zero), 8);
 	int	newFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (newFd == -1)

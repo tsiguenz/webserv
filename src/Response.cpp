@@ -299,6 +299,7 @@ std::string auto_index(char **env){
 		{
 			std::string slash = "/";
 			std::string url = "<a href=\"http://" + ft_getenv(env, "REMOTE_HOST");
+			// problem here
 			if (ft_getenv(env, "PATH_INFO").substr(6).find(".") == std::string::npos)
 			{
 				url += ft_getenv(env, "PATH_INFO").substr(6);
@@ -376,9 +377,8 @@ void	Response::buildingResponse(void) {
 	response += getServerName();
 	response += getConnectionType();
 	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
-	if (fileName.find_last_of(".") != std::string::npos && mime.isCgi(extension)) {
-		if (server.isAllowedExtCgi(std::string(".") + extension) == false)
-			getFile();
+	if (fileName.find_last_of(".") != std::string::npos && mime.isCgi(extension)
+			&& server.isAllowedExtCgi(std::string(".") + extension) == false) {
 		Cgi	cgi(*this);
 		std::map<std::string, std::string>	map = cgi.create_env();
 		char	**envp = mtoss(map);

@@ -12,3 +12,4 @@
 // adam
 [ ] Change malloc with new
 [ ] Change the error handler
+[ ] Error in auto_index line 303 (run with ./webserv config/multiple_servers.conf and access to localhost:1024)
