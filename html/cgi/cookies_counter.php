@@ -29,7 +29,7 @@
 			else
 				$_SESSION["compt"] += 1;
 			$compt = $_SESSION["compt"];
-			echo "<p style= \"text-align:center\">$compt</p>";
+			echo "<h1>$compt</h1>";
 		?>
 	</body>
 </html>

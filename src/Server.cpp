@@ -101,8 +101,6 @@ void	Server::_sendResponse(epoll_event const& event) {
 	if (itReq == _requests.end() || itReq->second.isRequestComplete == false)
 		return ;
 	Response	currentResponse(itReq->second);
-	itReq->second.printRequest();
-//	std::cout << currentResponse.response.c_str() << std::endl;
 	send(event.data.fd, currentResponse.response.c_str(), currentResponse.response.size(), 0);
 	_requests.erase(itReq);
 	close(event.data.fd);

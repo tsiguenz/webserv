@@ -29,7 +29,7 @@ Response::Response( Request  src): mime(), isAutoIndex(false){
 	port = ss.str();
 
 	buildingResponse();
-	//	printResponse();
+		// printResponse();
 }
 
 Response::Response(Response const& rhs)
@@ -378,7 +378,7 @@ void	Response::buildingResponse(void) {
 	response += getConnectionType();
 	std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
 	if (fileName.find_last_of(".") != std::string::npos && mime.isCgi(extension)
-			&& server.isAllowedExtCgi(std::string(".") + extension) == false) {
+			&& server.isAllowedExtCgi(std::string(".") + extension) == true) {
 		Cgi	cgi(*this);
 		std::map<std::string, std::string>	map = cgi.create_env();
 		char	**envp = mtoss(map);
