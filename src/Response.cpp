@@ -153,11 +153,11 @@ int	listDir(std::string & ls_output, const char *path){
 	int	return_code = 0;
 	int fds[2];
 
-	ls_cmd[0] = static_cast<char *>(malloc(strlen("/bin/ls") + 1));
+	ls_cmd[0] = new char[strlen("/bin/ls") + 1];
 	strcpy(ls_cmd[0], "/bin/ls");
-	ls_cmd[1] = static_cast<char *>(malloc(strlen("-p") + 1));
+	ls_cmd[1] = new char[strlen("-p") + 1];
 	strcpy(ls_cmd[1], "-p");
-	ls_cmd[2] = static_cast<char *>(malloc(strlen(path) + 1));
+	ls_cmd[2] = new char[strlen(path) + 1];
 	strcpy(ls_cmd[2], path);
 	ls_cmd[3] = NULL;
 	if (pipe(fds) < 0)
@@ -169,9 +169,9 @@ int	listDir(std::string & ls_output, const char *path){
 	}
 	else if (pid)
 		return_code = get_ls_output(fds, ls_output);
-	free(ls_cmd[0]);
-	free(ls_cmd[1]);
-	free(ls_cmd[2]);
+	delete(ls_cmd[0]);
+	delete(ls_cmd[1]);
+	delete(ls_cmd[2]);
 	return (return_code);
 }
 
@@ -354,7 +354,7 @@ char *ft_strcpy(char *dest, const char *src){
 char **mtoss(std::map<std::string, std::string> map) {
 	char **strs;
 	std::string str;
-	if (!(strs = (char **)malloc(sizeof(char *) * (map.size() + 1))))
+	if (!(strs = new char*[map.size() + 1]))
 		return (NULL);
 	int	i = -1;
 	for (std::map<std::string, std::string>::const_iterator it = map.begin(); it != map.end(); ++it){
@@ -394,6 +394,9 @@ void	Response::buildingResponse(void) {
 			throw std::runtime_error("1");
 		std::string	path = root + fileName;
 		cgi.executeCGI(path, envp);
+		for (int i = 0; envp[i]; i++)
+			delete(envp[i]);
+		delete envp;
 		response += cgi.get_final();
 		response += "\r\n";
 	}
