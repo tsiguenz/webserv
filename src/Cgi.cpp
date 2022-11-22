@@ -5,53 +5,12 @@
 */
 
 
-// int Cgi::read_output(int fd) {
-// 	char buffer[BUFFER_SIZE];
-// 	int ret;
-
-// 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0) {
-// 		_output.append(buffer, ret);
-// 	}
-// 	if (ret == -1)
-// 		return (-1);
-// 	return (0);
-// }
-
-// void	Cgi::manage_output (Response * res) {
-// 	(void)res;
-// 	inline std::size_t ret;
-// 	if ((ret = _output.find("\r\n\r\n")) != std::string::npos) {
-// 		_output.erase(0, ret + 4);
-// 	}
-// 	// res->set_body(_output); //in response : _output is the body to send
-// 	close(_fd);
-// }
-
-
-void	Cgi::free_env (void) {
-	for (char **it = _env; *it; it++) {
-		free(*it);
+void	free_env (char **envp) {
+	for (int i = 0; envp[i]; i++) {
+		free(envp[i]);
 	}
-	free(_env);
+	free(envp);
 }
-
-
-// void	Cgi::init (void) { 
-// 	std::map<std::string, std::string> env_vars = create_env();
-
-// 	if (!(_env = static_cast<char **>(malloc(sizeof(char *) * (env_vars.size() + 1)))))
-// 		return ;
-// 	for (inline std::size_t i = 0; i < env_vars.size(); i++) {
-// 		if ((_env[i] = strdup(env_vars[i].c_str())) == NULL) {
-// 			for (inline std::size_t j = 0; j < i; j++)
-// 				free(_env[j]);
-// 			free(_env);
-// 			return ;
-// 		}
-// 	}
-// 	_env[env_vars.size()] = NULL;
-// }
-
 
 std::string Cgi::get_length(void) {
 	std::ostringstream s;
@@ -104,18 +63,21 @@ std::string Cgi::getProgName(std::string &path)
 {
 	std::string extension = path.substr(path.find_last_of(".") + 1);
 	return (Mediatype.getProgName(extension));
-	throw std::runtime_error("501"); //throw
 }
 
-void Cgi::executeCGI(std::string &path, char **envp)
+int Cgi::executeCGI(std::string &path, char **envp)
 {
 	int pid, stat, fd[2];
 
-	if (pipe(fd) != 0)
-		throw std::runtime_error("503"); //throw
+	if (pipe(fd) != 0) {
+		free_env(envp);
+		return (1);
+	}
 	pid = fork();
-	if (pid == -1)
-		throw std::runtime_error("500"); //throw
+	if (pid == -1) {
+		free_env(envp);
+		return (1);
+	}
 	if (pid == 0) // child process
 	{
 		close(fd[0]);
@@ -128,37 +90,33 @@ void Cgi::executeCGI(std::string &path, char **envp)
 		std::fputs((char*) &copy[0], tmpf);
 		std::rewind(tmpf);
 		if (dup2(fileno(tmpf), STDIN_FILENO) == -1)
-			exit(1);
+			return (free_env(envp), exit(1), 1);
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
-			exit(1);
+			return (free_env(envp), exit(1), 1);
 		close(fd[1]);
-		char* binPath = strdup(getProgName(path).c_str());
-		char* progPath = strdup(path.c_str());
-		char* argv[3] = { binPath, progPath, NULL };
+		std::string tmp = getProgName(path);
+		const char* binPath = tmp.c_str();
+		const char* progPath = path.c_str();
+		char* argv[3] = { (char *)binPath, (char *)progPath, NULL };
 		execve(binPath, argv, envp);
-		for (int i = 0 ; envp[i] != NULL ; i++)
-			free(envp[i]);
-		free(envp);
-		free(binPath);
-		free(progPath);
+		free_env(envp);
 		exit(1);
 	}
 	else // parent process
 	{
-		for (int i = 0 ; envp[i] != NULL ; i++)
-			free(envp[i]);
-		free(envp);
+		free_env(envp);
 		waitpid(pid, &stat, 0);
 		stat = WEXITSTATUS(stat);
 		if (stat != 0)
-			throw std::runtime_error("500");  //throw
+			return (1);
 		close(fd[1]);
 		int	 ret = 0;
 		std::vector<unsigned char> buff(1024, 0);
 		while ((ret = read(fd[0], &buff[0], 1024)) > 0)
 			final_body.insert(final_body.end(), buff.begin(), buff.begin() + ret);
 		if (ret < 0)
-			throw std::runtime_error("500"); //throw
+			return (1);
 		close(fd[0]);
 	}
+	return (0);
 }

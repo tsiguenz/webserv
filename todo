@@ -10,6 +10,6 @@
 [ ] faire le site
 
 // adam
-[ ] Change malloc with new
-[ ] Change the error handler
-[ ] Error in auto_index line 303 (run with ./webserv config/multiple_servers.conf and access to localhost:1024)
+[X] Change malloc with new (tout les mallocs restants sont necessaire)
+[X] Change the error handler
+[X] Error in auto_index line 303 (run with ./webserv config/multiple_servers.conf and access to localhost:1024)

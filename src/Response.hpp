@@ -63,6 +63,8 @@ class Response
 		std::string getLength(void);
 		std::string	getConnectionType(void);
 		std::string	getTypeContent(void);
+		std::string auto_index(char **env);
+		std::string	handleErrorCgi(void);
 
 		template<typename It>
 			size_t	_itFind(It const& begin, It const& end, std::string const& toSearch, size_t pos = 0) {

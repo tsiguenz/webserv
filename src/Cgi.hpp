@@ -14,26 +14,10 @@ class Response;
 class Cgi {
 
 	public:
-
-		// Cgi (void) :_env(NULL), _exec(""), _extension(""), _fd(-1), _response(NULL),
-		// 					_output(""), Mediatype()
-		// {
-		// }
-		
-
 		Cgi (Response & response) : _env(NULL), _exec(""), _extension(""), _fd(-1), 
 							_response(&response), _output(""), Mediatype()
 		{
 		}
-
-		// Cgi (const std::string & ext, const std::string & path, Response * res) :
-		// 	_env(NULL), _exec(path), _extension(ext), _fd(-1), _response(res), _output(""), Mediatype()
-		// {
-		// }
-
-		// Cgi (const Cgi & copy) {
-		// 	*this = copy;
-		// }
 
 		~Cgi() {};
 
@@ -64,7 +48,7 @@ class Cgi {
 		std::string 		get_output (void) const 				{ return _output; }
 		std::string 		get_final (void) const 				{ return final_body; }
 		std::string			getProgName(std::string &path);
-		void				executeCGI(std::string &path, char **envp);
+		int					executeCGI(std::string &path, char **envp);
 		std::string			get_length(void);
 		std::string			get_code(void);
 		
@@ -79,7 +63,6 @@ class Cgi {
 
 		int		read_output(int fd);
 		void	manage_output (Response * res);
-		void	free_env (void);
 		void	init (void);
 		std::map<std::string, std::string>	create_env (void);
 

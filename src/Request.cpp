@@ -52,6 +52,7 @@ Request &				Request::operator=( Request const & rhs )
 void	Request::addingBuffer(std::vector<unsigned char> toAdd, ssize_t const& len) {
 	vectorRequest.insert(vectorRequest.end(), toAdd.begin(), toAdd.begin() + len);
 	parsingRequest();
+	// printRequest();
 }
 
 

@@ -29,7 +29,7 @@ Response::Response( Request  src): mime(), isAutoIndex(false){
 	port = ss.str();
 
 	buildingResponse();
-		// printResponse();
+	// printResponse();
 }
 
 Response::Response(Response const& rhs)
@@ -66,55 +66,6 @@ Response::~Response() { }
  ** --------------------------------- AUTO INDEX HTML ----------------------------------
  */
 
-std::string readFile(std::string path)
-{
-	std::ifstream 	ifs;
-	std::string		file_content;
-	std::string		filename = path;
-	int				length;
-	char			*buff;
-
-
-	ifs.open(filename.c_str(), std::ifstream::in);
-
-	if ( !ifs.is_open() )
-		return ("");
-
-	ifs.seekg (0, ifs.end);
-	length = ifs.tellg();
-	ifs.seekg (0, ifs.beg);
-
-	buff = new char[length + 1];
-	ifs.read(buff, length);
-	if (ifs.fail())
-	{
-		ifs.close();
-		return ("");
-	}
-	ifs.close();
-	buff[length] = '\0';
-	file_content = buff;
-	delete [] buff;
-
-	return (file_content);
-}
-
-void	printErrorPage(std::string error)
-{
-	std::string error_page = "./html/error_page/" + error + ".html";
-	std::string content_str = readFile(error_page);
-	std::stringstream ss;
-	ss << content_str.size();
-
-	std::cout << "HTTP/1.1 200\n";
-	std::cout << "Content-Type: text/html\r\n";
-	std::cout << "Content-Length: ";
-	std::cout << ss.str();
-	std::cout << "\n\n";
-	std::cout << content_str;
-	std::cout << "\r\n\r\n";
-}
-
 int	exec_ls(int *fds, char* const* ls_cmd){
 	close(fds[0]);
 	dup2(fds[1], 1);
@@ -142,20 +93,33 @@ int	listDir(std::string & ls_output, const char *path){
 	int pid = 0;
 	int	return_code = 0;
 	int fds[2];
-
+	
+	// ls_cmd[0] = new char(strlen("/bin/ls") + 1);
 	ls_cmd[0] = static_cast<char *>(malloc(strlen("/bin/ls") + 1));
+	if (!ls_cmd[0])
+		return (1);
 	strcpy(ls_cmd[0], "/bin/ls");
+	// ls_cmd[1] = new char(strlen("-p") + 1);
 	ls_cmd[1] = static_cast<char *>(malloc(strlen("-p") + 1));
+	if (!ls_cmd[1])
+		return (free(ls_cmd[0]), 1);
 	strcpy(ls_cmd[1], "-p");
+	// ls_cmd[2] = new char(strlen(path) + 1);
 	ls_cmd[2] = static_cast<char *>(malloc(strlen(path) + 1));
+	if (!ls_cmd[2])
+		return (free(ls_cmd[0]), free(ls_cmd[1]), 1);
 	strcpy(ls_cmd[2], path);
 	ls_cmd[3] = NULL;
 	if (pipe(fds) < 0)
-		return (1);
+		return (free(ls_cmd[0]), free(ls_cmd[1]), free(ls_cmd[2]), 1);
 	pid = fork();
 	if (pid == 0) {
 		if (exec_ls(fds, ls_cmd) < 0)
 			std::cout << "**error execve !!!**\n";
+		free(ls_cmd[0]);
+		free(ls_cmd[1]);
+		free(ls_cmd[2]);
+		exit(1);
 	}
 	else if (pid)
 		return_code = get_ls_output(fds, ls_output);
@@ -192,13 +156,34 @@ std::string ft_getenv(char **envp, const char *str) {
 	return (NULL);
 }
 
-std::string auto_index(char **env){
+std::string	Response::handleErrorCgi() {
+	
+	response.clear();
+	std::string preResponse;
+	code = 500;
+	std::string errorPage = server.errorHandler.generateErrorHtml(code); 
+	file.clear();
+	file.insert(file.begin(), errorPage.begin(), errorPage.end());
+	fileName = "error.html";
+	
+	preResponse = getResponse();
+	preResponse += getTime();
+	preResponse += getServerName();
+	preResponse += getConnectionType();
+	preResponse += getTypeContent();
+	preResponse += getLength();
+	preResponse += "\r\n\r\n";
+	preResponse += std::string(file.begin(), file.end());
+	return (preResponse);
+}
+
+std::string Response::auto_index(char **env){
 	std::string path;
 	std::string ls_output;
 	std::vector<std::string>	tab_output;
 	std::string					content_body;
 	if (!find_path(path, env))
-		return (0);
+		return (handleErrorCgi());
 
 	if (!listDir(ls_output, path.c_str()))
 	{
@@ -300,15 +285,19 @@ std::string auto_index(char **env){
 			std::string slash = "/";
 			std::string url = "<a href=\"http://" + ft_getenv(env, "REMOTE_HOST");
 			// problem here
-			if (ft_getenv(env, "PATH_INFO").substr(6).find(".") == std::string::npos)
+			std::cout << ft_getenv(env, "PATH_INFO") << std::endl;
+			std::cout << ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2) << std::endl;
+			std::cout << ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find(".") << std::endl;
+			// std::cout << ft_getenv(env, "PATH_INFO") << std::endl;
+			if (ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find(".") == std::string::npos)
 			{
-				url += ft_getenv(env, "PATH_INFO").substr(6);
-				if (ft_getenv(env, "PATH_INFO").substr(6).find_last_of("/") != ft_getenv(env, "PATH_INFO").substr(6).size() - 1)
+				url += ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2);
+				if (ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find_last_of("/") != ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).size() - 1)
 					url += "/";
 				url += *it;
 			}
 			else
-				url += std::string(*it).substr(6);
+				url += std::string(*it).substr(server.getRoot(url).length() + 2);
 			std::string img = "https://img.icons8.com/dusk/2x/000000/file--v2.png";
 			if (std::string(*it).find("/") != std::string::npos)
 				img = "https://i.pinimg.com/originals/67/75/9e/67759e3a6a1dd544deffe5673d021174.png";
@@ -325,7 +314,7 @@ std::string auto_index(char **env){
 
 	}
 	else
-		printErrorPage("400");
+		return (handleErrorCgi()); //error return null puis page handleerror
 	return (content_body);
 }
 
@@ -350,8 +339,12 @@ char **mtoss(std::map<std::string, std::string> map) {
 	int	i = -1;
 	for (std::map<std::string, std::string>::const_iterator it = map.begin(); it != map.end(); ++it){
 		str = (*it).first + "=" + map[(*it).first];
-		if (!(strs[++i] = (char *)malloc(sizeof(char) * (str.length() + 1))))
+		if (!(strs[++i] = (char *)malloc(sizeof(char) * (str.length() + 1)))) {
+			for (;i != -1; i--)
+				free(strs[i]);
+			free (strs);
 			return (NULL);
+		}
 		strs[i] = ft_strcpy(strs[i], str.c_str());
 	}
 	strs[++i] = NULL;
@@ -382,10 +375,15 @@ void	Response::buildingResponse(void) {
 		Cgi	cgi(*this);
 		std::map<std::string, std::string>	map = cgi.create_env();
 		char	**envp = mtoss(map);
-		if (!envp)
-			throw std::runtime_error("1");
+		if (!envp) {
+			response += handleErrorCgi();
+			return ;
+		}
 		std::string	path = root + fileName;
-		cgi.executeCGI(path, envp);
+		if (cgi.executeCGI(path, envp) == 1){
+			response += handleErrorCgi();
+			return ;
+		}
 		response += cgi.get_final();
 		response += "\r\n";
 	}
@@ -436,10 +434,21 @@ void		Response::getFile(void) {
 			Cgi	cgi(*this);
 			std::map<std::string, std::string> map = cgi.create_env();
 			char	**envp = mtoss(map);
-			if (!envp)
-				throw std::runtime_error("1");
+			if (!envp) {
+				code = 500 ;
+				return ;
+			}
+				
 			std::string htmlAutoIndex = auto_index(envp);
+			if (htmlAutoIndex.empty()) {
+				code = 500 ;
+				return ;
+			}
 			this->file = std::vector<char>(htmlAutoIndex.begin(), htmlAutoIndex.end());
+			for (int i = 0; envp[i]; i++) {
+				free(envp[i]);
+			}
+			free(envp);
 			return ;
 		}
 		redirectionIndex();
