@@ -94,17 +94,14 @@ int	listDir(std::string & ls_output, const char *path){
 	int	return_code = 0;
 	int fds[2];
 	
-	// ls_cmd[0] = new char(strlen("/bin/ls") + 1);
-	ls_cmd[0] = static_cast<char *>(malloc(strlen("/bin/ls") + 1));
+ 	ls_cmd[0] = static_cast<char *>(malloc(strlen("/bin/ls") + 1));
 	if (!ls_cmd[0])
 		return (1);
 	strcpy(ls_cmd[0], "/bin/ls");
-	// ls_cmd[1] = new char(strlen("-p") + 1);
 	ls_cmd[1] = static_cast<char *>(malloc(strlen("-p") + 1));
 	if (!ls_cmd[1])
 		return (free(ls_cmd[0]), 1);
 	strcpy(ls_cmd[1], "-p");
-	// ls_cmd[2] = new char(strlen(path) + 1);
 	ls_cmd[2] = static_cast<char *>(malloc(strlen(path) + 1));
 	if (!ls_cmd[2])
 		return (free(ls_cmd[0]), free(ls_cmd[1]), 1);
@@ -284,20 +281,10 @@ std::string Response::auto_index(char **env){
 		{
 			std::string slash = "/";
 			std::string url = "<a href=\"http://" + ft_getenv(env, "REMOTE_HOST");
-			// problem here
-			std::cout << ft_getenv(env, "PATH_INFO") << std::endl;
-			std::cout << ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2) << std::endl;
-			std::cout << ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find(".") << std::endl;
-			// std::cout << ft_getenv(env, "PATH_INFO") << std::endl;
-			if (ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find(".") == std::string::npos)
-			{
-				url += ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2);
-				if (ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find_last_of("/") != ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).size() - 1)
-					url += "/";
-				url += *it;
-			}
-			else
-				url += std::string(*it).substr(server.getRoot(url).length() + 2);
+			url += ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2);
+			if (ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).find_last_of("/") != ft_getenv(env, "PATH_INFO").substr(server.getRoot(url).length() + 2).size() - 1)
+				url += "/";
+			url += *it;
 			std::string img = "https://img.icons8.com/dusk/2x/000000/file--v2.png";
 			if (std::string(*it).find("/") != std::string::npos)
 				img = "https://i.pinimg.com/originals/67/75/9e/67759e3a6a1dd544deffe5673d021174.png";
@@ -308,10 +295,6 @@ std::string Response::auto_index(char **env){
 		content_body += "		</div>";
 		content_body += "	</body>";
 		content_body += "</html>";
-
-
-
-
 	}
 	else
 		return (handleErrorCgi()); //error return null puis page handleerror
@@ -379,8 +362,7 @@ void	Response::buildingResponse(void) {
 			response += handleErrorCgi();
 			return ;
 		}
-		std::string	path = root + fileName;
-		if (cgi.executeCGI(path, envp) == 1){
+		if (cgi.executeCGI(fileName, envp) == 1){
 			response += handleErrorCgi();
 			return ;
 		}
@@ -388,9 +370,9 @@ void	Response::buildingResponse(void) {
 		response += "\r\n";
 	}
 	//redirect
-	else if (method == "GET" || (code != 200 && (method == "DELETE" || method == "POST"))) {
+	else if (method == "GET" || code != 200 ) {
 		if (!file.empty())
-			response += getTypeContent();
+			response += getTypeContent();		
 		response += getLength();
 		response += "\r\n";
 		if (!file.empty())
@@ -404,7 +386,7 @@ void	Response::buildingResponse(void) {
  ** --------------------------------- GET METHODE ----------------------------------
  */
 void		Response::checkingMethod(void) {
-	if (server.isAllowedMethod(method, url))
+	if (server.isAllowedMethod(method, (url[url.size() -1] == '/') ? url : url + '/'))
 		return ;
 	if (method == "DELETE" || method == "GET" || method == "POST"
 			|| method == "HEAD" || method == "PATCH" || method == "PUT"
@@ -417,18 +399,30 @@ void		Response::checkingMethod(void) {
 }
 
 void		Response::redirectionIndex(void) {
-	if (url[url.length() - 1] == '/')
 		url = url + server.getIndex(url);
-	else
-		url = url + server.getIndex(url+"/");
 }
 
 void		Response::getFile(void) {
-	if (isADir(server.getRoot() + url))
+
+	std::string root = server.getRoot(url);
+	if (root[0] == '/')
+		root.erase(0,1);
+	std::string path = root + url;
+	if (path[0] == '/' && path.length() > 1)
+		path.erase(0,1);
+	if (isADir(path))
 	{
+		if (url[url.length() - 1] != '/')
+			url += "/";
+		if (server.getAutoIndex(url) == "off")
+			redirectionIndex();
+		path = root + url;
+		if (path[0] == '/')
+			path.erase(0,1);
 		if (url[url.size() - 1] != '/')
 			url.push_back('/');
-		if (server.getAutoIndex(url) == "on") {
+		
+		if (isADir(path) && server.getAutoIndex(url) == "on") {
 			isAutoIndex = true;
 			fileName = server.getRoot()+ url;
 			Cgi	cgi(*this);
@@ -438,7 +432,7 @@ void		Response::getFile(void) {
 				code = 500 ;
 				return ;
 			}
-				
+
 			std::string htmlAutoIndex = auto_index(envp);
 			if (htmlAutoIndex.empty()) {
 				code = 500 ;
@@ -451,23 +445,24 @@ void		Response::getFile(void) {
 			free(envp);
 			return ;
 		}
-		redirectionIndex();
+		if(isADir(path)) {
+			code = 404 ;
+			return ;
+		}
 	}
-	std::string pathRepertoire = server.getRoot(); 
-	if (!mime.isExtensionSupported(url)) {	
+	if (!mime.isExtensionSupported(path) && method == "GET") {	
 		code = 415;
 		return;
 	}
-	std::string path = pathRepertoire + url;
 	std::ifstream file(path.c_str());
-	if(file.fail()) {
+	if(file.fail() && method == "GET") {
 		code = 404;
 		return ;
 	}
 	if (method == "GET")
 		this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
-	fileName = url;
+	fileName = path;
 	return ;
 }
 
@@ -484,8 +479,12 @@ void		Response::redirectionUrl(void) {
  */
 
 void		Response::postFile(void) {
+	fileName = server.getRoot() + url;
 	if (fieldLines["Content-Type"].find("multipart/form-data") == 0)
 		_postFormData();
+	if (fieldLines["Content-Type"].find("application/x-www-form-urlencoded") == 0) {
+		queryString = std::string(body.begin(), body.end());
+	}
 }
 
 void	Response::_postFormData() {
@@ -556,14 +555,13 @@ void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
  */
 
 void	Response::deleteFile(void) {
-	std::string pathRepertoire = server.getRoot();
-
+	std::string root = server.getRoot();
 	if (fileName.find("..") != std::string::npos) {
 		code = 400;
 		return;
 	}
-	if (remove((pathRepertoire +fileName).c_str()) != 0)
-		code = 403;
+	if (remove((fileName).c_str()) != 0)
+		code = 404;
 }
 
 /*
@@ -571,8 +569,9 @@ void	Response::deleteFile(void) {
  */
 
 void		Response::handleError(void) {
+
 	if(server.getErrorPages(url).count(code)) {
-		fileName = server.getRoot(url) + server.getErrorPageByCode(code, url);
+
 		std::ifstream fileBuffer(fileName.c_str());
 		if(fileBuffer.fail()) {
 			fileName = "error.html";

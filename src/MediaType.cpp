@@ -383,20 +383,18 @@ bool	MediaType::isCgi(std::string extension) {
 }
 
 std::string MediaType::getMediaType(std::string requestedExtension) {
-    // std::cout << std::endl << RED "Request : " << requestedExtension << WHITE << std::endl;
     requestedExtension.erase(std::remove_if(requestedExtension.begin(), requestedExtension.end(), ::isspace),
             requestedExtension.end()); // remove all space
-    // std::cout << std::endl << PURPLE "Request : " << requestedExtension << PURPLE << WHITE << std::endl;
     while (requestedExtension.find('/') != std::string::npos) // reach the file
     {
         requestedExtension = requestedExtension.substr(requestedExtension.find('/') + 1);
     } 
-    // std::cout << CYAN << "final : " << requestedExtension << WHITE << std::endl;
+    if (requestedExtension.find('.') == std::string::npos)
+        return ("text/plain");
     while (requestedExtension.find('.') != std::string::npos) // reach the extension
     {
         requestedExtension = requestedExtension.substr(requestedExtension.find('.') + 1);
     } 
-    // std::cout << GREEN << "final : " << requestedExtension << WHITE << std::endl;
     return (mime.at(requestedExtension).mimeType); // searching extension in mime // at throw an exception if it's not find
 }
 
@@ -414,9 +412,6 @@ std::string MediaType::getMediaExtension(std::string requestedType)
     return (NULL);
 }
 
-// peut contenir une wildcart
-// requestedTypes : text/*;q=0.3, text/plain;q=0.7, text/plain;format=flowed, text/plain;format=fixed;q=0.4, */*;q=0.5
-// fileFormat : Mon file au format type
 bool 		MediaType::isInAccepted(std::string accepted, std::string fileFormat) //(recoit la ligne complete de "Accepted: " et la parse (du coup fait les ordre de prio et tout)) et check si ce quon sapprete a renvoyer et dans accepted //TODO
 {
     accepted.erase(std::remove_if(accepted.begin(), accepted.end(), ::isspace),

@@ -372,7 +372,7 @@ void	Request::printRequest(){
 		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
   			std::cout << (*it);
 		}
-		std::cout << std::endl;
+		std::cout <<  WHITE << std::endl;
 	}
 
 }
