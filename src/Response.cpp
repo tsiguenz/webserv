@@ -335,9 +335,19 @@ char **mtoss(std::map<std::string, std::string> map) {
 }
 
 void	Response::buildingResponse(void) {
+
+	std::string root = server.getRoot(url);
+	if (root[0] == '/')
+		root.erase(0,1);
+	fileName = root + url;
+	if (fileName[0] == '/' && fileName.length() > 1)
+		fileName.erase(0,1);
+	if (isADir(fileName))
+		fileName.push_back('/');
+
 	if (code == 200)
 		checkingMethod();
-	if (code == 200 && (method == "GET" || method == "DELETE"))
+	if (code == 200 && method == "GET")
 		getFile();
 	if (code == 200 && method == "DELETE")
 		deleteFile();
@@ -399,32 +409,24 @@ void		Response::checkingMethod(void) {
 }
 
 void		Response::redirectionIndex(void) {
-		url = url + server.getIndex(url);
+		url += server.getIndex(url);
 }
 
 void		Response::getFile(void) {
-
-	std::string root = server.getRoot(url);
-	if (root[0] == '/')
-		root.erase(0,1);
-	std::string path = root + url;
-	if (path[0] == '/' && path.length() > 1)
-		path.erase(0,1);
-	if (isADir(path))
+	if (isADir(fileName))
 	{
 		if (url[url.length() - 1] != '/')
 			url += "/";
 		if (server.getAutoIndex(url) == "off")
 			redirectionIndex();
-		path = root + url;
-		if (path[0] == '/')
-			path.erase(0,1);
+		fileName = root + url;
+		if (fileName[0] == '/')
+			fileName.erase(0,1);
 		if (url[url.size() - 1] != '/')
 			url.push_back('/');
-		
-		if (isADir(path) && server.getAutoIndex(url) == "on") {
+		if (isADir(fileName) && server.getAutoIndex(url) == "on") {
 			isAutoIndex = true;
-			fileName = server.getRoot()+ url;
+			fileName = server.getRoot(url) + url;
 			Cgi	cgi(*this);
 			std::map<std::string, std::string> map = cgi.create_env();
 			char	**envp = mtoss(map);
@@ -445,24 +447,22 @@ void		Response::getFile(void) {
 			free(envp);
 			return ;
 		}
-		if(isADir(path)) {
+		if(isADir(fileName)) {
 			code = 404 ;
 			return ;
 		}
 	}
-	if (!mime.isExtensionSupported(path) && method == "GET") {	
+	if (!mime.isExtensionSupported(fileName)) {	
 		code = 415;
 		return;
 	}
-	std::ifstream file(path.c_str());
-	if(file.fail() && method == "GET") {
+	std::ifstream file(fileName.c_str());
+	if(file.fail()) {
 		code = 404;
 		return ;
 	}
-	if (method == "GET")
-		this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
+	this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
-	fileName = path;
 	return ;
 }
 
@@ -479,7 +479,7 @@ void		Response::redirectionUrl(void) {
  */
 
 void		Response::postFile(void) {
-	fileName = server.getRoot() + url;
+	fileName = server.getRoot(url) + url;
 	if (fieldLines["Content-Type"].find("multipart/form-data") == 0)
 		_postFormData();
 	if (fieldLines["Content-Type"].find("application/x-www-form-urlencoded") == 0) {
@@ -555,7 +555,6 @@ void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
  */
 
 void	Response::deleteFile(void) {
-	std::string root = server.getRoot();
 	if (fileName.find("..") != std::string::npos) {
 		code = 400;
 		return;

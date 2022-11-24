@@ -3,7 +3,6 @@
 
 void	get_virtual_server_and_location() {
 	std::cout << "---------- get_virtual_server_and_location() ----------\n";
-	// test getLocationByIndex
 	{
 		std::string	str;
 		str += "server {\n";
@@ -24,6 +23,7 @@ void	get_virtual_server_and_location() {
 		assertEq("basic location block with subdir path upload path", vs.getUploadPath("/html/hello/index.html"), "/html/download");
 		assertEq("default location block upload path", vs.getUploadPath("/dir/index.html"), "/download");
 		assertEq("default server upload path", vs.getUploadPath("/other/index.html"), "/tmp/download");
+		assertEq("folder terminated by / (/html/)", vs.getUploadPath("/html/"), "/html/download");
 	}
 	{
 		std::string	str;
