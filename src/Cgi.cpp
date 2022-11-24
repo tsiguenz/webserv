@@ -14,7 +14,7 @@ void	free_env (char **envp) {
 
 std::string Cgi::get_length(void) {
 	std::ostringstream s;
-	s << std::distance(_response->file.begin(), _response->file.end());
+	s << std::distance(_response->body.begin(), _response->body.end());
 	return (std::string(s.str()));
 }
 
@@ -44,10 +44,7 @@ std::map<std::string, std::string>	Cgi::create_env (void) {
 	envs["REMOTE_ADDR"] = "";//
 	envs["AUTH_TYPE"] = "";//
 	envs["REMOTE_USER"] = "";//
-	if (Mediatype.isTypeSupported(_response->fileName))
-		envs["CONTENT_TYPE"] = Mediatype.getMediaType(_response->fileName);//application/x-www-form-urlencoded
-	else
-		envs["CONTENT_TYPE"] = "";
+	envs["CONTENT_TYPE"] = _response->fieldLines["Content-Type"];
 
 	envs["CONTENT_LENGTH"] = get_length();
 	envs["HTTP_ACCEPT"] = _response->fieldLines["Accept"]; //*/*
@@ -83,7 +80,6 @@ int Cgi::executeCGI(std::string &path, char **envp)
 		close(fd[0]);
 		close(STDOUT_FILENO);
 		close(STDIN_FILENO);
-	
 		std::vector<unsigned char> copy(_response->body);
 		copy.push_back('\0');
 		std::FILE* tmpf = std::tmpfile();
