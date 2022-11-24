@@ -34,6 +34,8 @@ void	ConfigParser::parseFile(std::string const& fileName) {
 	_checkFileName(_fileName);
 	_readFile(_fileName);
 	_parseFileContent(_fileContent);
+	if (_virtualServerList.empty() == true)
+		throw std::invalid_argument("Invalid argument: file doesn't contain server block parseFile()");
 }
 
 void	ConfigParser::_checkFileName(std::string const& fileName) const {

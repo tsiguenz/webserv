@@ -39,6 +39,15 @@ std::map<int, std::string>	VirtualServer::getErrorPages(std::string const& path)
 std::list<std::string>	VirtualServer::getServerNames() const
 { return _serverNames; }
 
+bool	VirtualServer::isServerName(std::string const& serverName) const {
+	std::list<std::string>::const_iterator it = _serverNames.begin();
+	std::list<std::string>::const_iterator end = _serverNames.end();
+	for (; it != end; it++)
+		if (*it == serverName)
+			return true;
+	return false;
+}
+
 std::string	VirtualServer::getIp() const
 { return _ip; }
 

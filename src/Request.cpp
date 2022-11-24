@@ -15,6 +15,7 @@ Request::Request(): _virtualServerList(), parsingCode(200), illegalCharacter("{}
 	isRequestComplete = false;
 	isParsingComplete = false;
 }
+
 Request::Request(std::vector<unsigned char> & toParse):  vectorRequest(toParse), isRequestComplete(false), isParsingComplete(false), parsingCode(200), illegalCharacter("{}|\\^~[]` "), escapingCharacter("\a\b\f\n\r\t\v\'\"\\\0")
 {
 	parsingRequest();
@@ -24,9 +25,7 @@ Request::Request(std::vector<unsigned char> & toParse):  vectorRequest(toParse),
 ** -------------------------------- DESTRUCTOR --------------------------------
 */
 
-Request::~Request()
-{
-}
+Request::~Request() { }
 
 
 /*
@@ -67,8 +66,7 @@ bool	Request::preParsing(void) {
 			parsingCode = 400;
 			return true;
 	}
-	else
-		posEnd = posEnd + 4;
+	posEnd = posEnd + 4;
 	return false;
 }
 
@@ -232,7 +230,7 @@ int	Request::definingBody() {
 }
 
 
-VirtualServer const 	Request::_selectServer(short const& port, std::string const& ip, std::string const& serverName) const {
+VirtualServer 	Request::_selectServer(short const& port, std::string const& ip, std::string const& serverName) const{
 	std::list<VirtualServer>	candidatVirtualServer = _virtualServerList;
 	std::list<VirtualServer>::iterator it = candidatVirtualServer.begin();
 	std::list<VirtualServer>::iterator end = candidatVirtualServer.end();
@@ -272,28 +270,16 @@ VirtualServer const 	Request::_selectServer(short const& port, std::string const
 	it = candidatVirtualServer.begin();
 	if (serverName.empty())
 		return(candidatVirtualServer.front());
-	std::list<std::string>::iterator itList;
 	for (; it != end; it++) {
-		bool	isNamePresent = false;
-		itList = (*it).getServerNames().begin();
-		for (; itList != (*it).getServerNames().end(); itList++)
-		{
-			if (serverName == (*itList))
-				isNamePresent = true;
+		if (it->isServerName(serverName)){
+			return(*it);
 		}
-		if (isNamePresent == false) {
-			if (candidatVirtualServer.size() == 1)
-				break ;
-			candidatVirtualServer.erase(it);
-		}
+
 	}
-	if (candidatVirtualServer.empty())
-		return(_virtualServerList.front());
 	return(candidatVirtualServer.front());
 }
 
-
-VirtualServer const	Request::_getVirtualServerByHost() const {
+VirtualServer	Request::_getVirtualServerByHost() const {
 
 	std::string	ip;
 	std::string	portString;
@@ -304,9 +290,6 @@ VirtualServer const	Request::_getVirtualServerByHost() const {
 	if (itFields == fieldLines.end())
 		return(_virtualServerList.front());
 	std::string	hostName = (*itFields).second;
-	size_t	posLocalHost = hostName.find("localhost");
-	if (posLocalHost != std::string::npos)
-		hostName.replace(posLocalHost, 9, "127.0.0.1");
 	size_t	posSeparator = hostName.find_last_of(':');
 	if (posSeparator == std::string::npos) {
 		if (is_digits(hostName) && hostName.size() < 6)
@@ -352,28 +335,27 @@ void	Request::trimingFieldLines() {
 }
 
 void	Request::printRequest(){
-
-	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
+//	std::cout << "--------------RAWREQUEST----------------"<< std::endl;
 	for (std::vector<unsigned char>::iterator it = vectorRequest.begin(); it != vectorRequest.end();it++){
    			std::cout << (*it);
  		}
 		std::cout << std::endl;
-
-	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << WHITE <<  std::endl << std::endl;
-
-	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++) {
-       std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
-   }
-
-	std::cout << BGREEN << "BODY: " << std::endl;
-	if (body.empty())
-		std::cout << BRED << "NONE" WHITE << std::endl;
-	else {
-		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
-  			std::cout << (*it);
-		}
-		std::cout <<  WHITE << std::endl;
-	}
-
+//
+//	std::cout << BGREEN << method << " " BCYAN << url <<  " " BRED <<  httpVersion << WHITE <<  std::endl << std::endl;
+//
+//	for(std::map<std::string, std::string>::iterator it = fieldLines.begin(); it != fieldLines.end(); it++) {
+//       std::cout << BGREEN << it->first << ": " BPURPLE << it->second << WHITE << std::endl;
+//   }
+//
+//	std::cout << BGREEN << "BODY: " << std::endl;
+//	if (body.empty())
+//		std::cout << BRED << "NONE" WHITE << std::endl;
+//	else {
+//		for (std::vector<unsigned char>::iterator it = body.begin(); it != body.end();it++){
+//  			std::cout << (*it);
+//		}
+//		std::cout <<  WHITE << std::endl;
+//	}
+//
 }
 /* ************************************************************************** */

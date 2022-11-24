@@ -412,18 +412,14 @@ std::string MediaType::getMediaExtension(std::string requestedType)
     return (NULL);
 }
 
-bool 		MediaType::isInAccepted(std::string accepted, std::string fileFormat) //(recoit la ligne complete de "Accepted: " et la parse (du coup fait les ordre de prio et tout)) et check si ce quon sapprete a renvoyer et dans accepted //TODO
-{
+bool 		MediaType::isInAccepted(std::string accepted, std::string fileFormat) {
     accepted.erase(std::remove_if(accepted.begin(), accepted.end(), ::isspace),
-        accepted.end()); // remove all space
+        accepted.end());
     
     while (1){
         std::string parsed = accepted.substr(0, accepted.find(','));
         if (parsed.find(';') != std::string::npos)
             parsed = parsed.substr(0, accepted.find(';'));
-        // std::cout << "Element : " << parsed << "\tfind : " << isTypeSupported(parsed) << std::endl;
-
-        //wildcard
         {
             if (parsed.find('*') != std::string::npos)
             {
@@ -437,7 +433,6 @@ bool 		MediaType::isInAccepted(std::string accepted, std::string fileFormat) //(
                     {
                         std::string full_extension = first + '/' + mime[(*it).first].mimeType.substr(mime[(*it).first].mimeType.find('/') + 1);
                         if (isTypeSupported(full_extension)) {
-                            // std::cout << RED << fileFormat << PURPLE "Full : " << full_extension << WHITE << std::endl;
                             if (getMediaExtension(full_extension) == fileFormat)
                                 return (true);
                         }
@@ -446,30 +441,22 @@ bool 		MediaType::isInAccepted(std::string accepted, std::string fileFormat) //(
             }
         }
 
-        // if (isTypeSupported(parsed))
-        //     std::cout << "\t\t" << getMediaExtension(parsed) << std::endl;
         if (isTypeSupported(parsed))
             if (getMediaExtension(parsed) == fileFormat)
                 return (true);
-        // std::cout << accepted << "\n"; 
         if (accepted.find(',') == std::string::npos)
             break;
         accepted = accepted.substr(accepted.find(',') + 1);
-        // std::cout << "Accepted : " << accepted << std::endl;
     }
     return (false);
 }
 
-bool	MediaType::isTypeSupported(std::string	requestedType) //recoit la ligne dans contentType et check si le type est bien un media type accepté //TODO
-{
-    // std::cout << std::endl << RED "Giving : " << requestedType << RED << WHITE << std::endl;
+bool	MediaType::isTypeSupported(std::string	requestedType) {
     requestedType.erase(std::remove_if(requestedType.begin(), requestedType.end(), ::isspace),
-        requestedType.end()); // remove all space
-    // std::cout << std::endl << PURPLE "Space : " << requestedType << PURPLE << WHITE << std::endl;
+        requestedType.end());
     requestedType = requestedType.substr(0, requestedType.find(';'));
     if (requestedType.find('/') == std::string::npos)
-        return (false); //comporte un /
-    // std::cout << std::endl << CYAN "After ';' : '" << requestedType << "'" CYAN << WHITE << std::endl;
+        return (false);
     for(std::map<std::string, t_data>::iterator it = mime.begin(); it != mime.end(); ++it)
     {
         if(mime[(*it).first].mimeType == requestedType)
@@ -481,7 +468,7 @@ bool	MediaType::isTypeSupported(std::string	requestedType) //recoit la ligne dan
 bool	MediaType::isExtensionSupported(std::string requestedExtension)
 {
     requestedExtension.erase(std::remove_if(requestedExtension.begin(), requestedExtension.end(), ::isspace),
-        requestedExtension.end()); // remove all space
+        requestedExtension.end());
     if (requestedExtension.find('.') == std::string::npos)
         return (true);
     requestedExtension = requestedExtension.substr(requestedExtension.find_last_of('.') + 1); //reach the extension
@@ -495,5 +482,5 @@ std::string MediaType::getProgName(std::string &extension) {
     it = mime.find(extension);
     if (it != mime.end())
         return (it->second.path);
-    exit(123); //throw
+	return "";
 }

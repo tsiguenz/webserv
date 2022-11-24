@@ -21,15 +21,15 @@ Response::Response( Request  src): mime(), isAutoIndex(false){
 	fieldLines = src.fieldLines;
 	server = src.server;
 	body = src.body;
-	root = server.getRoot();
+	root = server.getRoot(url);
 	queryString = src.queryString;
-	serverName = server.getServerNames().front();
+	if (server.getServerNames().empty() == false)
+		serverName = server.getServerNames().front();
 	std::stringstream ss;
 	ss << server.getPort();
 	port = ss.str();
-
 	buildingResponse();
-	// printResponse();
+//	printResponse();
 }
 
 Response::Response(Response const& rhs)
@@ -94,35 +94,30 @@ int	listDir(std::string & ls_output, const char *path){
 	int	return_code = 0;
 	int fds[2];
 	
- 	ls_cmd[0] = static_cast<char *>(malloc(strlen("/bin/ls") + 1));
+ 	ls_cmd[0] = strdup("/bin/ls");
 	if (!ls_cmd[0])
 		return (1);
-	strcpy(ls_cmd[0], "/bin/ls");
-	ls_cmd[1] = static_cast<char *>(malloc(strlen("-p") + 1));
+	ls_cmd[1] = strdup("-p");
 	if (!ls_cmd[1])
 		return (free(ls_cmd[0]), 1);
-	strcpy(ls_cmd[1], "-p");
-	ls_cmd[2] = static_cast<char *>(malloc(strlen(path) + 1));
+	ls_cmd[2] = strdup(path);
 	if (!ls_cmd[2])
 		return (free(ls_cmd[0]), free(ls_cmd[1]), 1);
-	strcpy(ls_cmd[2], path);
 	ls_cmd[3] = NULL;
 	if (pipe(fds) < 0)
 		return (free(ls_cmd[0]), free(ls_cmd[1]), free(ls_cmd[2]), 1);
 	pid = fork();
 	if (pid == 0) {
 		if (exec_ls(fds, ls_cmd) < 0)
-			std::cout << "**error execve !!!**\n";
-		free(ls_cmd[0]);
-		free(ls_cmd[1]);
-		free(ls_cmd[2]);
+			std::cerr << "**error execve !!!**\n";
+		for (int i = 0; i < 3; i++)
+			free(ls_cmd[i]);
 		exit(1);
 	}
 	else if (pid)
 		return_code = get_ls_output(fds, ls_output);
-	free(ls_cmd[0]);
-	free(ls_cmd[1]);
-	free(ls_cmd[2]);
+	for (int i = 0; i < 3; i++)
+		free(ls_cmd[i]);
 	return (return_code);
 }
 
@@ -335,7 +330,6 @@ char **mtoss(std::map<std::string, std::string> map) {
 }
 
 void	Response::buildingResponse(void) {
-
 	std::string root = server.getRoot(url);
 	if (root[0] == '/')
 		root.erase(0,1);
@@ -463,6 +457,7 @@ void		Response::getFile(void) {
 	}
 	this->file = std::vector<char>((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
 	file.close();
+
 	return ;
 }
 
@@ -524,7 +519,7 @@ void	Response::_postFormDataBlock(std::vector<unsigned char> const& v) {
 	if (posDelim == std::string::npos) { code = 400; return ; }
 	std::string	delim = fieldLines["Content-Type"].substr(posDelim + 9);
 	// get upload path
-	std::string	uploadPath = server.getUploadPath(root + url);
+	std::string	uploadPath = server.getUploadPath(url);
 	if (*(uploadPath.end() - 1) != '/' && uploadPath.empty() == false)
 		uploadPath.push_back('/');
 	// get filename
