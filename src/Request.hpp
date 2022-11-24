@@ -59,12 +59,11 @@ class Request
 		int				parsingFieldName(std::string fieldName);
 		std::string		parsingFieldValue(std::string fieldValue);
 		int				parsingBody();
-		int				parsingBody2();
 
 		void			trimingFieldLines();
 
-		VirtualServer const	_getVirtualServerByHost() const;
-		VirtualServer const	_selectServer(short const& port, std::string const& ip, std::string const& name) const;
+		VirtualServer 	_getVirtualServerByHost() const;
+		VirtualServer 	_selectServer(short const& port, std::string const& ip, std::string const& name) const;
 
 		// Response Checking
 		int				checkingFile();

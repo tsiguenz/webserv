@@ -20,6 +20,7 @@ class VirtualServer {
 		std::string					getErrorPageByCode(int const& errorCode, std::string const& path = "") const;
 		std::map<int, std::string>	getErrorPages(std::string const& path = "") const;
 		std::list<std::string>		getServerNames() const;
+		bool						isServerName(std::string const& serverName) const;
 		std::string					getIp() const;
 		short						getPort() const;
 		int							getClientMaxBodySize(std::string const& path = "") const;

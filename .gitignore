@@ -10,3 +10,4 @@ webserv_test
 log
 debug
 html/upload/*
+.vscode
