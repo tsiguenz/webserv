@@ -480,7 +480,5 @@ bool	MediaType::isExtensionSupported(std::string requestedExtension)
 std::string MediaType::getProgName(std::string &extension) {
     std::map<std::string, t_data>::iterator it;
     it = mime.find(extension);
-    if (it != mime.end())
-        return (it->second.path);
-	return "";
+	return (it->second.path);
 }
