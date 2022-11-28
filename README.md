@@ -1,6 +1,10 @@
 # webserv (42 Project)
 
 This project is about writing HTTP server with c++98.
+It was made by aboudjel, adben-mc and me (tsiguenz)
+aboudjel: response and request class.
+adben-mc: cgi and autoindex.
+tsiguenz: config parser and server.
 
 ---
 
